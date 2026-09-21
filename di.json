@@ -1,0 +1,251 @@
+{
+  "sourceImage": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\assets\\logosemfundo.png",
+  "zonesDir": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs",
+  "detailInventory": {
+    "scanMethod": "grid-3x3",
+    "targetMinDetails": 12,
+    "details": [
+      {
+        "id": "pizza-holes",
+        "kind": "hole",
+        "description": "8 circular holes in pizza slice",
+        "region": {
+          "x": 0.3333,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "small",
+        "affects": "pizza-slice geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "pizza-slice"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "grill-crosshatch",
+        "kind": "groove",
+        "description": "Chocolate-brown crosshatch grid on grill half",
+        "region": {
+          "x": 0.6667,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "small",
+        "affects": "grill-half geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "grill-half"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c2.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "flame-lobes",
+        "kind": "contour",
+        "description": "3-lobed stylized flame with red-orange gradient",
+        "region": {
+          "x": 0.3333,
+          "y": 0.3333,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "flame geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "flame"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r1c1.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "leaf-shape",
+        "kind": "contour",
+        "description": "Single green leaf with pointed tip, left of pizza",
+        "region": {
+          "x": 0.0,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "leaf geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "leaf"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c0.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "sanja-horizontal-line",
+        "kind": "linework",
+        "description": "Horizontal brown line bisecting SANJA text",
+        "region": {
+          "x": 0.3333,
+          "y": 0.3333,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "sanja-text geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "sanja-text"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r1c1.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "pizza-crust-edge",
+        "kind": "bevel",
+        "description": "Thick yellow crust with triangular profile",
+        "region": {
+          "x": 0.3333,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "pizza-slice geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "pizza-slice"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "grill-red-border",
+        "kind": "ridge",
+        "description": "Red curved border around grill half",
+        "region": {
+          "x": 0.6667,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "grill-half geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "grill-half"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c2.png",
+        "confidence": 0.85
+      },
+      {
+        "id": "bottom-swoosh",
+        "kind": "contour",
+        "description": "Green swoosh under HAMBURGUERIA with double-line effect",
+        "region": {
+          "x": 0.3333,
+          "y": 0.6667,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "bottom-swoosh geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "bottom-swoosh"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r2c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "oval-break",
+        "kind": "contour",
+        "description": "Oval frame broken by horizontal SANJA divider line",
+        "region": {
+          "x": 0.0,
+          "y": 0.3333,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "large",
+        "affects": "oval-frame geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "oval-frame"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r1c0.png",
+        "confidence": 0.95
+      },
+      {
+        "id": "green-inner-arcs",
+        "kind": "contour",
+        "description": "Green curved arcs inside oval behind icon",
+        "region": {
+          "x": 0.3333,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "large",
+        "affects": "oval-frame geometry",
+        "mapsTo": {
+          "type": "component.localFeatures",
+          "ref": "oval-frame"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "pizza-toppings",
+        "kind": "decal",
+        "description": "Red circular pepperoni toppings on yellow cheese",
+        "region": {
+          "x": 0.3333,
+          "y": 0.0,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "small",
+        "affects": "pizza-slice material",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "pizza-slice-material"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r0c1.png",
+        "confidence": 0.9
+      },
+      {
+        "id": "flame-glow",
+        "kind": "emissive",
+        "description": "Emissive red-orange flame with bright core",
+        "region": {
+          "x": 0.3333,
+          "y": 0.3333,
+          "width": 0.3333,
+          "height": 0.3333,
+          "units": "normalized"
+        },
+        "scale": "medium",
+        "affects": "flame material",
+        "mapsTo": {
+          "type": "material.localOverrides",
+          "ref": "flame-material"
+        },
+        "evidenceRef": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\.img2threejs\\zone-r1c1.png",
+        "confidence": 0.85
+      }
+    ]
+  },
+  "authoringInstruction": "Open each zone crop under zonesDir and replace every detail stub's kind, description, scale, affects, mapsTo, and confidence with what is actually observed. Add more detail entries per zone if a single zone contains multiple distinct marks; do not leave stubs unfilled or unlinked (mapsTo must reference a real component.localFeatures or material.localOverrides entry)."
+}

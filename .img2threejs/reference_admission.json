@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "reference",
+    "sourcePath": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\assets\\logosemfundo.png",
+    "width": 1451,
+    "height": 1084,
+    "foregroundCoverage": 0.3046,
+    "largestComponentFraction": 1.0,
+    "pHash": 18078425982124730880,
+    "duplicateOfHash": null
+  }
+}

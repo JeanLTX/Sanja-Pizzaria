@@ -1,0 +1,391 @@
+{
+  "targetName": "Sanja Logo",
+  "sourceImage": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\assets\\logosemfundo.png",
+  "preSpecAssessment": {
+    "objectClass": {
+      "primaryType": "brand-mark",
+      "primaryDomain": "object",
+      "formLanguage": ["graphic", "typographic", "iconic"],
+      "structureKind": ["composite", "layered"],
+      "motionPotential": ["static"],
+      "materialFamilies": ["plastic", "glossy", "emissive"],
+      "notes": "2D brand logo with 3D extruded/beveled appearance. Non-character object."
+    },
+    "complexity": {
+      "tier": "moderate",
+      "scores": {
+        "silhouetteComplexity": 0.4,
+        "componentCount": 0.7,
+        "hierarchyDepth": 0.6,
+        "repetitionDensity": 0.3,
+        "materialLayerCount": 0.6,
+        "localDetailDensity": 0.5,
+        "occlusionRisk": 0.2,
+        "actionReadinessNeed": 0.3
+      },
+      "estimatedCounts": {
+        "macroComponents": 5,
+        "mesoComponents": 12,
+        "microFeatureGroups": 6,
+        "materialLayers": 8,
+        "repetitionSystems": 0
+      },
+      "reasoning": [
+        "Vertical oval composition with stacked hierarchy: frame, icon assembly, brand text, tagline, swoosh.",
+        "Icon assembly contains multiple meso components: pizza slice, grill half, flame, leaf, curved accents.",
+        "Text is extruded/beveled with horizontal divider.",
+        "Multiple distinct materials: glossy brown frame/text, green tagline/swoosh/accents, red flame, yellow pizza, dark grill.",
+        "Identity-defining micro details: pizza hole pattern, grill crosshatch, flame lobes, leaf shape."
+      ]
+    },
+    "specDepthDecision": {
+      "requiredDepth": "moderate",
+      "minimumComponentLevels": [
+        "macro",
+        "meso"
+      ],
+      "needsRepetitionSystems": false,
+      "needsMaterialLocalOverrides": true,
+      "needsMultipleReviewViews": true,
+      "needsActionReadyHierarchy": false,
+      "rationale": "Logo is static graphic mark with moderate component count. No animation rig needed. Material local overrides needed for distinct glossy finishes and emissive flame."
+    },
+    "unknownsToResolveBeforeImplementation": [
+      "Exact bevel angles inferred from highlights — will use approximate values",
+      "Back-face geometry is not visible — single view only",
+      "Exact flame internal geometry is ambiguous — will use stylized approximation"
+    ],
+    "detailInventory": {
+      "scanMethod": "component-zones",
+      "targetMinDetails": 12,
+      "details": [
+        {
+          "id": "pizza-holes",
+          "kind": "negative-space pattern",
+          "description": "8 circular holes in pizza slice",
+          "region": "upper-left quadrant",
+          "scale": "small",
+          "affects": "pizza-slice geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "pizza-slice"
+          },
+          "evidenceRef": "zone-r0c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "grill-crosshatch",
+          "kind": "relief pattern",
+          "description": "Chocolate-brown crosshatch grid on grill half",
+          "region": "upper-right quadrant",
+          "scale": "small",
+          "affects": "grill-half geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "grill-half"
+          },
+          "evidenceRef": "zone-r0c2.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "flame-lobes",
+          "kind": "shape feature",
+          "description": "3-lobed stylized flame with red-orange gradient",
+          "region": "center below icon",
+          "scale": "medium",
+          "affects": "flame geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "flame"
+          },
+          "evidenceRef": "zone-r1c1.png",
+          "confidence": 0.85
+        },
+        {
+          "id": "leaf-shape",
+          "kind": "shape feature",
+          "description": "Single green leaf with pointed tip, left of pizza",
+          "region": "upper-left",
+          "scale": "medium",
+          "affects": "leaf geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "leaf"
+          },
+          "evidenceRef": "zone-r0c0.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "sanja-horizontal-line",
+          "kind": "inscription",
+          "description": "Horizontal brown line bisecting SANJA text",
+          "region": "center",
+          "scale": "medium",
+          "affects": "sanja-text geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "sanja-text"
+          },
+          "evidenceRef": "zone-r1c1.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "pizza-crust-edge",
+          "kind": "edge feature",
+          "description": "Thick yellow crust with triangular profile",
+          "region": "upper-left",
+          "scale": "medium",
+          "affects": "pizza-slice geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "pizza-slice"
+          },
+          "evidenceRef": "zone-r0c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "grill-red-border",
+          "kind": "edge feature",
+          "description": "Red curved border around grill half",
+          "region": "upper-right",
+          "scale": "medium",
+          "affects": "grill-half geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "grill-half"
+          },
+          "evidenceRef": "zone-r0c2.png",
+          "confidence": 0.85
+        },
+        {
+          "id": "bottom-swoosh",
+          "kind": "curve feature",
+          "description": "Green swoosh under HAMBURGUERIA with double-line effect",
+          "region": "bottom",
+          "scale": "medium",
+          "affects": "bottom-swoosh geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "bottom-swoosh"
+          },
+          "evidenceRef": "zone-r2c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "oval-break",
+          "kind": "gap feature",
+          "description": "Oval frame broken by horizontal SANJA divider line",
+          "region": "center",
+          "scale": "large",
+          "affects": "oval-frame geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "oval-frame"
+          },
+          "evidenceRef": "zone-r1c0.png",
+          "confidence": 0.95
+        },
+        {
+          "id": "green-inner-arcs",
+          "kind": "curve feature",
+          "description": "Green curved arcs inside oval behind icon",
+          "region": "upper-center",
+          "scale": "large",
+          "affects": "oval-frame geometry",
+          "mapsTo": {
+            "type": "component.localFeatures",
+            "ref": "oval-frame"
+          },
+          "evidenceRef": "zone-r0c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "pizza-toppings",
+          "kind": "surface detail",
+          "description": "Red circular pepperoni toppings on yellow cheese",
+          "region": "upper-left",
+          "scale": "small",
+          "affects": "pizza-slice material",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "pizza-slice-material"
+          },
+          "evidenceRef": "zone-r0c1.png",
+          "confidence": 0.9
+        },
+        {
+          "id": "flame-glow",
+          "kind": "surface finish",
+          "description": "Emissive red-orange flame with bright core",
+          "region": "center below icon",
+          "scale": "medium",
+          "affects": "flame material",
+          "mapsTo": {
+            "type": "material.localOverrides",
+            "ref": "flame-material"
+          },
+          "evidenceRef": "zone-r1c1.png",
+          "confidence": 0.85
+        }
+      ]
+    },
+    "anatomy": {
+      "applies": false,
+      "styleHeads": 0.0,
+      "proportions": {
+        "headUnit": 0.0,
+        "torso": 0.0,
+        "legs": 0.0,
+        "shoulderWidth": 0.0,
+        "hipWidth": 0.0
+      },
+      "pose": {
+        "type": "unassessed",
+        "jointAngles": {}
+      },
+      "faceLandmarks": {
+        "eyeLine": 0.0,
+        "eyeSpacing": 0.0,
+        "noseBase": 0.0,
+        "mouthLine": 0.0,
+        "hairline": 0.0
+      },
+      "features": [],
+      "confidence": 0.0,
+      "note": "Only meaningful when objectClass.primaryDomain is character or hybrid. Set applies=true and fill from forge/stage1_intake/extract_landmarks.py. See grimoire/character/reconstruction.md and grimoire/character/likeness_maximization.md."
+    },
+    "sourceImage": "C:\\Users\\jeanl\\Desktop\\Sanja Pizzaria\\assets\\logosemfundo.png"
+  },
+  "qualityContract": {
+    "qualityBar": "moderate",
+    "definitionOfDone": [
+      "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier.",
+      "Logo elements are recognizable: oval frame, food icon, SANJA text, tagline, swoosh",
+      "Colors approximate reference within moderate tolerance",
+      "3D extrusion and bevel effects present on text and frame"
+    ],
+    "minimumSpecDepth": {
+      "macroComponents": 4,
+      "mesoComponents": 8,
+      "microFeatureGroups": 4,
+      "materialLayers": 6,
+      "repetitionSystems": 0,
+      "reviewViewpoints": 3
+    },
+    "featureGroups": [
+      {
+        "id": "overall-silhouette",
+        "name": "Overall silhouette and proportions",
+        "required": true,
+        "qualityCriteria": [
+          "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model reads as a generic placeholder instead of the reference object",
+          "major proportions are guessed without evidence"
+        ]
+      },
+      {
+        "id": "primary-structure",
+        "name": "Primary structure and hierarchy",
+        "required": true,
+        "qualityCriteria": [
+          "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "large visible parts are merged into one mesh",
+          "component hierarchy is too shallow for the observed complexity"
+        ]
+      },
+      {
+        "id": "attachment-joint-correctness",
+        "name": "Attachment and joint correctness",
+        "required": true,
+        "qualityCriteria": [
+          "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "child part root floats away from the parent",
+          "branch/limb/tube is centered in space instead of pivoting from its root",
+          "parent-child transform mixes world and local coordinates"
+        ]
+      },
+      {
+        "id": "surface-material-response",
+        "name": "Surface material response",
+        "required": true,
+        "qualityCriteria": [
+          "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+          "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+          "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "surface looks like flat plastic",
+          "local material variation is missing or not tied to image evidence"
+        ]
+      },
+      {
+        "id": "reference-lookdev",
+        "name": "Reference color, material, and lighting response",
+        "required": true,
+        "qualityCriteria": [
+          "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+          "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+          "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+          "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+        ],
+        "evidenceRefs": [
+          "full-object"
+        ],
+        "failureModes": [
+          "model has acceptable shape but reads as flat shaded or plastic",
+          "colors are a generic average instead of reference-observed local color zones",
+          "lighting is evenly ambient and cannot reproduce the source value range"
+        ]
+      }
+    ],
+    "visualDeltaChecks": [
+      "silhouette and negative-space delta",
+      "component hierarchy depth delta",
+      "repetition density and distribution delta",
+      "material albedo/roughness/normal response delta",
+      "local feature placement and scale delta"
+    ],
+    "antiShallowSpecRules": [
+      "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+      "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+      "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+      "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+      "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+      "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+      "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+      "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+      "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+      "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+      "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+    ]
+  },
+  "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec.",
+  "localSpecSearch": {
+    "collection": "core_3d",
+    "query": "Sanja Logo",
+    "index": {
+      "status": "rebuilt",
+      "reason": "missing",
+      "fingerprint": "06f0b2ece2935e441653f5c3533f91b3a4d6163f2aec4267559d7d8419bdd040"
+    },
+    "matches": []
+  }
+}

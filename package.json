@@ -1,0 +1,30 @@
+{
+  "name": "foggareli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tailwindcss -i ./src/input.css -o ./style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JeanLTX/Foggareli.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JeanLTX/Foggareli/issues"
+  },
+  "homepage": "https://github.com/JeanLTX/Foggareli#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "esbuild": "^0.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "dependencies": {
+    "three": "^0.186.0"
+  }
+}
