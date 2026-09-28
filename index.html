@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <!-- Permite tracking/storage para funcionalidades essenciais -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>Foggareli - Cardápio Online</title>
+    <title>Sanja - Cardápio Online</title>
 
     <!-- Google tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LY1XD2F4N9"></script>
@@ -14,12 +13,11 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-LY1XD2F4N9');
     </script>
 
     <!-- Favicons -->
-    <link rel="icon" type="image/png" href="assets/logo2.png">
+    <link rel="icon" type="image/png" href="assets/logosemtexto.png">
 
     <!-- Tailwind CSS (via Import) & Custom Styles -->
     <link href="./style.css" rel="stylesheet">
@@ -31,26 +29,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
 
     <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Fraunces:opsz,wght@9..144,700&family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&family=Fraunces:opsz,wght@9..144,700&family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap"
         rel="stylesheet">
 </head>
 
 <body class="font-sans text-gray-900">
 
-    <!-- CABEÇALHO -->
-    <header id="site-header" class="fixed top-0 left-0 right-0 z-50 bg-transparent transition-colors">
-        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-5">
-                <img src="assets/logo2.PNG" alt="Logo" class="w-16 h-16 md:w-14 md:h-14 object-contain drop-shadow-sm">
-                <h1 class="site-title text-2xl md:text-3xl font-bold text-white tracking-widest font-great-vibes pt-1">
-                    Foggareli</h1>
-            </div>
+    <!-- NAVBAR -->
+    <header id="site-header" class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Início (esquerda) -->
+            <a href="javascript:void(0)" onclick="scrollToHero()" class="text-gray-700 hover:text-orange-600 font-medium transition-colors">Início</a>
 
-            <div class="relative">
+            <!-- Contato e Carrinho (direita) -->
+            <div class="flex items-center gap-4">
+                <a href="#contato" class="text-gray-700 hover:text-orange-600 font-medium transition-colors">Contato</a>
                 <button onclick="toggleCartDrawer()"
-                    class="p-2 hover:bg-white/10 rounded-full transition-colors relative">
-                    <i data-lucide="shopping-cart" class="site-cart-icon text-white w-6 h-6"></i>
+                    class="p-2 hover:bg-gray-100 rounded-full transition-colors relative" aria-label="Abrir Carrinho">
+                    <i data-lucide="shopping-cart" class="site-cart-icon text-gray-700 w-6 h-6"></i>
                     <span id="header-cart-count"
                         class="hidden absolute top-0 right-0 bg-orange-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">0</span>
                 </button>
@@ -58,32 +57,33 @@
         </div>
     </header>
 
+    <!-- Logo flutuante centralizada (fora da navbar) -->
+    <a href="javascript:void(0)" onclick="scrollToHero()" id="floating-logo" class="fixed left-1/2 top-32 -translate-x-1/2 z-50 flex items-center" aria-label="Sanja Pizzaria - Início" style="pointer-events: auto; top: 8px">
+        <img src="assets/logosemtexto.png" alt="Sanja Pizzaria" style="height: 150px; width: auto;">
+    </a>
+
     <!-- HERO SECTION -->
-    <section class="relative w-full h-screen md:min-h-[420px] h-screen-fix">
+    <section id="inicio" class="relative w-full h-screen h-screen-fix overflow-hidden">
         <!-- Imagem de fundo -->
-        <picture class="absolute inset-0">
-            <!-- Mobile: bannerfoggareli3.png (até 768px) -->
-            <source media="(max-width: 767px)" srcset="assets/1.webp">
-            <!-- Desktop: bannerfoggareli.png (768px+) -->
-            <source media="(min-width: 768px)" srcset="assets/b2.webp">
-            <!-- Fallback -->
-            <img src="assets/b2.webp" alt="Banner Foggareli" class="w-full h-full object-cover">
-        </picture>
+        <img src="assets/teste1.png" alt="Fundo do Hero" class="absolute inset-0 w-full h-full object-cover">
+        <!-- Overlay escuro -->
+        <div class="absolute inset-0" style="background-color: rgba(0, 0, 0, 0.45);"></div>
 
-        <!-- Overlay -->
-        <div class="absolute inset-0" style="background-color: rgba(0, 0, 0, 0.2);"></div>
+        <!-- Conteúdo -->
+        <div class="absolute inset-0 z-10 flex items-center px-4 md:px-8">
+            <div class="flex flex-col items-start max-w-2xl">
+                <!-- Título Principal H1 -->
+                <h1 class="bebas-neue-regular uppercase text-white leading-none mb-6 tracking-tight"
+                    style="font-size: clamp(2.5rem, 8vw, 5.5rem); line-height: 1;">
+                    O MELHOR DA <span style="color: #FBBF24;">PIZZA</span> E DO <span style="color: #FBBF24;">BURGER</span> NA SUA MESA!
+                </h1>
 
-        <!-- Conteúdo central -->
-        <div class="relative z-10 w-full h-full flex items-center justify-center px-6 py-20">
-            <div class="max-w-2xl text-center flex flex-col items-center">
-                <p class="text-white text-lg md:text-xl mb-8 opacity-100"
-                    style="font-family: 'Fraunces', serif; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
-                    Escolha sua pizza favorita e monte seu pedido em poucos cliques
-                </p>
+                <!-- Botão CTA -->
                 <button id="cta-order-btn"
-                    class="cta-btn bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2 shadow-lg">
-                    <span>Fazer Pedido</span>
-                    <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                    class="cta-btn bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 shadow-lg"
+                    onclick="scrollToCategory('combos')">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    <span>Fazer Pedido Agora</span>
                 </button>
             </div>
         </div>
@@ -113,23 +113,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                 <!-- Coluna Esquerda: Informações e Horários -->
                 <div class="text-center md:text-left">  
-                    <h3 class="text-2xl font-bold text-white mb-4 font-serif">Foggareli</h3>
+                    <h3 class="text-2xl font-bold text-white mb-4 font-serif">Sanja</h3>
                     <p class="text-gray-400 mb-6">As melhores pizzas da cidade, preparadas com tradição e qualidade.</p>
                     <div class="space-y-4 text-sm">
                         <div class="flex items-start justify-center md:justify-start gap-3">
                             <i data-lucide="clock" class="text-orange-500 w-4 h-4 mt-1"></i>
                             <div class="text-gray-400 leading-relaxed text-[13px]">
-                                <p>📅 Segunda, Quarta e Quinta: <span class="text-gray-300">18:00h às 23:00h</span></p>
-                                <p>📅 Terça: <span class="text-orange-500 font-bold">Fechado</span></p>
-                                <p>📅 Sexta, Sábado, Domingo e Feriados: <span class="text-gray-300">18:00h às 23:30h</span></p>
+                                <p>📅 Terça, Quarta e Quinta: <span class="text-gray-300">18:00h às 23:00h</span></p>
+                                <p>📅 Segunda: <span class="text-orange-500 font-bold">Fechado</span></p>
+                                <p>📅 Sexta, Sábado, Domingo e Feriados: <span class="text-gray-300">18:00h às 00:00h</span></p>
                             </div>
                         </div>
                         <div class="flex items-center justify-center md:justify-start gap-3">
                             <i data-lucide="map-pin" class="text-orange-500 w-4 h-4"></i>
                             <span class="text-gray-400">R. Adélia Carvalhães Barbosa, 4 - Cabo Frio - RJ</span>
                         </div>
-                        <a href="https://www.instagram.com/pizzariafoggareli/" target="_blank" rel="noopener noreferrer"
-                            aria-label="Instagram da Pizzaria Foggareli"
+                        <a href="https://www.instagram.com/sanja_pizzariaehamburgueria/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Instagram da Sanja Pizzaria"
                             class="flex items-center justify-center md:justify-start gap-3 text-orange-400 hover:text-orange-300 transition-colors">
                             <i class="fa-brands fa-instagram text-2xl text-orange-400 shrink-0" aria-hidden="true"></i>
                             <span class="font-semibold">Instagram</span>
@@ -153,7 +153,7 @@
                     Desenvolvido por <span
                         class="text-gray-400 group-hover:text-orange-500 transition-colors underline decoration-gray-700 underline-offset-4">CodeByJean</span>
                 </a>
-                <p>© 2026 Foggareli Pizzaria. Todos os direitos reservados.</p>
+                <p>© 2026 Sanja Pizzaria. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>
@@ -299,40 +299,40 @@
         </div>
     </div>
 
-    <!-- MODAL DE COMBOS (ESTILO IGUAL AO DE PIZZAS NORMAS) -->
-    <div id="combo-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-0 sm:p-4">
+    <!-- MODAL DE COMBOS -->
+    <div id="combo-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-3 sm:p-4">
         <div id="combo-modal-overlay" class="absolute inset-0 bg-black/75 backdrop-blur-sm" onclick="closeComboModal()"></div>
         
-        <div class="combo-modal-container bg-white w-full max-w-lg h-full sm:h-auto sm:max-h-[90vh] sm:rounded-2xl overflow-hidden shadow-2xl relative z-10 flex flex-col transition-all duration-300">
-            <button class="modal-close-btn" onclick="closeComboModal()">
-                <i data-lucide="x" class="w-5 h-5"></i>
+        <div class="combo-modal-container bg-white w-full max-w-[440px] sm:max-w-[460px] rounded-3xl overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[90vh] max-h-[90dvh] my-auto">
+            <button class="combo-modal-close-btn" onclick="closeComboModal()" aria-label="Fechar modal">
+                <i data-lucide="x" class="w-4 h-4 text-gray-800 stroke-[2.5]"></i>
             </button>
 
             <!-- Área de Conteúdo (Scrollable) -->
-            <div id="combo-modal-content" class="modal-scroll-area bg-white">
+            <div id="combo-modal-content" class="modal-scroll-area flex-1 min-h-0 overflow-y-auto bg-white no-scrollbar">
                 <!-- Conteúdo injetado via JS (Step 1 ou Step 2) -->
             </div>
 
             <!-- Rodapé Fixo -->
-            <div id="combo-modal-footer" class="p-6 bg-white border-t border-slate-100 shrink-0">
-                <div id="combo-selection-summary-container" class="hidden flex flex-col mb-4 bg-orange-50 p-3 rounded-xl border border-orange-100">
-                    <label class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Resumo da seleção:</label>
-                    <p id="combo-selection-summary" class="text-sm font-bold text-orange-800 italic leading-snug">🍕 Escolha seus sabores...</p>
+            <div id="combo-modal-footer" class="shrink-0 bg-white border-t border-gray-200 px-5 py-4 sm:px-6">
+                <div id="combo-selection-summary-container" class="hidden flex flex-col mb-3 bg-orange-50 p-2.5 rounded-xl border border-orange-100">
+                    <label class="text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-0.5">Resumo da seleção:</label>
+                    <p id="combo-selection-summary" class="text-xs sm:text-sm font-bold text-orange-800 italic leading-snug">🍕 Escolha seus sabores...</p>
                 </div>
                 
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Total do Combo</span>
-                        <span id="combo-modal-price" class="text-2xl font-black text-orange-600">R$ 0,00</span>
+                        <span class="text-[11px] font-normal uppercase tracking-wider text-gray-800">TOTAL DO COMBO</span>
+                        <span id="combo-modal-price" class="text-xl sm:text-2xl font-bold text-[#E53E00]">R$ 0,00</span>
                     </div>
                     
-                    <div class="flex gap-2">
-                        <button id="combo-back-btn" onclick="prevComboStep()" class="hidden p-4 rounded-xl border-2 border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-all">
-                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    <div class="flex items-center gap-2">
+                        <button id="combo-back-btn" onclick="prevComboStep()" class="hidden p-2.5 sm:p-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-all cursor-pointer">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         </button>
-                        <button id="combo-next-btn" onclick="nextComboStep()" class="bg-orange-600 hover:bg-orange-700 disabled:bg-slate-200 disabled:cursor-not-allowed text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-orange-100 transition-all flex items-center justify-center gap-2">
-                            <span id="combo-next-text" class="text-sm">Escolher sabor</span>
-                            <i id="combo-next-icon" data-lucide="arrow-right" class="w-5 h-5"></i>
+                        <button id="combo-next-btn" onclick="nextComboStep()" class="bg-[#E64A19] hover:bg-[#D84315] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-medium sm:font-semibold py-2.5 px-5 sm:py-3 sm:px-6 rounded-xl sm:rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 text-xs sm:text-sm active:scale-95 cursor-pointer">
+                            <span id="combo-next-text">Escolher sabor</span>
+                            <i id="combo-next-icon" data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
@@ -419,7 +419,7 @@
     </div>
 
 
-    <!-- MODAL DE DIA FECHADO (TERÇA-FEIRA) -->
+    <!-- MODAL DE DIA FECHADO (SEGUNDA-FEIRA) -->
     <div id="closed-day-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
         <div id="closed-day-overlay" class="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onclick="closeClosedDayModal()"></div>
@@ -429,7 +429,7 @@
             </div>
             <h2 class="text-2xl font-bold text-gray-900 mb-2 font-serif">Hoje estamos fechados</h2>
             <p class="text-gray-600 leading-relaxed mb-6">
-                Não trabalhamos as terças-feiras, mas fique à vontade para conhecer nosso cardápio e deixar o seu
+                Não trabalhamos as segundas-feiras, mas fique à vontade para conhecer nosso cardápio e deixar o seu
                 pedido pronto, voltamos amanhã a partir das 18h! 🍕
             </p>
             <button onclick="closeClosedDayModal()"
