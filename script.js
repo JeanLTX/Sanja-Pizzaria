@@ -394,13 +394,13 @@ const getDeliveryFee = () => 0;
 
 // --- RENDERIZAR TABS DE CATEGORIA ---
 const CATEGORY_NAV = [
-    { id: 'combos', label: 'Combos', icon: 'combos.png', target: 'combos', includes: ['combos'] },
-    { id: 'pizzas', label: 'Pizzas', icon: 'pizza2.png', target: 'salgadas', includes: ['salgadas', 'especiais', 'doces'] },
-    { id: 'meio-a-meio', label: 'Meio a Meio', icon: 'meioameio.png', target: 'meio-a-meio', includes: ['meio-a-meio'] },
-    { id: 'lanches', label: 'Lanches', icon: 'lanche.png', target: 'lanches', includes: ['lanches', 'lanches_artesanais'] },
-    { id: 'porcoes', label: 'Porções', icon: 'fritas.png', target: 'porcoes_inteira', includes: ['porcoes_inteira', 'porcoes_meia'] },
-    { id: 'esfihas', label: 'Esfihas', icon: 'esfiha.png', target: 'esfihas_sal', includes: ['esfihas_sal', 'esfihas_doces'] },
-    { id: 'bebidas', label: 'Bebidas', icon: 'bebidas.png', target: 'bebidas', includes: ['bebidas'] }
+    { id: 'combos', label: 'Combos', icon: 'combos.webp', target: 'combos', includes: ['combos'] },
+    { id: 'pizzas', label: 'Pizzas', icon: 'pizza2.webp', target: 'salgadas', includes: ['salgadas', 'especiais', 'doces'] },
+    { id: 'meio-a-meio', label: 'Meio a Meio', icon: 'meioameio.webp', target: 'meio-a-meio', includes: ['meio-a-meio'] },
+    { id: 'lanches', label: 'Lanches', icon: 'lanche.webp', target: 'lanches', includes: ['lanches', 'lanches_artesanais'] },
+    { id: 'porcoes', label: 'Porções', icon: 'fritas.webp', target: 'porcoes_inteira', includes: ['porcoes_inteira', 'porcoes_meia'] },
+    { id: 'esfihas', label: 'Esfihas', icon: 'esfiha.webp', target: 'esfihas_sal', includes: ['esfihas_sal', 'esfihas_doces'] },
+    { id: 'bebidas', label: 'Bebidas', icon: 'bebidas.webp', target: 'bebidas', includes: ['bebidas'] }
 ];
 
 const renderCategoryButtons = () => {
