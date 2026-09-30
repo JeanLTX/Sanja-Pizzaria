@@ -1,0 +1,16 @@
+# Robots.txt for Sanja Pizzaria
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://sanjapizzaria.com.br/sitemap.xml
+
+# Disallow admin/private areas (if any)
+Disallow: /assets/
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /script.js
+Disallow: /style.css
+Disallow: /*.map$

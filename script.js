@@ -6,61 +6,60 @@
 // Preços de borda adicional
 const BORDAS = [
     { id: 'sem_borda', name: 'Sem Borda Recheada', prices: { P: 0, M: 0, G: 0 } },
-    { id: 'catupiry', name: 'Catupiry', prices: { P: 11.99, M: 13.99, G: 18.99 } },
-    { id: 'cheddar', name: 'Cheddar', prices: { P: 11.99, M: 13.99, G: 18.99 } },
-    { id: 'cream_cheese', name: 'Cream Cheese', prices: { P: 11.99, M: 13.99, G: 18.99 } },
-    { id: 'chocolate', name: 'Chocolate', prices: { P: 13.99, M: 15.99, G: 18.99 } },
-    { id: 'catupiry_calabresa', name: 'Catupiry + Calabresa', prices: { P: 15.99, M: 17.99, G: 20.99 } }
+    { id: 'catupiry', name: 'Catupiry', prices: { P: 10.00, M: 10.00, G: 10.00 } },
+    { id: 'cheddar', name: 'Cheddar', prices: { P: 10.00, M: 10.00, G: 10.00 } },
+    { id: 'chocolate', name: 'Chocolate', prices: { P: 10.00, M: 10.00, G: 10.00 } },
+    { id: 'mussarela', name: 'Mussarela', prices: { P: 20.00, M: 20.00, G: 20.00 } }
 ];
 
 // Massa/Broto base: R$ 40,00
 // Pizzas Salgadas
 const PIZZAS_SALGADAS = [
-    { id: 1, name: "À MODA DA CASA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, lombo, bacon, tomate e orégano.", img: "assets/moda_casa.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
+    { id: 1, name: "À MODA DA CASA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, lombo, bacon, tomate e orégano.", img: "assets/modadacasa.jpg", type: "pizza", prices: { P: 58.00, M: 58.00, G: 58.00 } },
     { id: 2, name: "ATUM", category: "Pizzas Salgadas", desc: "Molho, mussarela, atum, cebola, azeitona e orégano.", img: "assets/atum.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
     { id: 3, name: "BACON", category: "Pizzas Salgadas", desc: "Molho, mussarela, bacon, cebola e orégano.", img: "assets/bacon.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 4, name: "BACON C/ FRITAS", category: "Pizzas Salgadas", desc: "Molho, mussarela, bacon, catupiry e batata frita.", img: "assets/bacon_fritas.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 5, name: "BAIACATU", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, catupiry e orégano.", img: "assets/baiacatu.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 6, name: "BOLONHESA", category: "Pizzas Salgadas", desc: "Molho, carne-moída temperada, mussarela, pimentão e cebola.", img: "assets/bolonhesea.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 7, name: "BRÓCOLIS", category: "Pizzas Salgadas", desc: "Molho, mussarela, brócolis, bacon, azeitona e orégano.", img: "assets/brocolis.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
+    { id: 4, name: "BACON C/ FRITAS", category: "Pizzas Salgadas", desc: "Molho, mussarela, bacon, catupiry e batata frita.", img: "assets/baconcomfritas.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
+    { id: 5, name: "BAIACATU", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, catupiry e orégano.", img: "assets/baiacatu.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 6, name: "BOLONHESA", category: "Pizzas Salgadas", desc: "Molho, carne-moída temperada, mussarela, pimentão e cebola.", img: "assets/bolonhesa.webp", type: "pizza", prices: { P: 59.00, M: 59.00, G: 59.00 } },
+    { id: 7, name: "BRÓCOLIS", category: "Pizzas Salgadas", desc: "Molho, mussarela, brócolis, bacon, azeitona e orégano.", img: "assets/brocolis.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
     { id: 8, name: "CAIPIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho e orégano.", img: "assets/caipira.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
     { id: 9, name: "CALABRESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, cebola e orégano.", img: "assets/calabresa.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
-    { id: 10, name: "CALABRESA C/ CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, cheddar e orégano.", img: "assets/calabresa_cheddar.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 11, name: "CALABRESA MINEIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, milho, bacon e orégano.", img: "assets/calabresa_mineira.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 12, name: "CALARUFFLES", category: "Pizzas Salgadas", desc: "Molho, mussarela, batata Ruffles, frango, bacon e calabresa.", img: "assets/calaruffles.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 13, name: "CINCO QUEIJOS", category: "Pizzas Salgadas", desc: "Molho, mussarela, parmesão, provolone, gorgonzola, catupiry e orégano.", img: "assets/cinco_queijos.webp", type: "pizza", prices: { P: 59.00, M: 59.00, G: 59.00 } },
-    { id: 14, name: "CROCANTE", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, bacon, milho, batata palha e orégano.", img: "assets/crocrante.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 15, name: "FAZENDEIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho, bacon, catupiry e orégano.", img: "assets/fazendeira.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
-    { id: 16, name: "FAZENDINHA", category: "Pizzas Salgadas", desc: "Molho, mussarela, milho, bacon, catupiry e orégano.", img: "assets/fazendinha.webp", type: "pizza", prices: { P: 53.00, M: 53.00, G: 53.00 } },
-    { id: 17, name: "FILADELPHIA", category: "Pizzas Salgadas", desc: "Molho, mussarela, costela bovina desfiada temperada, tomate e cebola.", img: "assets/philadelphia.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 18, name: "FRANCESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, bacon, azeitona e orégano.", img: "assets/francesa.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 19, name: "FRANCHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, bacon, cheddar e Doritos.", img: "assets/frankedar.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 20, name: "FRANGO CAIPIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho, cheddar, calabresa e orégano.", img: "assets/frango_caipira.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 21, name: "FRANGO C/ CATUPIRY OU CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, catupiry ou cheddar.", img: "assets/frango_catupiry.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 22, name: "FRANGO C/ CREME CHEESE", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, cebola e creme cheese.", img: "assets/frango_creamcheese.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 23, name: "LOMBO", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo e orégano.", img: "assets/lombo.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
-    { id: 24, name: "LOMBO ESPECIAL", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, champignon, catupiry e orégano.", img: "assets/lombo_especial.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 25, name: "LOMBO CANADENSE", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo canadense, abacaxi, bacon e catupiry.", img: "assets/lombo_canadense.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 26, name: "LOMBO CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, cheddar e azeitona.", img: "assets/lombo_cheddar.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
-    { id: 27, name: "MARGUERITA", category: "Pizzas Salgadas", desc: "Molho, mussarela, parmesão, manjericão e alho.", img: "assets/marguerita.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 28, name: "MAIALE", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, calabresa, bacon, catupiry e orégano.", img: "assets/maiale.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
+    { id: 10, name: "CALABRESA C/ CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, cheddar e orégano.", img: "assets/calabresacomcheddar.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 11, name: "CALABRESA MINEIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, milho, bacon e orégano.", img: "assets/calabresa_mineira.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 12, name: "CALARUFFLES", category: "Pizzas Salgadas", desc: "Molho, mussarela, batata Ruffles, frango, bacon e calabresa.", img: "assets/calaruffles.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } },
+    { id: 13, name: "CINCO QUEIJOS", category: "Pizzas Salgadas", desc: "Molho, mussarela, parmesão, provolone, gorgonzola, catupiry e orégano.", img: "assets/cincoqueijos.webp", type: "pizza", prices: { P: 64.00, M: 64.00, G: 64.00 } },
+    { id: 14, name: "CROCANTE", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, bacon, milho, batata palha e orégano.", img: "assets/crocante.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
+    { id: 15, name: "FAZENDEIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho, bacon, catupiry e orégano.", img: "assets/fazendeira.webp", type: "pizza", prices: { P: 58.00, M: 58.00, G: 58.00 } },
+    { id: 16, name: "FAZENDINHA", category: "Pizzas Salgadas", desc: "Molho, mussarela, milho, bacon, catupiry e orégano.", img: "assets/fazendinha.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 17, name: "FILADELPHIA", category: "Pizzas Salgadas", desc: "Molho, mussarela, costela bovina desfiada temperada, tomate e cebola.", img: "assets/filadelphia.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } },
+    { id: 18, name: "FRANCESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, bacon, azeitona e orégano.", img: "assets/francesa.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
+    { id: 19, name: "FRANCHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, bacon, cheddar e Doritos.", img: "assets/frankedar.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } },
+    { id: 20, name: "FRANGO CAIPIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho, cheddar, calabresa e orégano.", img: "assets/frango_caipira.webp", type: "pizza", prices: { P: 61.00, M: 61.00, G: 61.00 } },
+    { id: 21, name: "FRANGO C/ CATUPIRY OU CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, catupiry ou cheddar.", img: "assets/frangocomcatupiry.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 22, name: "FRANGO C/ CREME CHEESE", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, cebola e creme cheese.", img: "assets/creamcheese.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 23, name: "LOMBO", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo e orégano.", img: "assets/lombo.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 24, name: "LOMBO ESPECIAL", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, champignon, catupiry e orégano.", img: "assets/lombo_especial.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
+    { id: 25, name: "LOMBO CANADENSE", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo canadense, abacaxi, bacon e catupiry.", img: "assets/lombo_canadense.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
+    { id: 26, name: "LOMBO CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, cheddar e azeitona.", img: "assets/lombo_cheddar.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 27, name: "MARGUERITA", category: "Pizzas Salgadas", desc: "Molho, mussarela, parmesão, manjericão e alho.", img: "assets/margherita.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
+    { id: 28, name: "MAIALE", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, calabresa, bacon, catupiry e orégano.", img: "assets/maiale.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
     { id: 29, name: "MARINARA", category: "Pizzas Salgadas", desc: "Molho, mussarela, atum, tomate picado, provolone e orégano.", img: "assets/marinhana.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 30, name: "MEXICANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, ovo, pimenta e cebola.", img: "assets/mexicana.webp", type: "pizza", prices: { P: 50.00, M: 50.00, G: 50.00 } },
+    { id: 30, name: "MEXICANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, ovo, pimenta e cebola.", img: "assets/mexicana.webp", type: "pizza", prices: { P: 53.00, M: 53.00, G: 53.00 } },
     { id: 31, name: "MISTA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, parmesão, tomate e orégano.", img: "assets/mista.webp", type: "pizza", prices: { P: 50.00, M: 50.00, G: 50.00 } },
-    { id: 32, name: "MUSSARELA", category: "Pizzas Salgadas", desc: "Molho, mussarela, tomate, azeitona e orégano.", img: "assets/mussarela.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 33, name: "NORDESTINA", category: "Pizzas Salgadas", desc: "Molho, mussarela, carne seca temperada, tomate e cebola.", img: "assets/nordestina.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
-    { id: 34, name: "PALMITO ESPECIAL", category: "Pizzas Salgadas", desc: "Molho, mussarela, palmito e milho.", img: "assets/palmito.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 35, name: "PEPPERONI", category: "Pizzas Salgadas", desc: "Molho, mussarela, pepperoni, cheddar, pimentão, cebola e orégano.", img: "assets/pepperoni.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 36, name: "PORTUGUESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, ervilha, palmito, ovo e cebola.", img: "assets/portuguesa.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
-    { id: 37, name: "ROCA BLANCA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, catupiry, cebola e alho frito.", img: "assets/roca_blanca.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 32, name: "MUSSARELA", category: "Pizzas Salgadas", desc: "Molho, mussarela, tomate, azeitona e orégano.", img: "assets/Muçarela.webp", type: "pizza", prices: { P: 50.00, M: 50.00, G: 50.00 } },
+    { id: 33, name: "NORDESTINA", category: "Pizzas Salgadas", desc: "Molho, mussarela, carne seca temperada, tomate e cebola.", img: "assets/nordestina.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 34, name: "PALMITO ESPECIAL", category: "Pizzas Salgadas", desc: "Molho, mussarela, palmito e milho.", img: "assets/palmito.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 35, name: "PEPPERONI", category: "Pizzas Salgadas", desc: "Molho, mussarela, pepperoni, cheddar, pimentão, cebola e orégano.", img: "assets/Pepperoni.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 36, name: "PORTUGUESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, ervilha, palmito, ovo e cebola.", img: "assets/portuguesa.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
+    { id: 37, name: "ROCA BLANCA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, catupiry, cebola e alho frito.", img: "assets/roca_blanca.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
     { id: 38, name: "ROMANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, ovo, bacon, tomate e orégano.", img: "assets/romana.webp", type: "pizza", prices: { P: 53.00, M: 53.00, G: 53.00 } },
     { id: 39, name: "TEXANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, bacon, calabresa e orégano.", img: "assets/texana.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
     { id: 40, name: "TOSCANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, calabresa, tomate, cebola, azeitona e orégano.", img: "assets/toscana.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 41, name: "VEGETARIANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, tomate, cebola, palmito, champignon e orégano.", img: "assets/vegetariana.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 42, name: "VIENA", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, tomate, catupiry, champignon e orégano.", img: "assets/viena.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
-    { id: 43, name: "QUATRO QUEIJOS", category: "Pizzas Salgadas", desc: "Molho, mussarela, provolone, parmesão, catupiry e orégano.", img: "assets/quatro_queijos.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
-    { id: 44, name: "QUATRO QUEIJOS, FRANGO E BACON", category: "Pizzas Salgadas", desc: "Molho, mussarela, provolone, parmesão, catupiry, frango, bacon e orégano.", img: "assets/4queijos_frango_bacon.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
-    { id: 45, name: "SACOLA", category: "Pizzas Salgadas", desc: "Molho, mussarela, catupiry, lombo, bacon, frango, palmito e orégano.", img: "assets/sacola.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
+    { id: 41, name: "VEGETARIANA", category: "Pizzas Salgadas", desc: "Molho, mussarela, tomate, cebola, palmito, champignon e orégano.", img: "assets/vegetariana.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
+    { id: 42, name: "VIENA", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, tomate, catupiry, champignon e orégano.", img: "assets/viena.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
+    { id: 43, name: "QUATRO QUEIJOS", category: "Pizzas Salgadas", desc: "Molho, mussarela, provolone, parmesão, catupiry e orégano.", img: "assets/quatroqueijos.webp", type: "pizza", prices: { P: 61.00, M: 61.00, G: 61.00 } },
+    { id: 44, name: "QUATRO QUEIJOS, FRANGO E BACON", category: "Pizzas Salgadas", desc: "Molho, mussarela, provolone, parmesão, catupiry, frango, bacon e orégano.", img: "assets/4queijos_frango_bacon.webp", type: "pizza", prices: { P: 65.00, M: 65.00, G: 65.00 } },
+    { id: 45, name: "SACOLA", category: "Pizzas Salgadas", desc: "Molho, mussarela, catupiry, lombo, bacon, frango, palmito e orégano.", img: "assets/sacola.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } },
     { id: 46, name: "STROGONOFF", category: "Pizzas Salgadas", desc: "Molho, mussarela, milho, frango, champignon, batata palha e orégano.", img: "assets/strogonoff.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
     { id: 47, name: "MONTE SUA PIZZA", category: "Pizzas Salgadas", desc: "Com até 5 ingredientes.", img: "assets/monte_sua_pizza.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } }
 ];
@@ -248,7 +247,7 @@ const COMBOS = [
         name: "Combo Casal",
         badge: "Casal",
         desc: "Na medida! nem muito, nem pouco! 🍕💕\nPizza na lenha, massa artesanal e sabor sem igual!",
-        itens: ["Pizza 30cm · 6 fatias", "Refrigerante 1L", "Borda recheada já inclusa: cream cheese, catupiry ou cheddar"],
+        itens: ["Pizza 25cm · 6 fatias", "Refrigerante 1L", "Borda recheada já inclusa: catupiry, cheddar, chocolate ou mussarela"],
         price: 75.90,
         obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/combocasal.webp",
@@ -259,7 +258,7 @@ const COMBOS = [
         name: "Combo Família",
         badge: "Família",
         desc: "Combo Família que resolve! 👨‍👩‍👧‍👦\nPizza na lenha, massa artesanal e sabor incomparável!",
-        itens: ["Pizza 40cm · 10 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
+        itens: ["Pizza 35cm · 10 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
         price: 89.90,
         obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/combofamilia2.webp",
@@ -270,7 +269,7 @@ const COMBOS = [
         name: "Combo Perfeito",
         badge: "Perfeito",
         desc: "Experiência completa 🍕✨\nNa lenha, massa artesanal. Não fique na vontade! 😋",
-        itens: ["Pizza 40cm · 10 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
+        itens: ["Pizza 35cm · 10 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
         price: 115.90,
         obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/comboperfeito2.webp",
@@ -303,17 +302,8 @@ const CATEGORIES = [
 const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth;
 document.documentElement.style.setProperty('--scrollbar-width', `${getScrollbarWidth()}px`);
 
-// PREÇOS DE ENTREGA
-const DELIVERY_REGIONS = [
-    { id: 'colinas', name: 'Colinas do Peró', fee: 4.00 },
-    { id: 'caminho', name: 'Caminho de Búzios', fee: 6.00 },
-    { id: 'jardim', name: 'Jardim Esperança, Tangará, Reserva, Nova Cabo Frio, Jardim Peró', fee: 6.00 },
-    { id: 'porto', name: 'Porto do Carro, Vinhanteiro, Peró, Boca do Mato', fee: 8.00 },
-    { id: 'passaros', name: 'Condomínio dos pássaros', fee: 8.00 },
-    { id: 'bosque_pero', name: 'Condomínio Bosque do Peró', fee: 8.00 },
-    { id: 'ogiva', name: 'Ogiva', fee: 10.00 },
-    { id: 'cabo', name: 'Cabo Frio, Portinho, Novo Portinho', fee: 12.00 }
-];
+// ENTREGA
+// A taxa de entrega da Sanja é confirmada pela equipe conforme o endereço/localização.
 
 // ==========================================
 // 2. ESTADO DA APLICAÇÃO (STATE)
@@ -323,7 +313,7 @@ let checkoutData = {
     name: '',
     phone: '',
     address: '',
-    region: '',
+    location: null,
     paymentMethod: ''
 };
 
@@ -395,25 +385,35 @@ const updateCartItemQuantity = (index, delta) => {
 };
 
 const getCartTotal = () => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-const getDeliveryFee = () => {
-    if (!checkoutData.region) return 0;
-    const reg = DELIVERY_REGIONS.find(r => r.id === checkoutData.region);
-    return reg ? reg.fee : 0;
-}
+// A taxa de entrega é confirmada pela Sanja conforme a localização.
+const getDeliveryFee = () => 0;
 
 // ==========================================
 // 5. RENDERIZAÇÃO DE UI
 // ==========================================
 
 // --- RENDERIZAR TABS DE CATEGORIA ---
+const CATEGORY_NAV = [
+    { id: 'combos', label: 'Combos', icon: 'combos.png', target: 'combos', includes: ['combos'] },
+    { id: 'pizzas', label: 'Pizzas', icon: 'pizza2.png', target: 'salgadas', includes: ['salgadas', 'especiais', 'doces'] },
+    { id: 'meio-a-meio', label: 'Meio a Meio', icon: 'meioameio.png', target: 'meio-a-meio', includes: ['meio-a-meio'] },
+    { id: 'lanches', label: 'Lanches', icon: 'lanche.png', target: 'lanches', includes: ['lanches', 'lanches_artesanais'] },
+    { id: 'porcoes', label: 'Porções', icon: 'fritas.png', target: 'porcoes_inteira', includes: ['porcoes_inteira', 'porcoes_meia'] },
+    { id: 'esfihas', label: 'Esfihas', icon: 'esfiha.png', target: 'esfihas_sal', includes: ['esfihas_sal', 'esfihas_doces'] },
+    { id: 'bebidas', label: 'Bebidas', icon: 'bebidas.png', target: 'bebidas', includes: ['bebidas'] }
+];
+
 const renderCategoryButtons = () => {
     const container = document.getElementById('categories-bar-scrolling');
-    container.innerHTML = CATEGORIES.map((cat, index) => `
-        <button class="category-tab ${index === 0 ? 'active' : ''} whitespace-nowrap px-6 py-4 text-sm font-medium border-b-2 hover:text-red-600 transition-colors"
-                        data-category="${cat.id}"
-                        onclick="scrollToCategory('${cat.id}')">
-                    ${cat.label}
-                </button>
+    container.innerHTML = CATEGORY_NAV.map((cat, index) => `
+        <button class="category-tab ${index === 0 ? 'active' : ''}"
+            data-category="${cat.id}"
+            onclick="scrollToCategory('${cat.target}')">
+            <span class="category-icon-wrap">
+                <img class="category-icon" src="assets/category-icons/${cat.icon}" alt="" aria-hidden="true">
+            </span>
+            <span class="category-label">${cat.label}</span>
+        </button>
     `).join('');
 };
 
@@ -437,6 +437,13 @@ function scrollToHero() {
         top: 0,
         behavior: "smooth"
     });
+}
+
+function scrollToFooter() {
+    const footer = document.getElementById('contato');
+    if (footer) {
+        footer.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // --- RENDERIZAR CARDS ---
@@ -571,35 +578,71 @@ function renderHalfFlavors() {
     const grid = document.getElementById('half-flavors-grid');
     if (!grid) return;
 
-    grid.innerHTML = ALL_PIZZA_FLAVORS.map(pizza => `
-        <div onclick="selectFlavor(${pizza.id})" id="flavor-card-${pizza.id}" class="flavor-card shadow-sm">
-            <div class="flavor-card-img-container">
-                <img src="${pizza.img}" alt="${pizza.name}" class="flavor-card-img" 
-                     onerror="this.src='assets/logosemfundo.png'">
-            </div>
-            <div class="flavor-card-body">
-                <span class="flavor-card-name">${pizza.name}</span>
-                <span class="flavor-card-desc">${pizza.desc}</span>
-            </div>
-            <div class="selection-badge selection-badge-1">1º SABOR</div>
-            <div class="selection-badge selection-badge-2">2º SABOR</div>
-        </div>
-    `).join('');
+    grid.innerHTML = ALL_PIZZA_FLAVORS.map(pizza => {
+        const isSelected1 = halfPizzaState.flavor1 && halfPizzaState.flavor1.id === pizza.id;
+        const isSelected2 = halfPizzaState.flavor2 && halfPizzaState.flavor2.id === pizza.id;
+        const isSelected = isSelected1 || isSelected2;
+        const selectionIndex = isSelected1 ? 0 : (isSelected2 ? 1 : -1);
+        const overlayText = selectionIndex === 0 ? '1º SABOR' : '2º SABOR';
+
+        return `
+            <button type="button" onclick="selectFlavor(${pizza.id})" id="flavor-card-${pizza.id}"
+                class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
+                <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
+                    <img src="${pizza.img}" alt="${pizza.name}" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.png'">
+                </div>
+                <div class="flavor-card-body p-3 relative">
+                    <div class="flavor-card-content">
+                        <span class="flavor-card-name text-sm font-bold text-gray-800 line-clamp-1 block uppercase">${pizza.name}</span>
+                        <span class="flavor-card-desc text-xs text-gray-500 line-clamp-2 block mt-1 leading-snug">${pizza.desc}</span>
+                    </div>
+                    <!-- Bottom-up selection overlay (tarja) -->
+                    <div class="flavor-card-selection-overlay ${isSelected ? 'active' : ''} ${selectionIndex === 0 ? 'selected-1' : 'selected-2'}">
+                        <span class="text-xs font-bold text-white">
+                            ${overlayText}
+                        </span>
+                    </div>
+                </div>
+            </button>
+        `;
+    }).join('');
 
     // Re-aplicar seleções visuais se existirem
     syncHalfVisuals();
 }
 
 function syncHalfVisuals() {
-    document.querySelectorAll('.flavor-card').forEach(c => c.classList.remove('selected-1', 'selected-2'));
+    document.querySelectorAll('.flavor-card').forEach(c => {
+        c.classList.remove('selected-1', 'selected-2');
+        const overlay = c.querySelector('.flavor-card-selection-overlay');
+        if (overlay) {
+            overlay.classList.remove('active', 'selected-1', 'selected-2');
+        }
+    });
 
     if (halfPizzaState.flavor1) {
         const el = document.getElementById(`flavor-card-${halfPizzaState.flavor1.id}`);
-        if (el) el.classList.add('selected-1');
+        if (el) {
+            el.classList.add('selected-1');
+            const overlay = el.querySelector('.flavor-card-selection-overlay');
+            if (overlay) {
+                overlay.classList.add('active', 'selected-1');
+                const span = overlay.querySelector('span');
+                if (span) span.textContent = '1º SABOR';
+            }
+        }
     }
     if (halfPizzaState.flavor2) {
         const el = document.getElementById(`flavor-card-${halfPizzaState.flavor2.id}`);
-        if (el) el.classList.add('selected-2');
+        if (el) {
+            el.classList.add('selected-2');
+            const overlay = el.querySelector('.flavor-card-selection-overlay');
+            if (overlay) {
+                overlay.classList.add('active', 'selected-2');
+                const span = overlay.querySelector('span');
+                if (span) span.textContent = '2º SABOR';
+            }
+        }
     }
 }
 
@@ -726,26 +769,22 @@ let comboStep = 1; // 1: Detalhes, 2: Sabores Salgados, 3: Sabores Doces (para P
 let comboSelections = {
     flavors: [], // ids de pizzas salgadas
     sweetFlavor: null, // id de pizza doce
-    border: null // catupiry, cheddar, ou cream_cheese
+    border: null // catupiry, cheddar, chocolate ou mussarela
 };
 
 const COMBO_BORDER_SIZES = {
-    individual: 'P',
+    individual: 'M',
     casal: 'M',
     familia: 'G',
     perfeito: 'G'
 };
 const COMBO_BORDER_IMAGES = {
     catupiry: 'assets/catupiry.webp',
-    catupiry_calabresa: 'assets/catupirycalabresa.webp',
-    chocolate: 'assets/chocolate.webp',
     cheddar: 'assets/cheddar.webp',
-    cream_cheese: 'assets/creamcheese.webp'
+    chocolate: 'assets/chocolate.webp'
 };
 
 function getComboBorderPrice() {
-    if (currentCombo.id === 'casal') return 0;
-
     const border = BORDAS.find(item => item.id === comboSelections.border);
     const size = COMBO_BORDER_SIZES[currentCombo.id];
     return border && size ? border.prices[size] : 0;
@@ -859,11 +898,9 @@ function renderComboStep() {
                 <div class="rounded-2xl border border-red-100 bg-red-50/50 p-4 sm:p-5 shadow-sm">
                     <p class="mb-3 text-center text-xs font-bold uppercase tracking-wider text-red-700">Borda recheada (opcional)</p>
                     <div class="space-y-2.5">
-                        ${BORDAS.filter(border => currentCombo.id !== 'casal' || !['chocolate', 'catupiry_calabresa'].includes(border.id)).map(border => {
+                        ${BORDAS.map(border => {
                             const isSelected = comboSelections.border === border.id;
-                            const priceLabel = currentCombo.id === 'casal'
-                                ? 'Grátis no combo'
-                                : `+ ${formatCurrency(border.prices[comboBorderSize])}`;
+                            const priceLabel = `+ ${formatCurrency(border.prices[comboBorderSize])}`;
                             const image = COMBO_BORDER_IMAGES[border.id];
                             const borderName = border.id === 'sem_borda'
                                 ? 'Sem borda'
@@ -871,7 +908,7 @@ function renderComboStep() {
 
                             return `
                                 <button type="button" onclick="selectComboBorder('${border.id}')"
-                                    class="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3.5 py-2.5 text-left transition-all cursor-pointer ${isSelected ? 'border-orange-500 bg-orange-50 shadow-sm' : 'border-gray-200 hover:border-orange-300'}">
+                                    class="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3.5 py-2.5 text-left transition-all cursor-pointer ${isSelected ? 'border-red-500 bg-red-50 shadow-sm' : 'border-gray-200 hover:border-red-300'}">
                                     <span class="flex min-w-0 flex-col">
                                         <span class="text-xs sm:text-sm font-bold text-gray-800">${borderName}</span>
                                         ${border.id !== 'sem_borda' ? `<span class="mt-0.5 text-[11px] font-bold text-red-600">${priceLabel}</span>` : ''}
@@ -914,10 +951,14 @@ function renderComboStep() {
                         : comboSelections.flavors.includes(pizza.id);
 
                     const selectionIndex = comboSelections.flavors.indexOf(pizza.id);
+                    const isFirstSelection = selectionIndex === 0;
+                    const overlayText = (['casal', 'familia'].includes(currentCombo.id) || (currentCombo.id === 'perfeito' && !isPerfeitoStep2))
+                        ? (isFirstSelection ? '1º SABOR' : '2º SABOR')
+                        : 'Sabor Escolhido';
 
                     return `
                          <button type="button" data-flavor-id="${pizza.id}" data-sweet="${isPerfeitoStep2}"
-                             class="flavor-card ${isSelected ? (selectionIndex === 1 ? 'selected-2' : 'selected-1') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
+                             class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                             <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
                                 <img src="${pizza.img}" alt="${pizza.name}" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.png'">
                             </div>
@@ -927,9 +968,9 @@ function renderComboStep() {
                                     <span class="flavor-card-desc text-xs text-gray-500 line-clamp-2 block mt-1 leading-snug">${pizza.desc}</span>
                                 </div>
                                 <!-- Bottom-up selection overlay -->
-                                <div class="flavor-card-selection-overlay ${isSelected ? 'active' : ''} ${selectionIndex === 1 ? 'selected-1' : 'selected-2'}">
+                                <div class="flavor-card-selection-overlay ${isSelected ? 'active' : ''} ${selectionIndex === 0 ? 'selected-1' : 'selected-2'}">
                                     <span class="text-xs font-bold text-white">
-                                        ${['casal', 'familia'].includes(currentCombo.id) || (currentCombo.id === 'perfeito' && !isPerfeitoStep2) ? '1º SABOR' : 'Sabor Escolhido'}
+                                        ${overlayText}
                                     </span>
                                 </div>
                             </div>
@@ -1044,6 +1085,8 @@ function selectComboFlavor(id, isSweet) {
 }
 
 function syncComboFlavorSelection(isSweet) {
+    const isTwoFlavorCombo = ['casal', 'familia'].includes(currentCombo.id) || (currentCombo.id === 'perfeito' && !isSweet);
+
     document.querySelectorAll('#combo-modal-content .flavor-card').forEach(card => {
         card.classList.remove('selected-1', 'selected-2');
         // Also remove active from overlays
@@ -1055,10 +1098,16 @@ function syncComboFlavorSelection(isSweet) {
         const flavorCards = document.querySelectorAll('#combo-modal-content .flavor-card');
         const card = [...flavorCards].find(item => Number(item.dataset.flavorId) === flavorId);
         if (card) {
-            card.classList.add(index === 1 ? 'selected-2' : 'selected-1');
-            // Add active to overlay
+            card.classList.add(index === 0 ? 'selected-1' : 'selected-2');
+            // Add active to overlay and update text
             const overlay = card.querySelector('.flavor-card-selection-overlay');
-            if (overlay) overlay.classList.add('active', index === 1 ? 'selected-1' : 'selected-2');
+            if (overlay) {
+                overlay.classList.add('active', index === 0 ? 'selected-1' : 'selected-2');
+                const span = overlay.querySelector('span');
+                if (span) {
+                    span.textContent = isTwoFlavorCombo ? (index === 0 ? '1º SABOR' : '2º SABOR') : 'Sabor Escolhido';
+                }
+            }
         }
     });
 
@@ -1263,9 +1312,8 @@ function openProductModal(item) {
 
         // Renderizar tamanhos
         const sizes = {
-            P: { label: 'Pequena', size: '25cm' },
-            M: { label: 'Média', size: '30cm' },
-            G: { label: 'Grande', size: '40cm' }
+            M: { label: 'Média', size: '25cm' },
+            G: { label: 'Grande', size: '35cm' }
         };
 
         const sizesGrid = document.getElementById('modal-sizes-grid');
@@ -1385,7 +1433,7 @@ document.getElementById('modal-add-btn').onclick = () => {
         const borderObj = BORDAS.find(b => b.id === borderId);
         const borderDisplay = borderObj.id !== 'sem_borda' ? `Borda de ${borderObj.name}` : 'Sem Borda';
 
-        const sizesNames = { P: 'Pequena', M: 'Média', G: 'Grande' };
+        const sizesNames = { M: 'Média', G: 'Grande' };
 
         let finalPrice = currentModalItem.prices[currentModalSize];
         if (borderObj) finalPrice += borderObj.prices[currentModalSize];
@@ -1456,8 +1504,13 @@ const renderMenu = () => {
         title.textContent = cat.label;
         section.appendChild(title);
 
+        // Grid específico para meio a meio (full width no desktop)
+        let gridClassName = "grid grid-cols-1 md:grid-cols-2 gap-4";
+        if (cat.type === 'half') {
+            gridClassName = "grid grid-cols-1 gap-4"; // Full width para meio a meio
+        }
         const grid = document.createElement('div');
-        grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+        grid.className = gridClassName;
 
         if (cat.type === 'half') {
             grid.appendChild(renderHalfCard());
@@ -1541,15 +1594,13 @@ function updateCartUI() {
                 <span>Subtotal</span>
                 <span>${formatCurrency(subtotal)}</span>
             </div>
-            ${checkoutData.region ? `
-                 <div class="flex justify-between text-gray-500 text-sm mb-1">
-                    <span>Entrega</span>
-                    <span>${formatCurrency(deliveryFee)}</span>
-                </div>
-            ` : ''}
+            <div class="flex justify-between text-gray-500 text-sm mb-1">
+                <span>Entrega</span>
+                <span>A confirmar</span>
+            </div>
             <div class="flex justify-between text-gray-900 font-bold text-lg mt-2 pt-2 border-t border-gray-100">
-                <span>Total</span>
-                <span>${formatCurrency(subtotal + deliveryFee)}</span>
+                <span>Total dos itens</span>
+                <span>${formatCurrency(subtotal)}</span>
             </div>
         `;
     }
@@ -1590,14 +1641,48 @@ function openCheckout() {
         return;
     }
     closeCartDrawer();
-    document.getElementById('checkout-section').classList.add('open');
+    const checkoutSection = document.getElementById('checkout-section');
+    checkoutSection.classList.remove('hidden');
+    checkoutSection.classList.add('open');
     document.body.classList.add('modal-open');
     renderCheckoutForm();
 }
 
 function closeCheckout() {
-    document.getElementById('checkout-section').classList.remove('open');
+    const checkoutSection = document.getElementById('checkout-section');
+    checkoutSection.classList.add('hidden');
+    checkoutSection.classList.remove('open');
     document.body.classList.remove('modal-open');
+}
+
+function captureUserLocation() {
+    if (!navigator.geolocation) {
+        alert("Seu navegador não suporta localização.");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            checkoutData.location = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: Math.round(position.coords.accuracy)
+            };
+            renderCheckoutForm();
+        },
+        (error) => {
+            let message = "Não foi possível obter sua localização.";
+            if (error.code === 1) message = "Permita o acesso à localização no navegador para enviar sua posição.";
+            if (error.code === 2) message = "Não foi possível determinar sua localização. Tente novamente.";
+            if (error.code === 3) message = "A localização demorou para responder. Tente novamente.";
+            alert(message);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+    );
 }
 
 function renderCheckoutForm() {
@@ -1610,7 +1695,7 @@ function renderCheckoutForm() {
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Telefone / WhatsApp</label>
-            <input type="tel" class="w-full p-3 border border-gray-300 rounded-lg focus:border-orange-500 outline-none" 
+            <input type="tel" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
                 placeholder="(XX) XXXXX-XXXX" value="${checkoutData.phone}" oninput="checkoutData.phone = this.value">
         </div>
         <div>
@@ -1618,16 +1703,17 @@ function renderCheckoutForm() {
             <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
                 placeholder="Rua, Número, Bairro, Complemento" value="${checkoutData.address}" oninput="checkoutData.address = this.value">
         </div>
-        <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Região de Entrega</label>
-            <select class="w-full p-3 border border-gray-300 rounded-lg outline-none bg-white" onchange="checkoutData.region = this.value; updateCartUI();">
-                <option value="">Selecione sua região...</option>
-                ${DELIVERY_REGIONS.map(Reg => `
-                    <option value="${Reg.id}" ${checkoutData.region === Reg.id ? 'selected' : ''}>
-                        ${Reg.name} (+ ${formatCurrency(Reg.fee)})
-                    </option>
-                `).join('')}
-            </select>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Localização para entrega</label>
+            <p class="text-xs text-gray-500 leading-relaxed mb-3">
+                Principalmente para endereços na zona rural, envie sua localização atual para ajudar o entregador a encontrar você.
+            </p>
+            <button type="button" onclick="captureUserLocation()"
+                class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 border-red-500 text-red-600 font-bold hover:bg-red-50 transition-colors ${checkoutData.location ? 'bg-red-50' : 'bg-white'}">
+                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                <span>${checkoutData.location ? 'Localização capturada ✓' : 'Enviar minha localização atual'}</span>
+            </button>
+            <p class="text-[11px] text-gray-400 mt-2 text-center">Seu navegador pedirá permissão para acessar sua localização.</p>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
@@ -1648,9 +1734,13 @@ function renderCheckoutForm() {
         </div>
         
         <div class="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
+            <div class="flex justify-between text-gray-600 text-sm mb-1">
+                <span>Taxa de entrega</span>
+                <span>A confirmar</span>
+            </div>
             <div class="flex justify-between text-gray-900 font-bold">
-                 <span>Total a Pagar:</span>
-                 <span id="checkout-total-display">${formatCurrency(getCartTotal() + getDeliveryFee())}</span>
+                 <span>Total dos itens:</span>
+                 <span id="checkout-total-display">${formatCurrency(getCartTotal())}</span>
             </div>
         </div>
     `;
@@ -1678,13 +1768,15 @@ function sendToWhatsApp() {
         openClosedDayModal();
         return;
     }
-    if (!checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.region || !checkoutData.paymentMethod) {
+    if (!checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.paymentMethod) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
     }
 
     const total = getCartTotal() + getDeliveryFee();
-    const regionName = DELIVERY_REGIONS.find(r => r.id === checkoutData.region)?.name || '';
+    const mapsUrl = checkoutData.location
+        ? `https://www.google.com/maps?q=${checkoutData.location.latitude},${checkoutData.location.longitude}`
+        : '';
 
     const now = new Date();
     const dateTime = now.toLocaleString('pt-BR', {
@@ -1709,8 +1801,8 @@ function sendToWhatsApp() {
     msg += `*--------------------------*\n\n`;
 
     msg += `*➕ RESUMO:* \n`;
-    msg += `📦 *Taxa de Entrega:* ${formatCurrency(getDeliveryFee())}\n`;
-    msg += `💰 *TOTAL A PAGAR: ${formatCurrency(total)}*\n\n`;
+    msg += `📦 *Taxa de Entrega:* A confirmar pela Sanja\n`;
+    msg += `💰 *TOTAL DOS ITENS: ${formatCurrency(total)}*\n\n`;
 
     msg += `*--------------------------*\n\n`;
 
@@ -1718,7 +1810,9 @@ function sendToWhatsApp() {
     msg += `*• Nome:* ${checkoutData.name}\n`;
     msg += `*• Telefone:* ${checkoutData.phone}\n`;
     msg += `*• Endereço:* ${checkoutData.address}\n`;
-    msg += `*• Região:* ${regionName}\n`;
+    msg += checkoutData.location
+        ? `*• Localização (GPS):* ${mapsUrl}\n`
+        : `*• Localização (GPS):* Não informada\n`;
     msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n\n`;
 
     msg += `*--------------------------*\n`;
@@ -1758,10 +1852,10 @@ function sendToWhatsApp() {
 
 
 // ==========================================
-// 7.5 DIA FECHADO (TERÇA-FEIRA)
+// 7.5 DIA FECHADO (SEGUNDA-FEIRA)
 // ==========================================
 function isClosedToday() {
-    return new Date().getDay() === 2; // 0 = domingo, 1 = segunda, 2 = terça...
+    return new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
 }
 
 function openClosedDayModal() {
@@ -1801,14 +1895,29 @@ window.onload = function () {
 
     window.addEventListener('scroll', () => {
         const scrollY = window.scrollY;
-
-        // Header Style
         const header = document.getElementById('site-header');
+        const categoriesBar = document.getElementById('categories-bar');
+        const floatingLogo = document.getElementById('floating-logo');
+
+        // Hero section height (viewport height)
+        const heroSection = document.getElementById('inicio');
+        const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
+
+        // Hide navbar and logo on scroll down, show only at hero (top)
+        if (scrollY > 100 && scrollY > heroHeight * 0.3) {
+            // Scrolled past hero - hide navbar and logo
+            if (header) header.classList.add('navbar-hidden');
+            if (floatingLogo) floatingLogo.classList.add('navbar-hidden');
+        } else {
+            // At or near hero - show navbar and logo
+            if (header) header.classList.remove('navbar-hidden');
+            if (floatingLogo) floatingLogo.classList.remove('navbar-hidden');
+        }
+
+        // Categories bar style (keep existing)
         if (scrollY > 50) {
-            if (header) header.classList.add('scrolled');
             if (categoriesBar) categoriesBar.classList.add('scrolled');
         } else {
-            if (header) header.classList.remove('scrolled');
             if (categoriesBar) categoriesBar.classList.remove('scrolled');
         }
 
@@ -1828,7 +1937,9 @@ window.onload = function () {
 
         // Update Tabs
         document.querySelectorAll('.category-tab').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.category === currentCat);
+            const navCategory = CATEGORY_NAV.find(cat => cat.id === btn.dataset.category);
+            const isActive = navCategory ? navCategory.includes.includes(currentCat) : false;
+            btn.classList.toggle('active', isActive);
         });
     });
 
@@ -1898,6 +2009,7 @@ window.closeCheckout = closeCheckout;
 window.sendToWhatsApp = sendToWhatsApp;
 window.scrollToCategory = scrollToCategory;
 window.scrollToHero = scrollToHero;
+window.scrollToFooter = scrollToFooter;
 window.openProductModal = openProductModal;
 window.closeProductModal = closeProductModal;
 window.setModalSize = setModalSize;

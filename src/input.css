@@ -46,6 +46,21 @@ h1, h2, h3, .serif-font {
 }
 
 /* ==========================================
+   NAVBAR HIDE ON SCROLL
+=========================================== */
+#site-header,
+#floating-logo {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+#site-header.navbar-hidden,
+#floating-logo.navbar-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================
    ANIMAÇÕES
 =========================================== */
 @keyframes slideUp {
@@ -112,8 +127,76 @@ h1, h2, h3, .serif-font {
 }
 
 /* ==========================================
-   HALF-MODAL & FLAVOR CARD STYLES
-   ========================================== */
+   HALF MODAL (Meio a Meio) - NOVO
+=========================================== */
+.half-modal-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  border-radius: 1.5rem;
+  max-height: 90vh;
+  max-height: 90dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: comboModalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.half-modal-close-btn {
+  position: absolute !important;
+  top: 1rem !important;
+  right: 1rem !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 9999px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #1f2937 !important;
+  cursor: pointer !important;
+  z-index: 50 !important;
+  border: none !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.half-modal-close-btn:hover {
+  background-color: #f3f4f6 !important;
+  transform: scale(1.05);
+}
+
+#half-modal-content {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+#half-modal-footer {
+  flex-shrink: 0 !important;
+  background-color: #ffffff !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 1rem 1.25rem !important;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+}
+
+/* Ensure the modal is centered and visible */
+#half-modal {
+  display: none;
+}
+
+#half-modal.flex {
+  display: flex !important;
+}
+
+/* ==========================================
+   HALF-MODAL & FLAVOR CARD STYLES (EXISTING)
+=========================================== */
 .half-size-grid {
   display: flex;
   justify-content: center;
@@ -215,12 +298,12 @@ h1, h2, h3, .serif-font {
 }
 
 .selection-badge-1 {
-  background: #f97316;
+  background: #16a34a;
   color: #fff;
 }
 
 .selection-badge-2 {
-  background: #ef4444;
+  background: #dc2626;
   color: #fff;
 }
 
@@ -243,10 +326,13 @@ h1, h2, h3, .serif-font {
 
 .flavor-card-selection-overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.375rem 0.75rem;
+  bottom: -0.75rem;
+  left: -0.75rem;
+  right: -0.75rem;
+  /* Height to cover exactly the description area (2 lines * line-height + padding) */
+  height: calc(2 * 1.3 * 0.625rem + 0.75rem);
+  /* Extra bottom padding to push text up from bottom edge */
+  padding: 0.375rem 0.75rem 0.5rem;
   font-size: 0.625rem;
   font-weight: 700;
   text-align: center;
@@ -255,6 +341,11 @@ h1, h2, h3, .serif-font {
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .flavor-card-selection-overlay.active {
@@ -268,7 +359,7 @@ h1, h2, h3, .serif-font {
 }
 
 .flavor-card-selection-overlay.selected-2 {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: #fff;
 }
 
@@ -428,7 +519,7 @@ h1, h2, h3, .serif-font {
 }
 
 .modal-size-btn.active,
-.modal-size-btn.border-orange-500 {
+.modal-size-btn.border-red-500 {
   border-color: #ef4444 !important;
   background: #fef2f2 !important;
   color: #dc2626 !important;
@@ -470,8 +561,8 @@ h1, h2, h3, .serif-font {
 
 #modal-note:focus {
   outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 3px #ffedd5;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px #fee2e2;
 }
 
 #modal-note::placeholder {
