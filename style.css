@@ -2600,7 +2600,7 @@ h1, h2, h3, .serif-font {
 }
 
 
-/* Seleção de Pagamento — mesmo layout do checkout Foggareli */
+/* Seleção de Pagamento */
 .payment-method-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
