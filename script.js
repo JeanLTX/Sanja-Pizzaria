@@ -448,6 +448,11 @@ function scrollToFooter() {
 
 // --- RENDERIZAR CARDS ---
 // --- RENDERIZAR CARDS COMPACTOS ---
+const getCardImageSrc = (src) => {
+    if (!src || !src.startsWith('assets/') || src.includes('/')) return src;
+    return src.replace('assets/', 'assets/thumbs/');
+};
+
 const renderPizzaCard = (pizza) => {
     const card = document.createElement('div');
     card.className = "flex items-center gap-4 p-4 bg-white border border-red-100 rounded-3xl shadow-sm hover:shadow-md hover:border-red-200 transition-[transform,box-shadow,border-color] duration-300 cursor-pointer group relative z-10";
@@ -465,8 +470,8 @@ const renderPizzaCard = (pizza) => {
             </div>
         </div>
         <div class="pizza-img-container">
-            <img src="${pizza.img}" alt="${pizza.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
-                 onerror="this.src='assets/logosemfundo.webp'">
+            <img src="${getCardImageSrc(pizza.img)}" alt="${pizza.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/thumbs/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -490,8 +495,8 @@ const renderDrinkCard = (drink) => {
             </div>
         </div>
         <div class="pizza-img-container">
-            <img src="${drink.img}" alt="${drink.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
-                 onerror="this.src='assets/logosemfundo.webp'">
+            <img src="${getCardImageSrc(drink.img)}" alt="${drink.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/thumbs/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -527,8 +532,8 @@ const renderComboCard = (combo) => {
             </div>
         </div>
         <div class="pizza-img-container shadow-inner">
-            <img src="${combo.img}" alt="${combo.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
-                 onerror="this.src='assets/logosemfundo.webp'">
+            <img src="${getCardImageSrc(combo.img)}" alt="${combo.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/thumbs/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -589,7 +594,7 @@ function renderHalfFlavors() {
             <button type="button" onclick="selectFlavor(${pizza.id})" id="flavor-card-${pizza.id}"
                 class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                 <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                    <img src="${pizza.img}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
+                    <img src="${getCardImageSrc(pizza.img)}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
                 </div>
                 <div class="flavor-card-body p-3 relative">
                     <div class="flavor-card-content">
@@ -854,7 +859,7 @@ function renderComboStep() {
         content.innerHTML = `
             <div class="animate-in fade-in duration-200">
                 <div class="relative h-56 sm:h-60 w-full bg-gray-100 overflow-hidden shrink-0">
-                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
+                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
                 </div>
 
                 <div class="px-6 py-5 sm:px-7 sm:py-6 space-y-4">
@@ -960,7 +965,7 @@ function renderComboStep() {
                          <button type="button" data-flavor-id="${pizza.id}" data-sweet="${isPerfeitoStep2}"
                              class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                             <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                                <img src="${pizza.img}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
+                                <img src="${getCardImageSrc(pizza.img)}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
                             </div>
                             <div class="flavor-card-body p-3 relative">
                                 <div class="flavor-card-content">
@@ -1296,7 +1301,7 @@ function openProductModal(item) {
     // Preencher dados básicos
     modalImg.src = item.img;
     modalImg.onerror = () => {
-        modalImg.src = 'assets/logosemfundo.webp';
+        modalImg.src = 'assets/thumbs/logosemfundo.webp';
     };
     modalName.textContent = item.name.toUpperCase();
     modalDesc.textContent = item.desc;
