@@ -8,6 +8,10 @@
     <title>Sanja - Cardápio Online</title>
     <link rel="canonical" href="https://sanjapizzaria.com.br/">
 
+    <!-- Preload da imagem LCP da hero conforme o dispositivo -->
+    <link rel="preload" as="image" href="assets/banner.webp" fetchpriority="high" media="(min-width: 768px)">
+    <link rel="preload" as="image" href="assets/testemobile.webp" fetchpriority="high" media="(max-width: 767px)">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://sanjapizzaria.com.br/">
@@ -38,24 +42,21 @@
     </script>
 
     <!-- Favicons -->
-    <link rel="icon" type="image/png" href="assets/logosemtexto.png">
-    <link rel="apple-touch-icon" href="assets/logosemtexto.png">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
     <!-- Tailwind CSS (via Import) & Custom Styles -->
     <link href="./style.css" rel="stylesheet">
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <!-- Font Awesome Brands -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"></noscript>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&family=Fraunces:opsz,wght@9..144,700&family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap"
-        rel="stylesheet">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:wght@700&display=swap"></noscript>
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -126,15 +127,15 @@
     <a href="javascript:void(0)" onclick="scrollToHero()" id="floating-logo"
         class="fixed left-1/2 top-32 -translate-x-1/2 z-50 flex items-center" aria-label="Sanja Pizzaria - Início"
         style="pointer-events: auto; top: 8px">
-        <img src="assets/logosemtexto.png" alt="Sanja Pizzaria" style="height: 120px; width: auto;">
+        <img src="assets/logosemtexto.webp" alt="Sanja Pizzaria" width="600" height="448" decoding="async" style="height: 120px; width: auto;">
     </a>
 
     <!-- HERO SECTION -->
     <section id="inicio" class="relative w-full h-screen h-screen-fix overflow-hidden">
         <!-- Imagem de fundo: versão mobile apenas em telas menores -->
         <picture class="absolute inset-0 w-full h-full">
-            <source media="(max-width: 767px)" srcset="assets/testemobile.png">
-            <img src="assets/banner.webp" alt="Banner" class="absolute inset-0 w-full h-full object-cover">
+            <source media="(max-width: 767px)" srcset="assets/testemobile.webp">
+            <img src="assets/banner.webp" alt="Banner" width="1920" height="1080" fetchpriority="high" decoding="async" class="absolute inset-0 w-full h-full object-cover">
         </picture>
         <!-- Overlay escuro -->
         <div class="absolute inset-0" style="background-color: rgba(0, 0, 0, 0.45);"></div>
@@ -538,9 +539,8 @@
         </div>
     </div>
 
-    <!-- GSAP & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Ícones Lucide: carregados após o HTML principal para não bloquear a primeira pintura -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- JavaScript -->
     <script src="script.js"></script>

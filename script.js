@@ -15,7 +15,7 @@ const BORDAS = [
 // Massa/Broto base: R$ 40,00
 // Pizzas Salgadas
 const PIZZAS_SALGADAS = [
-    { id: 1, name: "À MODA DA CASA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, lombo, bacon, tomate e orégano.", img: "assets/modadacasa.jpg", type: "pizza", prices: { P: 58.00, M: 58.00, G: 58.00 } },
+    { id: 1, name: "À MODA DA CASA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, lombo, bacon, tomate e orégano.", img: "assets/modadacasa.webp", type: "pizza", prices: { P: 58.00, M: 58.00, G: 58.00 } },
     { id: 2, name: "ATUM", category: "Pizzas Salgadas", desc: "Molho, mussarela, atum, cebola, azeitona e orégano.", img: "assets/atum.webp", type: "pizza", prices: { P: 52.00, M: 52.00, G: 52.00 } },
     { id: 3, name: "BACON", category: "Pizzas Salgadas", desc: "Molho, mussarela, bacon, cebola e orégano.", img: "assets/bacon.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
     { id: 4, name: "BACON C/ FRITAS", category: "Pizzas Salgadas", desc: "Molho, mussarela, bacon, catupiry e batata frita.", img: "assets/baconcomfritas.webp", type: "pizza", prices: { P: 60.00, M: 60.00, G: 60.00 } },
@@ -410,7 +410,7 @@ const renderCategoryButtons = () => {
             data-category="${cat.id}"
             onclick="scrollToCategory('${cat.target}')">
             <span class="category-icon-wrap">
-                <img class="category-icon" src="assets/category-icons/${cat.icon}" alt="" aria-hidden="true">
+                <img class="category-icon" src="assets/category-icons/${cat.icon}" alt="" aria-hidden="true" width="128" height="128" decoding="async">
             </span>
             <span class="category-label">${cat.label}</span>
         </button>
@@ -465,8 +465,8 @@ const renderPizzaCard = (pizza) => {
             </div>
         </div>
         <div class="pizza-img-container">
-            <img src="${pizza.img}" alt="${pizza.name}" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" 
-                 onerror="this.src='assets/logosemfundo.png'">
+            <img src="${pizza.img}" alt="${pizza.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -490,8 +490,8 @@ const renderDrinkCard = (drink) => {
             </div>
         </div>
         <div class="pizza-img-container">
-            <img src="${drink.img}" alt="${drink.name}" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
-                 onerror="this.src='assets/logosemfundo.png'">
+            <img src="${drink.img}" alt="${drink.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -527,8 +527,8 @@ const renderComboCard = (combo) => {
             </div>
         </div>
         <div class="pizza-img-container shadow-inner">
-            <img src="${combo.img}" alt="${combo.name}" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
-                 onerror="this.src='assets/logosemfundo.png'">
+            <img src="${combo.img}" alt="${combo.name}" width="100" height="100" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                 onerror="this.src='assets/logosemfundo.webp'">
         </div>
     `;
     return card;
@@ -589,7 +589,7 @@ function renderHalfFlavors() {
             <button type="button" onclick="selectFlavor(${pizza.id})" id="flavor-card-${pizza.id}"
                 class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                 <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                    <img src="${pizza.img}" alt="${pizza.name}" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.png'">
+                    <img src="${pizza.img}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
                 </div>
                 <div class="flavor-card-body p-3 relative">
                     <div class="flavor-card-content">
@@ -854,7 +854,7 @@ function renderComboStep() {
         content.innerHTML = `
             <div class="animate-in fade-in duration-200">
                 <div class="relative h-56 sm:h-60 w-full bg-gray-100 overflow-hidden shrink-0">
-                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/logosemfundo.png'">
+                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
                 </div>
 
                 <div class="px-6 py-5 sm:px-7 sm:py-6 space-y-4">
@@ -960,7 +960,7 @@ function renderComboStep() {
                          <button type="button" data-flavor-id="${pizza.id}" data-sweet="${isPerfeitoStep2}"
                              class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                             <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                                <img src="${pizza.img}" alt="${pizza.name}" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.png'">
+                                <img src="${pizza.img}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/logosemfundo.webp'">
                             </div>
                             <div class="flavor-card-body p-3 relative">
                                 <div class="flavor-card-content">
@@ -1296,7 +1296,7 @@ function openProductModal(item) {
     // Preencher dados básicos
     modalImg.src = item.img;
     modalImg.onerror = () => {
-        modalImg.src = 'assets/logosemfundo.png';
+        modalImg.src = 'assets/logosemfundo.webp';
     };
     modalName.textContent = item.name.toUpperCase();
     modalDesc.textContent = item.desc;
@@ -1947,55 +1947,14 @@ window.onload = function () {
         scrollToCategory('combos');
     };
 
-    // --- Inicia animação do botão CTA com GSAP ---
-    gsap.registerPlugin(ScrollTrigger);
-
+    // --- Animação do CTA sem biblioteca externa ---
     const ctaBtn = document.getElementById('cta-order-btn');
-    if (ctaBtn) {
-        // Configuração conforme pedido (AnimatedContent props)
-        const distance = 100; // distance={240}
-        const startScale = 0.5; // scale={0.1}
-
-        // Define estado inicial
-        gsap.set(ctaBtn, {
-            y: distance,
-            scale: startScale,
-            opacity: 0,
-            visibility: 'visible'
-        });
-
-        // Timeline da animação
-        const tl = gsap.timeline({
-            paused: true,
-            delay: 0.2, // delay={0.2}
-            onComplete: () => {
-                // Inicia o bounce infinito diretamente via GSAP para evitar conflitos com estilos inline
-                gsap.to(ctaBtn, {
-                    y: -10,
-                    duration: 1.5,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-            }
-        });
-
-        // Animação de entrada
-        tl.to(ctaBtn, {
-            y: 0,
-            scale: 1,
-            opacity: 1, // animateOpacity={true}
-            duration: 2, // duration={3}
-            ease: "power3.out" // ease="power3.out"
-        });
-
-        // ScrollTrigger para disparar quando visível
-        ScrollTrigger.create({
-            trigger: ctaBtn,
-            start: "top 90%", // threshold={0.1} => 90% view
-            once: true,
-            onEnter: () => tl.play()
-        });
+    if (ctaBtn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        ctaBtn.classList.add('cta-enter');
+        ctaBtn.addEventListener('animationend', () => {
+            ctaBtn.classList.remove('cta-enter');
+            ctaBtn.classList.add('cta-bounce');
+        }, { once: true });
     }
 };
 
