@@ -1535,7 +1535,7 @@ const renderMenu = () => {
         container.appendChild(section);
     });
 
-    if (window.lucide) lucide.createIcons();
+    if (window.lucide) lucide.createIcons({ root: container });
 };
 
 

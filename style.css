@@ -2187,6 +2187,8 @@ h1, h2, h3, .serif-font {
   }
 }
 .category-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
   scroll-margin-top: 120px;
 }
 #cart-drawer {
