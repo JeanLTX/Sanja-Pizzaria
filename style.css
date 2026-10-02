@@ -2621,6 +2621,23 @@ h1, h2, h3, .serif-font {
   display: block;
 }
 
+.hours-badge {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.hours-badge svg,
+.hours-badge i {
+  flex: 0 0 1rem;
+  width: 1rem !important;
+  height: 1rem !important;
+  display: block;
+}
+
 /* Modal de dia fechado */
 #closed-day-modal {
   color: #1f2937;
