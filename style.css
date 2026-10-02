@@ -1560,8 +1560,19 @@ h1, h2, h3, .serif-font {
 #site-header, #floating-logo {
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
-#site-header.navbar-hidden, #floating-logo.navbar-hidden {
+#site-header.navbar-hidden {
   transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+#floating-logo {
+  left: 50%;
+  width: 161px;
+  height: 120px;
+  transform: translate3d(-50%, 0, 0);
+}
+#floating-logo.navbar-hidden {
+  transform: translate3d(-50%, -100%, 0);
   opacity: 0;
   pointer-events: none;
 }
