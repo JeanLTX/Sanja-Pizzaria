@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Cardápio online da Sanja Pizzaria em Brazópolis. Pizzas, burgers, esfihas e lanches. Faça seu pedido pelo WhatsApp.">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Sanja - Cardápio Online</title>
     <link rel="canonical" href="https://sanjapizzaria.com.br/">
 
     <!-- Preload da imagem LCP da hero conforme o dispositivo -->
     <link rel="preload" as="image" href="assets/banner.webp" fetchpriority="high" media="(min-width: 768px)">
-    <link rel="preload" as="image" href="assets/testemobile.webp" fetchpriority="high" media="(max-width: 767px)">
+    <link rel="preload" as="image" href="assets/testemobile.webp" type="image/webp" fetchpriority="high" media="(max-width: 767px)">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -36,8 +37,15 @@
     <link rel="icon" type="image/png" href="assets/favicon.png">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 
-    <!-- Tailwind CSS (via Import) & Custom Styles -->
-    <link href="./style.min.css" rel="stylesheet">
+    <!-- Critical CSS: estilos mínimos para a primeira pintura da hero -->
+    <style>
+        html,body{margin:0;padding:0}body{background:#fdfbf7;color:#2c3e50;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;overflow-x:hidden}*,::before,::after{box-sizing:border-box}img,svg{display:block}#inicio picture img{width:100%;height:100%;object-fit:cover}button{border:0;background:transparent}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.top-0{top:0}.z-10{z-index:10}.z-50{z-index:50}.flex{display:flex}.hidden{display:none}.items-center{align-items:center}.justify-center{justify-content:center}.w-full{width:100%}.h-full{height:100%}.h-screen{height:100vh}.overflow-hidden{overflow:hidden}.text-center{text-align:center}.text-white{color:#fff}.px-4{padding-inline:1rem}.px-8{padding-inline:2rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.mb-4{margin-bottom:1rem}.rounded-full{border-radius:9999px}.font-medium{font-weight:500}.font-bold{font-weight:700}.leading-none{line-height:1}.tracking-tight{letter-spacing:-.025em}.inline-flex{display:inline-flex}.px-3{padding-inline:.75rem}.py-2{padding-block:.5rem}.py-4{padding-block:1rem}.text-xs{font-size:.75rem;line-height:1rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.w-5{width:1.25rem}.h-5{height:1.25rem}.bg-green-600{background:#16a34a}.shadow-lg{box-shadow:0 10px 15px -3px rgb(0 0 0/.1),0 4px 6px -4px rgb(0 0 0/.1)}.bebas-neue-regular{font-family:"Bebas Neue",sans-serif;font-weight:400;font-style:normal}.hero-menu-btn{display:inline-block;color:#fff;font-weight:700;font-size:1.125rem;padding:.5rem 1rem;border-bottom:2px solid #fff}.desktop-navbar{display:flex;width:100%;height:6rem;padding:0 1rem;padding-top:.5rem;align-items:center;justify-content:center;gap:4rem}.navbar-link{position:relative;padding:.35rem .25rem}.navbar-link:after{content:"";position:absolute;left:0;right:0;bottom:-.2rem;height:2px;background:#dc2626;transform:scaleX(0);transition:transform .2s ease}.site-cart-icon{width:1.5rem;height:1.5rem}.cta-btn{display:flex;align-items:center;gap:.75rem}.cta-btn.cta-enter,.cta-btn.cta-bounce{will-change:transform,opacity}#site-header,#floating-logo{transition:transform .3s ease-in-out,opacity .3s ease-in-out}#site-header.navbar-hidden,#floating-logo.navbar-hidden{transform:translateY(-100%);opacity:0;pointer-events:none}#floating-logo{left:50%;top:8px;transform:translateX(-50%)}#inicio>.absolute.z-10{transform:translateY(-6vh);padding-inline:1rem}.hero-menu-btn{display:inline-block}#site-header{pointer-events:auto}@media(min-width:768px){#inicio>.absolute.z-10{justify-content:flex-start;transform:none;padding-inline:2rem}#inicio>.absolute.z-10>div{align-items:flex-start;text-align:left}}@media(max-width:767px){.desktop-navbar{display:none!important}.hero-menu-btn{display:none!important}#inicio>.absolute.z-10>div{align-items:center;text-align:center}}
+    </style>
+
+    <!-- CSS principal: pré-carregado e aplicado após a primeira pintura -->
+    <link rel="preload" as="style" href="./style.min.css" fetchpriority="low">
+    <link rel="stylesheet" href="./style.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="./style.min.css"></noscript>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -90,7 +98,7 @@
     <header id="site-header" class="fixed top-0 left-0 right-0 z-50 transition-colors">
         <div class="desktop-navbar w-full px-4 h-24 pt-2 items-center justify-center gap-16">
             <!-- Início (esquerda) -->
-            <a href="javascript:void(0)" onclick="scrollToHero()"
+            <a href="#inicio" onclick="scrollToHero(); return false;"
                 class="desktop-nav-link navbar-link text-white font-medium transition-colors ml-16">Início</a>
 
             <!-- Espaço central para a logo flutuante (fora da navbar) -->
@@ -98,7 +106,7 @@
 
             <!-- Contato e Carrinho (direita) -->
             <div class="flex items-center gap-4">
-                <a href="javascript:void(0)" onclick="scrollToFooter()"
+                <a href="#contato" onclick="scrollToFooter(); return false;"
                     class="desktop-nav-link navbar-link text-white font-medium transition-colors">Contato</a>
                 <button onclick="toggleCartDrawer()"
                     class="p-2 hover:bg-white/10 rounded-full transition-colors relative" aria-label="Abrir Carrinho">
@@ -111,10 +119,10 @@
     </header>
 
     <!-- Logo flutuante centralizada (fora da navbar) -->
-    <a href="javascript:void(0)" onclick="scrollToHero()" id="floating-logo"
+    <a href="#inicio" onclick="scrollToHero(); return false;" id="floating-logo"
         class="fixed left-1/2 top-32 -translate-x-1/2 z-50 flex items-center" aria-label="Sanja Pizzaria - Início"
         style="pointer-events: auto; top: 8px">
-        <img src="assets/logosemtexto.webp" alt="Sanja Pizzaria" width="600" height="448" decoding="async" style="height: 120px; width: auto;">
+        <img src="assets/logosemtexto-header.webp" alt="Sanja Pizzaria" width="320" height="239" decoding="async" style="height: 120px; width: auto;">
     </a>
 
     <!-- HERO SECTION -->
@@ -246,7 +254,7 @@
     </div>
 
     <!-- FLOATING ACTION BUTTON (CARRINHO) -->
-    <button id="cart-fab"
+    <button id="cart-fab" aria-label="Abrir carrinho"
         class="fixed bottom-6 right-6 bg-orange-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-40"
         onclick="toggleCartDrawer()">
         <i data-lucide="shopping-cart" class="w-6 h-6"></i>
@@ -265,7 +273,7 @@
                 <i data-lucide="shopping-bag" class="text-orange-600 w-5 h-5"></i>
                 Seu Pedido
             </h2>
-            <button class="text-gray-400 hover:text-gray-900 transition-colors" onclick="closeCartDrawer()">
+            <button aria-label="Fechar carrinho" class="text-gray-400 hover:text-gray-900 transition-colors" onclick="closeCartDrawer()">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
         </div>
@@ -532,13 +540,52 @@
         </div>
     </div>
 
-    <!-- Google tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DVXGB5CLJG"></script>
+    <!-- Google Analytics: mantém a fila de eventos e carrega a biblioteca após a carga inicial -->
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-DVXGB5CLJG');
+
+        (function () {
+            function loadGoogleAnalytics() {
+                if (window.__sanjaGaLoaded) return;
+                window.__sanjaGaLoaded = true;
+                var script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=G-DVXGB5CLJG';
+                document.head.appendChild(script);
+            }
+
+            function scheduleGoogleAnalytics() {
+                if (window.__sanjaGaScheduled) return;
+                window.__sanjaGaScheduled = true;
+
+                const interactionEvents = ['pointerdown', 'keydown', 'touchstart'];
+                const loadOnInteraction = () => {
+                    interactionEvents.forEach(eventName => {
+                        window.removeEventListener(eventName, loadOnInteraction);
+                    });
+                    loadGoogleAnalytics();
+                };
+
+                interactionEvents.forEach(eventName => {
+                    window.addEventListener(eventName, loadOnInteraction, { once: true, passive: true });
+                });
+
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadGoogleAnalytics, { timeout: 8000 });
+                } else {
+                    setTimeout(loadGoogleAnalytics, 8000);
+                }
+            }
+
+            if (document.readyState === 'complete') {
+                scheduleGoogleAnalytics();
+            } else {
+                window.addEventListener('load', scheduleGoogleAnalytics, { once: true });
+            }
+        })();
     </script>
 
     <!-- Ícones Lucide: bundle mínimo local com apenas os ícones usados pelo projeto -->

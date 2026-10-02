@@ -298,9 +298,7 @@ const CATEGORIES = [
     { id: 'bebidas', label: 'Bebidas', items: BEBIDAS, type: 'drink' }
 ];
 
-// Cálculo da largura da scrollbar para evitar saltos de layout
-const getScrollbarWidth = () => window.innerWidth - document.documentElement.clientWidth;
-document.documentElement.style.setProperty('--scrollbar-width', `${getScrollbarWidth()}px`);
+
 
 // ENTREGA
 // A taxa de entrega da Sanja é confirmada pela equipe conforme o endereço/localização.
@@ -332,7 +330,8 @@ const saveCart = () => {
     try { localStorage.setItem('sanja-pizzaria-cart', JSON.stringify(cart)); } catch (e) { }
 };
 
-const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const formatCurrency = (val) => currencyFormatter.format(val);
 
 const showToast = (msg) => {
     const toast = document.getElementById('toast');
@@ -449,8 +448,10 @@ function scrollToFooter() {
 // --- RENDERIZAR CARDS ---
 // --- RENDERIZAR CARDS COMPACTOS ---
 const getCardImageSrc = (src) => {
-    if (!src || !src.startsWith('assets/') || src.includes('/')) return src;
-    return src.replace('assets/', 'assets/thumbs/');
+    if (!src || !src.startsWith('assets/')) return src;
+    const relativePath = src.slice('assets/'.length);
+    if (relativePath.includes('/')) return src;
+    return `assets/thumbs/${relativePath}`;
 };
 
 const renderPizzaCard = (pizza) => {
@@ -509,7 +510,7 @@ const renderComboCard = (combo) => {
 
     const itemsHtml = combo.itens.map(item => `
         <li class="flex items-start gap-1.5 text-xs text-gray-600 font-medium">
-            <i data-lucide="check" class="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0"></i>
+            <svg class="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l4 4L19 6"></path></svg>
             <span class="leading-tight">${item}</span>
         </li>
     `).join('');
@@ -1472,7 +1473,7 @@ const renderHalfCard = () => {
 
     card.innerHTML = `
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-            <i data-lucide="pizza" class="w-32 h-32 md:w-48 md:h-48"></i>
+            <svg class="w-32 h-32 md:w-48 md:h-48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15.5 5.5a11 11 0 0 1-11 11L4 20l3.5-.5a11 11 0 0 1 11-11l-.9-3.4z"></path><path d="M7 16l5.5-5.5"></path></svg>
         </div>
         <div class="flex-1 relative z-10 text-center md:text-left">
             <span class="bg-white/20 text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest mb-4 inline-block">Funcionalidade Exclusiva</span>
@@ -1480,26 +1481,34 @@ const renderHalfCard = () => {
             <p class="text-sm md:text-base opacity-90 max-w-md mb-6 leading-relaxed">Não consegue decidir? Escolha dois dos seus sabores favoritos em uma única pizza Média ou Grande.</p>
             <div class="flex flex-wrap justify-center md:justify-start gap-3">
                 <span class="flex items-center gap-2 bg-black/10 px-4 py-2 rounded-xl text-xs font-bold border border-white/10 italic">
-                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Média 6 Fatias
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg> Média 6 Fatias
                 </span>
                 <span class="flex items-center gap-2 bg-black/10 px-4 py-2 rounded-xl text-xs font-bold border border-white/10 italic">
-                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Grande 10 Fatias
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg> Grande 10 Fatias
                 </span>
             </div>
         </div>
         <div class="relative z-10 bg-white text-red-600 p-4 md:p-6 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-lg group-hover:scale-105 transition-transform">
             <span class="text-[10px] font-black uppercase">Monte Agora</span>
-            <i data-lucide="arrow-right" class="w-6 h-6"></i>
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
         </div>
     `;
     return card;
 };
 
-const renderMenu = () => {
+const renderMenu = (onComplete) => {
     const container = document.getElementById('pizzas-container');
+    if (!container) return;
     container.innerHTML = '';
 
-    CATEGORIES.forEach(cat => {
+    let categoryIndex = 0;
+    const renderNextCategory = () => {
+        if (categoryIndex >= CATEGORIES.length) {
+            if (typeof onComplete === 'function') onComplete();
+            return;
+        }
+
+        const cat = CATEGORIES[categoryIndex++];
         const section = document.createElement('section');
         section.id = `category-${cat.id}`;
         section.className = "category-section scroll-mt-32 mb-12 px-1";
@@ -1517,10 +1526,22 @@ const renderMenu = () => {
         const grid = document.createElement('div');
         grid.className = gridClassName;
 
+        section.appendChild(grid);
+        container.appendChild(section);
+
         if (cat.type === 'half') {
             grid.appendChild(renderHalfCard());
-        } else {
-            cat.items.forEach(item => {
+            setTimeout(renderNextCategory, 0);
+            return;
+        }
+
+        // Renderiza poucos cards por tarefa para não prender a thread principal.
+        let itemIndex = 0;
+        const items = cat.items || [];
+        const renderItemChunk = () => {
+            const chunkEnd = Math.min(itemIndex + 6, items.length);
+            while (itemIndex < chunkEnd) {
+                const item = items[itemIndex++];
                 if (cat.type === 'drink') {
                     grid.appendChild(renderDrinkCard(item));
                 } else if (cat.type === 'combo') {
@@ -1528,14 +1549,23 @@ const renderMenu = () => {
                 } else {
                     grid.appendChild(renderPizzaCard(item));
                 }
-            });
-        }
+            }
 
-        section.appendChild(grid);
-        container.appendChild(section);
-    });
+            if (itemIndex < items.length) {
+                setTimeout(renderItemChunk, 0);
+            } else {
+                setTimeout(renderNextCategory, 0);
+            }
+        };
 
-    if (window.lucide) lucide.createIcons({ root: container });
+        renderItemChunk();
+    };
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(renderNextCategory, { timeout: 1200 });
+    } else {
+        setTimeout(renderNextCategory, 0);
+    }
 };
 
 
@@ -1563,7 +1593,7 @@ function updateCartUI() {
     if (cart.length === 0) {
         drawerBody.innerHTML = `
             <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                <i data-lucide="shopping-basket" class="w-16 h-16 mb-4 opacity-20"></i>
+                <svg class="w-16 h-16 mb-4 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m2 11 4-7"></path><path d="M4 11h16"></path><path d="m18 11-4-7"></path><path d="m3 11 1.5 7.4a2 2 0 0 0 2 1.6h11a2 2 0 0 0 2-1.6L21 11"></path><path d="M4.5 15.5h15"></path><path d="m5 11 4-7"></path><path d="m9 11 1 9"></path><path d="m15 11-1 9"></path></svg>
                 <p>Seu carrinho está vazio</p>
             </div>
         `;
@@ -1584,7 +1614,7 @@ function updateCartUI() {
                         <button class="px-2 text-gray-500 hover:text-red-600" onclick="updateCartItemQuantity(${i}, 1)">+</button>
                     </div>
                     <button class="text-red-400 hover:text-red-600" onclick="removeFromCart(${i})">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 </div>
             </div>
@@ -1610,11 +1640,6 @@ function updateCartUI() {
         `;
     }
 
-    if (window.lucide) {
-        lucide.createIcons({
-            root: drawerBody
-        });
-    }
     updateCheckoutForm(); // Atualiza resumo no checkout também se aberto
 }
 
@@ -1885,11 +1910,34 @@ function closeClosedDayModal() {
 // ==========================================
 // 8. INICIALIZAÇÃO
 // ==========================================
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => {
     loadCart();
     renderCategoryButtons();
-    renderMenu();
-    updateCartUI();
+    const updateCategoryTabs = (activeCategory) => {
+        document.querySelectorAll('.category-tab').forEach(btn => {
+            const navCategory = CATEGORY_NAV.find(cat => cat.id === btn.dataset.category);
+            const isActive = navCategory ? navCategory.includes.includes(activeCategory) : false;
+            btn.classList.toggle('active', isActive);
+        });
+    };
+
+    const setupCategoryObserver = () => {
+        if (!('IntersectionObserver' in window)) return;
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const activeCategory = entry.target.id.replace('category-', '');
+                updateCategoryTabs(activeCategory);
+            });
+        }, { rootMargin: '-150px 0px -55% 0px', threshold: 0 });
+
+        document.querySelectorAll('.category-section').forEach(section => observer.observe(section));
+        updateCategoryTabs(CATEGORIES[0].id);
+    };
+
+    // A renderização pesada do cardápio começa só depois da primeira pintura.
+    requestAnimationFrame(() => renderMenu(setupCategoryObserver));
 
     if (isClosedToday()) {
         openClosedDayModal();
@@ -1897,16 +1945,24 @@ window.onload = function () {
 
     // Active Category Logic
     const categoriesBar = document.getElementById('categories-bar');
+    const updateHeroHeight = () => {
+        window.__sanjaHeroHeight = window.innerHeight;
+    };
+    updateHeroHeight();
+    window.addEventListener('resize', updateHeroHeight, { passive: true });
 
+    let scrollTick = false;
     window.addEventListener('scroll', () => {
+        if (scrollTick) return;
+        scrollTick = true;
+        requestAnimationFrame(() => {
         const scrollY = window.scrollY;
         const header = document.getElementById('site-header');
         const categoriesBar = document.getElementById('categories-bar');
         const floatingLogo = document.getElementById('floating-logo');
 
         // Hero section height (viewport height)
-        const heroSection = document.getElementById('inicio');
-        const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
+        const heroHeight = window.__sanjaHeroHeight || window.innerHeight;
 
         // Hide navbar and logo on scroll down, show only at hero (top)
         if (scrollY > 100 && scrollY > heroHeight * 0.3) {
@@ -1926,25 +1982,7 @@ window.onload = function () {
             if (categoriesBar) categoriesBar.classList.remove('scrolled');
         }
 
-        // Active State Sync
-        const headerOffset = 180;
-        let currentCat = CATEGORIES[0].id;
-
-        CATEGORIES.forEach(cat => {
-            const section = document.getElementById(`category-${cat.id}`);
-            if (section) {
-                const sectionTop = section.offsetTop;
-                if (scrollY >= sectionTop - headerOffset) {
-                    currentCat = cat.id;
-                }
-            }
-        });
-
-        // Update Tabs
-        document.querySelectorAll('.category-tab').forEach(btn => {
-            const navCategory = CATEGORY_NAV.find(cat => cat.id === btn.dataset.category);
-            const isActive = navCategory ? navCategory.includes.includes(currentCat) : false;
-            btn.classList.toggle('active', isActive);
+        scrollTick = false;
         });
     });
 
@@ -1961,7 +1999,8 @@ window.onload = function () {
             ctaBtn.classList.add('cta-bounce');
         }, { once: true });
     }
-};
+    });
+});
 
 // Expose global functions
 window.toggleCartDrawer = toggleCartDrawer;
