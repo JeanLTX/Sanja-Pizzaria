@@ -1749,15 +1749,15 @@ function renderCheckoutForm() {
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
             <div class="payment-method-grid">
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Pix' ? 'active' : ''}" onclick="setPaymentMethod('Pix')">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3z"></path><path d="M18 18h3v3h-3z"></path><path d="M18 14h3"></path><path d="M14 18v3"></path></svg>
+                    <span class="payment-icon payment-icon-pix" aria-hidden="true"></span>
                     <span class="text-xs uppercase tracking-tighter">Pix</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Dinheiro' ? 'active' : ''}" onclick="setPaymentMethod('Dinheiro')">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2.5"></circle><path d="M6 10h.01"></path><path d="M18 14h.01"></path></svg>
+                    <span class="payment-icon payment-icon-cash" aria-hidden="true"></span>
                     <span class="text-xs uppercase tracking-tighter">Dinheiro</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Cartão' ? 'active' : ''}" onclick="setPaymentMethod('Cartão')">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path><path d="M6 15h4"></path></svg>
+                    <span class="payment-icon payment-icon-card" aria-hidden="true"></span>
                     <span class="text-xs uppercase tracking-tighter">Cartão</span>
                 </div>
             </div>
@@ -1775,11 +1775,10 @@ function renderCheckoutForm() {
         </div>
     `;
 
-    if (window.lucide) {
-        lucide.createIcons({
-            root: form
-        });
+    if (!window.__sanjaPaymentIconsPromise) {
+        window.__sanjaPaymentIconsPromise = import('./payment-icons.js');
     }
+    window.__sanjaPaymentIconsPromise.then(({ hydratePaymentIcons }) => hydratePaymentIcons(form)).catch(() => {});
 }
 
 function setPaymentMethod(method) {

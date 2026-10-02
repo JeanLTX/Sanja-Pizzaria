@@ -2614,9 +2614,11 @@ h1, h2, h3, .serif-font {
   font-weight: 700 !important;
 }
 
-.payment-method-btn i {
+.payment-method-btn i,
+.payment-method-btn .payment-icon {
   width: 1.5rem !important;
   height: 1.5rem !important;
+  display: block;
 }
 
 /* Modal de dia fechado */
