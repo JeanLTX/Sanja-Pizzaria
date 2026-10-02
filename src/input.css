@@ -20,14 +20,6 @@ h1, h2, h3, .serif-font {
     font-family: 'Playfair Display', serif;
 }
 
-.font-great-vibes {
-    font-family: 'Great Vibes', cursive;
-}
-
-.font-montserrat {
-    font-family: 'Montserrat', sans-serif;
-}
-
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
   font-weight: 400;
@@ -94,36 +86,43 @@ h1, h2, h3, .serif-font {
 
 /* Componentes */
 
-@keyframes bounceInfinite {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.cta-btn {
-    will-change: transform, opacity;
-    opacity: 0; /* Começa invisível, GSAP controla a entrada */
-    visibility: hidden; /* GSAP seta visible */
-}
-
-/* Aplica bounce infinito APÓS a entrada */
-.cta-btn.loaded {
-    opacity: 1 !important; /* Force visibility */
-    animation: bounceInfinite 2s infinite ease-in-out;
-}
-
-/* Hover só funciona DEPOIS de carregado (.loaded) para não quebrar a entrada */
-.cta-btn.loaded:hover {
-    opacity: 1 !important;
-    animation: bounceDown 1.5s infinite;
-    transform: scale(1.05);
-}
-
 .cta-btn:focus {
     box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.18);
 }
 
+.cta-btn.cta-enter {
+    animation: sanjaCtaEnter 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.cta-btn.cta-bounce {
+    animation: sanjaCtaBounce 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes sanjaCtaEnter {
+    from {
+        transform: translateY(100px) scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes sanjaCtaBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .cta-btn { animation: none !important; transition: none !important; }
+    .cta-btn.cta-enter,
+    .cta-btn.cta-bounce,
+    .cta-btn {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
 }
 
 /* ==========================================

@@ -1507,12 +1507,6 @@ body {
 h1, h2, h3, .serif-font {
   font-family: 'Playfair Display', serif;
 }
-.font-great-vibes {
-  font-family: 'Great Vibes', cursive;
-}
-.font-montserrat {
-  font-family: 'Montserrat', sans-serif;
-}
 .bebas-neue-regular {
   font-family: "Bebas Neue", sans-serif;
   font-weight: 400;
@@ -1566,8 +1560,19 @@ h1, h2, h3, .serif-font {
 #site-header, #floating-logo {
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
-#site-header.navbar-hidden, #floating-logo.navbar-hidden {
+#site-header.navbar-hidden {
   transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+#floating-logo {
+  left: 50%;
+  width: 161px;
+  height: 120px;
+  transform: translate3d(-50%, 0, 0);
+}
+#floating-logo.navbar-hidden {
+  transform: translate3d(-50%, -100%, 0);
   opacity: 0;
   pointer-events: none;
 }
@@ -1601,36 +1606,8 @@ h1, h2, h3, .serif-font {
 .btn-add:active {
   transform: scale(0.98);
 }
-@keyframes bounceInfinite {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-.cta-btn {
-  will-change: transform, opacity;
-  opacity: 0;
-  visibility: hidden;
-}
-.cta-btn.loaded {
-  opacity: 1 !important;
-  animation: bounceInfinite 2s infinite ease-in-out;
-}
-.cta-btn.loaded:hover {
-  opacity: 1 !important;
-  animation: bounceDown 1.5s infinite;
-  transform: scale(1.05);
-}
 .cta-btn:focus {
   box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.18);
-}
-@media (prefers-reduced-motion: reduce) {
-  .cta-btn {
-    animation: none !important;
-    transition: none !important;
-  }
 }
 .half-modal-container {
   background: #ffffff;
@@ -2221,6 +2198,8 @@ h1, h2, h3, .serif-font {
   }
 }
 .category-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
   scroll-margin-top: 120px;
 }
 #cart-drawer {
@@ -2635,9 +2614,28 @@ h1, h2, h3, .serif-font {
   font-weight: 700 !important;
 }
 
-.payment-method-btn i {
+.payment-method-btn i,
+.payment-method-btn .payment-icon {
   width: 1.5rem !important;
   height: 1.5rem !important;
+  display: block;
+}
+
+.hours-badge {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.hours-badge svg,
+.hours-badge i {
+  flex: 0 0 1rem;
+  width: 1rem !important;
+  height: 1rem !important;
+  display: block;
 }
 
 /* Modal de dia fechado */
@@ -2664,5 +2662,44 @@ h1, h2, h3, .serif-font {
 @media (max-width: 767px) {
   .hero-menu-btn {
     display: none !important;
+  }
+}
+
+/* CTA hero sem dependência de GSAP */
+.cta-btn.cta-enter,
+.cta-btn.cta-bounce {
+  will-change: transform, opacity;
+}
+
+.cta-btn.cta-enter {
+  animation: sanjaCtaEnter 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.cta-btn.cta-bounce {
+  animation: sanjaCtaBounce 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes sanjaCtaEnter {
+  from {
+    transform: translateY(100px) scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes sanjaCtaBounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-btn.cta-enter,
+  .cta-btn.cta-bounce {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
 }
