@@ -35,7 +35,7 @@ const PIZZAS_SALGADAS = [
     { id: 18, name: "FRANCESA", category: "Pizzas Salgadas", desc: "Molho, mussarela, presunto, bacon, azeitona e orégano.", img: "assets/francesa.webp", type: "pizza", prices: { P: 57.00, M: 57.00, G: 57.00 } },
     { id: 19, name: "FRANCHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, bacon, cheddar e Doritos.", img: "assets/frankedar.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } },
     { id: 20, name: "FRANGO CAIPIRA", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, milho, cheddar, calabresa e orégano.", img: "assets/frango_caipira.webp", type: "pizza", prices: { P: 61.00, M: 61.00, G: 61.00 } },
-    { id: 21, name: "FRANGO C/ CATUPIRY OU CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, catupiry ou cheddar.", img: "assets/frangocomcatupiry.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 } },
+    { id: 21, name: "FRANGO C/ CATUPIRY OU CHEDDAR", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, catupiry ou cheddar.", img: "assets/frangocomcatupiry.webp", type: "pizza", prices: { P: 55.00, M: 55.00, G: 55.00 }, choice: { label: "Escolha o recheio", options: [{ id: "catupiry", label: "Catupiry" }, { id: "cheddar", label: "Cheddar" }] } },
     { id: 22, name: "FRANGO C/ CREME CHEESE", category: "Pizzas Salgadas", desc: "Molho, mussarela, frango, cebola e creme cheese.", img: "assets/creamcheese.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
     { id: 23, name: "LOMBO", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo e orégano.", img: "assets/lombo.webp", type: "pizza", prices: { P: 54.00, M: 54.00, G: 54.00 } },
     { id: 24, name: "LOMBO ESPECIAL", category: "Pizzas Salgadas", desc: "Molho, mussarela, lombo, champignon, catupiry e orégano.", img: "assets/lombo_especial.webp", type: "pizza", prices: { P: 56.00, M: 56.00, G: 56.00 } },
@@ -567,6 +567,7 @@ const renderComboCard = (combo) => {
 // --- LÓGICA DO MODAL DE PRODUTO ---
 let currentModalItem = null;
 let currentModalSize = 'M';
+let currentModalChoice = null;
 
 // --- LÓGICA MEIO A MEIO ---
 let halfPizzaState = {
@@ -1312,6 +1313,7 @@ function addComboToCart() {
 
 function openProductModal(item) {
     currentModalItem = item;
+    currentModalChoice = null;
     const modal = document.getElementById('product-modal');
     const modalImg = document.getElementById('modal-img');
     const modalName = document.getElementById('modal-name');
@@ -1331,6 +1333,7 @@ function openProductModal(item) {
     modalName.textContent = item.name.toUpperCase();
     modalDesc.textContent = item.desc;
     modalNote.value = '';
+    renderModalChoice(item.type === 'pizza' ? item.choice : null);
 
     const hasVariations = item.prices && typeof item.prices === 'object';
 
@@ -1381,6 +1384,7 @@ function openProductModal(item) {
     }
 
     updateModalPrice();
+    updateModalAddButton();
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('modal-open');
@@ -1421,6 +1425,50 @@ function setModalSize(size) {
     updateModalPrice();
 }
 
+function renderModalChoice(choice) {
+    const container = document.getElementById('modal-choices-container');
+    const label = document.getElementById('modal-choices-label');
+    const grid = document.getElementById('modal-choices-grid');
+    if (!container || !label || !grid) return;
+
+    if (!choice || !Array.isArray(choice.options) || choice.options.length === 0) {
+        container.classList.add('hidden');
+        grid.innerHTML = '';
+        return;
+    }
+
+    label.textContent = choice.label || 'Escolha uma opção';
+    grid.innerHTML = choice.options.map(option => `
+        <button type="button" class="modal-choice-btn p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center ${option.id === currentModalChoice ? 'border-red-500 bg-red-50 text-red-700 font-bold' : 'border-gray-200 text-gray-500'}"
+            onclick="setModalChoice('${option.id}')" id="choice-btn-${option.id}">
+            <span class="text-sm">${option.label}</span>
+        </button>
+    `).join('');
+
+    container.classList.remove('hidden');
+}
+
+function setModalChoice(choiceId) {
+    if (!currentModalItem?.choice) return;
+    const isValid = currentModalItem.choice.options.some(option => option.id === choiceId);
+    if (!isValid) return;
+
+    currentModalChoice = choiceId;
+    renderModalChoice(currentModalItem.choice);
+    updateModalAddButton();
+}
+
+function updateModalAddButton() {
+    const button = document.getElementById('modal-add-btn');
+    if (!button) return;
+
+    const requiresChoice = currentModalItem?.choice?.options?.length > 0;
+    const ready = !requiresChoice || !!currentModalChoice;
+    button.disabled = !ready;
+    button.classList.toggle('opacity-50', !ready);
+    button.classList.toggle('cursor-not-allowed', !ready);
+}
+
 function renderModalBorders() {
     const select = document.getElementById('modal-border-select');
     if (!select) return;
@@ -1455,6 +1503,11 @@ function updateModalPrice() {
 document.getElementById('modal-add-btn').onclick = () => {
     if (!currentModalItem) return;
 
+    if (currentModalItem.choice?.options?.length > 0 && !currentModalChoice) {
+        showToast(`Escolha: ${currentModalItem.choice.label || 'uma opção'}`);
+        return;
+    }
+
     const note = document.getElementById('modal-note').value.trim();
     let itemToAdd = {};
 
@@ -1468,10 +1521,15 @@ document.getElementById('modal-add-btn').onclick = () => {
         let finalPrice = currentModalItem.prices[currentModalSize];
         if (borderObj) finalPrice += borderObj.prices[currentModalSize];
 
+        const selectedChoice = currentModalItem.choice?.options?.find(option => option.id === currentModalChoice);
+        const choiceDetails = selectedChoice
+            ? ` • ${currentModalItem.choice.label}: ${selectedChoice.label}`
+            : '';
+
         itemToAdd = {
             type: 'pizza',
             name: currentModalItem.name,
-            details: `Tam: ${sizesNames[currentModalSize]} • ${borderDisplay}`,
+            details: `Tam: ${sizesNames[currentModalSize]} • ${borderDisplay}${choiceDetails}`,
             price: finalPrice,
             note: note
         };
@@ -2039,6 +2097,7 @@ window.scrollToFooter = scrollToFooter;
 window.openProductModal = openProductModal;
 window.closeProductModal = closeProductModal;
 window.setModalSize = setModalSize;
+window.setModalChoice = setModalChoice;
 window.updateModalPrice = updateModalPrice;
 window.setPaymentMethod = setPaymentMethod;
 window.closeClosedDayModal = closeClosedDayModal;
