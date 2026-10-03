@@ -64,6 +64,23 @@ const PIZZAS_SALGADAS = [
     { id: 47, name: "MONTE SUA PIZZA", category: "Pizzas Salgadas", desc: "Com até 5 ingredientes.", img: "assets/monte_sua_pizza.webp", type: "pizza", prices: { P: 62.00, M: 62.00, G: 62.00 } }
 ];
 
+// Preços confirmados pela Sanja para pizzas de 25cm (tamanho M / 6 fatias).
+// As demais pizzas de 25cm ficam em R$ 40,00.
+const MEDIUM_PIZZA_PRICES = {
+    1: 44.00,
+    12: 45.00,
+    13: 44.00,
+    17: 44.00,
+    19: 45.00,
+    25: 45.00,
+    44: 45.00,
+    47: 48.00
+};
+
+PIZZAS_SALGADAS.forEach(pizza => {
+    pizza.prices.M = MEDIUM_PIZZA_PRICES[pizza.id] ?? 40.00;
+});
+
 const PIZZAS_ESPECIAIS = [
     { id: 99, name: "Pizza Sanja", category: "Pizzas Especiais", desc: "Molho, frango desfiado, cheddar, milho, muçarela, bacon, orégano.", img: "assets/sanja.webp", type: "pizza", prices: { P: 59.90, M: 61.90, G: 75.90 } }
 ];
