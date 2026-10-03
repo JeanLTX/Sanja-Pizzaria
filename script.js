@@ -454,6 +454,13 @@ const getCardImageSrc = (src) => {
     return `assets/thumbs/${relativePath}`;
 };
 
+const getModalImageSrc = (src) => {
+    if (!src || !src.startsWith('assets/')) return src;
+    const relativePath = src.slice('assets/'.length);
+    if (relativePath.includes('/')) return src;
+    return `assets/modal/${relativePath}`;
+};
+
 const renderPizzaCard = (pizza) => {
     const card = document.createElement('div');
     card.className = "flex items-center gap-4 p-4 bg-white border border-red-100 rounded-3xl shadow-sm hover:shadow-md hover:border-red-200 transition-[transform,box-shadow,border-color] duration-300 cursor-pointer group relative z-10";
@@ -595,7 +602,7 @@ function renderHalfFlavors() {
             <button type="button" onclick="selectFlavor(${pizza.id})" id="flavor-card-${pizza.id}"
                 class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                 <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                    <img src="${getCardImageSrc(pizza.img)}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
+                    <img src="${getModalImageSrc(pizza.img)}" alt="${pizza.name}" width="700" height="700" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/modal/logosemfundo.webp'">
                 </div>
                 <div class="flavor-card-body p-3 relative">
                     <div class="flavor-card-content">
@@ -966,7 +973,7 @@ function renderComboStep() {
                          <button type="button" data-flavor-id="${pizza.id}" data-sweet="${isPerfeitoStep2}"
                              class="flavor-card ${isSelected ? (selectionIndex === 0 ? 'selected-1' : 'selected-2') : ''} border rounded-xl overflow-hidden cursor-pointer text-left transition-all">
                             <div class="flavor-card-img-container h-24 sm:h-28 w-full bg-gray-50 overflow-hidden relative">
-                                <img src="${getCardImageSrc(pizza.img)}" alt="${pizza.name}" width="224" height="224" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
+                                <img src="${getModalImageSrc(pizza.img)}" alt="${pizza.name}" width="700" height="700" loading="lazy" decoding="async" class="flavor-card-img w-full h-full object-cover" onerror="this.src='assets/modal/logosemfundo.webp'">
                             </div>
                             <div class="flavor-card-body p-3 relative">
                                 <div class="flavor-card-content">
