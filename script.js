@@ -186,7 +186,7 @@ const ESFIHAS_SALGADAS = [
 ];
 
 const ESFIHAS_DOCES = [
-    { id: 142, name: "CHOCOLATE COM GRANULADO OU CONFETE", category: "Esfihas Doces", desc: "Chocolate com granulado ou confete.", img: "assets/esfihas_doces_chocolate.webp", type: "drink", price: 7.00 },
+    { id: 142, name: "CHOCOLATE COM GRANULADO OU CONFETE", category: "Esfihas Doces", desc: "Chocolate com granulado ou confete.", img: "assets/esfihas_doces_chocolate.webp", type: "drink", price: 7.00, choice: { label: "Escolha a cobertura", options: [{ id: "granulado", label: "Granulado" }, { id: "confete", label: "Confete" }] } },
     { id: 143, name: "PRESTÍGIO", category: "Esfihas Doces", desc: "Chocolate, coco ralado e leite condensado.", img: "assets/esfihas_doces_prestigio.webp", type: "drink", price: 7.00 },
     { id: 144, name: "DOCES DE LEITE", category: "Esfihas Doces", desc: "Queijo, doce de leite e leite condensado.", img: "assets/esfihas_doces_docedeleite.webp", type: "drink", price: 7.00 },
     { id: 145, name: "CHOCOLATE DUO", category: "Esfihas Doces", desc: "Chocolate preto e branco.", img: "assets/esfihas_doces_duo.webp", type: "drink", price: 7.00 },
@@ -1333,7 +1333,7 @@ function openProductModal(item) {
     modalName.textContent = item.name.toUpperCase();
     modalDesc.textContent = item.desc;
     modalNote.value = '';
-    renderModalChoice(item.type === 'pizza' ? item.choice : null);
+    renderModalChoice(item.choice || null);
 
     const hasVariations = item.prices && typeof item.prices === 'object';
 
@@ -1535,10 +1535,16 @@ document.getElementById('modal-add-btn').onclick = () => {
         };
     } else {
         const hasVariations = currentModalItem.prices && typeof currentModalItem.prices === 'object';
+        const selectedChoice = currentModalItem.choice?.options?.find(option => option.id === currentModalChoice);
+        const baseDetails = hasVariations ? currentModalItem.options[currentModalSize].label : currentModalItem.desc;
+        const choiceDetails = selectedChoice
+            ? ` • ${currentModalItem.choice.label}: ${selectedChoice.label}`
+            : '';
+
         itemToAdd = {
             type: currentModalItem.type || 'item',
             name: currentModalItem.name,
-            details: hasVariations ? currentModalItem.options[currentModalSize].label : currentModalItem.desc,
+            details: `${baseDetails}${choiceDetails}`,
             price: hasVariations ? currentModalItem.prices[currentModalSize] : currentModalItem.price,
             note: note
         };
