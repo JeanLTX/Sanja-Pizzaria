@@ -1161,6 +1161,16 @@ h1, h2, h3, .serif-font {
     .desktop-navbar {
         display: none !important;
     }
+
+    /* Remove o excesso de espaço em volta da barra de categorias no mobile. */
+    main > #categories-bar {
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    main.max-w-3xl {
+        padding-top: 0 !important;
+    }
 }
 
 @media (min-width: 768px) {

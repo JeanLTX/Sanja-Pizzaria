@@ -2467,16 +2467,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const categoriesBar = document.getElementById('categories-bar');
         const floatingLogo = document.getElementById('floating-logo');
 
-        // Hero section height (viewport height)
-        const heroHeight = window.__sanjaHeroHeight || window.innerHeight;
-
-        // Hide navbar and logo on scroll down, show only at hero (top)
-        if (scrollY > 100 && scrollY > heroHeight * 0.3) {
-            // Scrolled past hero - hide navbar and logo
+        // Logo e links da navbar respondem juntos ao mesmo ponto de scroll.
+        if (scrollY > 40) {
             if (header) header.classList.add('navbar-hidden');
             if (floatingLogo) floatingLogo.classList.add('navbar-hidden');
         } else {
-            // At or near hero - show navbar and logo
             if (header) header.classList.remove('navbar-hidden');
             if (floatingLogo) floatingLogo.classList.remove('navbar-hidden');
         }
