@@ -865,12 +865,16 @@ function renderEsfihaCombo() {
                             <div class="esfiha-choice-controls">
                                 <button type="button" class="esfiha-qty-btn" data-esfiha-index="${index}" data-esfiha-delta="-1"
                                     ${quantity === 0 ? 'disabled' : ''} aria-label="Remover uma ${variant.name}">
-                                    <i data-lucide="minus" class="w-4 h-4"></i>
+                                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                                        <path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                    </svg>
                                 </button>
                                 <span class="esfiha-qty-value">${quantity}</span>
                                 <button type="button" class="esfiha-qty-btn esfiha-qty-add" data-esfiha-index="${index}" data-esfiha-delta="1"
                                     ${total >= 10 ? 'disabled' : ''} aria-label="Adicionar uma ${variant.name}">
-                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+                                        <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -1183,7 +1187,8 @@ const COMBO_BORDER_SIZES = {
 const COMBO_BORDER_IMAGES = {
     catupiry: 'assets/catupiry.webp',
     cheddar: 'assets/cheddar.webp',
-    chocolate: 'assets/chocolate.webp'
+    chocolate: 'assets/chocolate.webp',
+    mussarela: 'assets/catupiry.webp'
 };
 
 function getComboBorderPrice() {
@@ -2202,7 +2207,7 @@ function renderCheckoutForm() {
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Localização para entrega</label>
             <p class="text-xs text-gray-500 leading-relaxed mb-3">
-                Principalmente para endereços na zona rural, envie sua localização atual para ajudar o entregador a encontrar você.
+                Envie sua localização atual para ajudar o entregador a encontrar você.
             </p>
             <button type="button" onclick="captureUserLocation()"
                 class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 border-red-500 text-red-600 font-bold hover:bg-red-50 transition-colors ${checkoutData.location ? 'bg-red-50' : 'bg-white'}">

@@ -1680,3 +1680,66 @@ h1, h2, h3, .serif-font {
         transition: none;
     }
 }
+
+
+/* PAGAMENTO NO CHECKOUT — botões lado a lado e ícones compactos */
+.payment-method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.payment-method-btn {
+    min-width: 0;
+    min-height: 76px;
+    padding: 0.65rem 0.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.9rem;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color .2s ease, background-color .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.payment-method-btn:hover {
+    border-color: #fca5a5;
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.payment-method-btn:active {
+    transform: scale(.98);
+}
+
+.payment-method-btn.active {
+    border-color: #ef4444;
+    background: #fef2f2;
+    color: #dc2626;
+    box-shadow: 0 0 0 2px #fee2e2;
+}
+
+.payment-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+}
+
+.payment-icon svg {
+    width: 24px;
+    height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    display: block;
+}
