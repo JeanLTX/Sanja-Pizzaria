@@ -276,6 +276,113 @@ const isPromoActiveForPizza = (pizza, size, selectedChoice = null) =>
     size === PROMO_PIZZA_SIZE &&
     isPromoPizza(pizza, selectedChoice);
 
+// Lembrete da promoção nos dias em que ela não está ativa.
+// O aviso aparece uma vez por sessão, desce do topo e pode ser fechado
+// pelo X, pelo swipe ou automaticamente após 5 segundos.
+const PROMO_REMINDER_DELAY = 4500;
+const PROMO_REMINDER_DURATION = 5000;
+const PROMO_REMINDER_SESSION_KEY = 'sanja-promo-reminder-shown';
+const PROMO_REMINDER_TEST_MODE = new URLSearchParams(window.location.search).get('promoTest') === '1';
+
+const showPromoReminder = (force = false) => {
+    if (isPromoDay() && !force) return;
+
+    try {
+        if (!force) {
+            if (sessionStorage.getItem(PROMO_REMINDER_SESSION_KEY) === 'true') return;
+            sessionStorage.setItem(PROMO_REMINDER_SESSION_KEY, 'true');
+        }
+    } catch (e) { }
+
+    const notification = document.createElement('aside');
+    notification.className = 'sanja-promo-notification';
+    notification.setAttribute('role', 'status');
+    notification.setAttribute('aria-live', 'polite');
+    notification.innerHTML = '<div class="sanja-promo-notification-icon" aria-hidden="true"><img src="assets/category-icons/pizza1.webp" alt="" width="44" height="44"></div>' +
+        '<div class="sanja-promo-notification-content"><strong>🍕 Promoção na Sanja</strong><span>Terça a Quinta • pizzas selecionadas por <strong>R$ 45,00</strong></span></div>' +
+        '<button type="button" class="sanja-promo-notification-close" aria-label="Fechar aviso"><i data-lucide="x"></i></button>';
+
+    document.body.appendChild(notification);
+
+    if (window.lucide) {
+        lucide.createIcons({ root: notification });
+    }
+
+    let closeTimer = null;
+    let removeTimer = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const closeNotification = (exitX = '0px', exitY = '-135%') => {
+        if (closeTimer) clearTimeout(closeTimer);
+        if (removeTimer) clearTimeout(removeTimer);
+
+        notification.classList.remove('is-visible');
+        notification.classList.remove('is-dragging');
+        notification.classList.add('is-leaving');
+        notification.style.setProperty('--sanja-promo-exit-x', exitX);
+        notification.style.setProperty('--sanja-promo-exit-y', exitY);
+        notification.style.removeProperty('--sanja-promo-drag-x');
+        notification.style.removeProperty('--sanja-promo-drag-y');
+
+        removeTimer = setTimeout(() => notification.remove(), 320);
+    };
+
+    notification.querySelector('.sanja-promo-notification-close')?.addEventListener('click', closeNotification);
+
+    notification.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        if (!touch) return;
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+    }, { passive: true });
+
+    notification.addEventListener('touchmove', (event) => {
+        const touch = event.touches[0];
+        if (!touch) return;
+
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 8) return;
+
+        event.preventDefault();
+        notification.classList.add('is-dragging');
+        notification.style.setProperty('--sanja-promo-drag-x', `${deltaX}px`);
+        notification.style.setProperty('--sanja-promo-drag-y', `${deltaY}px`);
+    }, { passive: false });
+
+    notification.addEventListener('touchend', (event) => {
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        const distance = Math.max(Math.abs(deltaX), Math.abs(deltaY));
+
+        notification.classList.remove('is-dragging');
+
+        if (distance >= 60) {
+            const horizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+            const exitX = horizontalSwipe ? (deltaX > 0 ? '120vw' : '-120vw') : '0px';
+            const exitY = horizontalSwipe ? '0px' : (deltaY > 0 ? '120vh' : '-135%');
+            closeNotification(exitX, exitY);
+            return;
+        }
+
+        notification.style.removeProperty('--sanja-promo-drag-x');
+        notification.style.removeProperty('--sanja-promo-drag-y');
+    }, { passive: true });
+
+    requestAnimationFrame(() => notification.classList.add('is-visible'));
+    closeTimer = setTimeout(closeNotification, PROMO_REMINDER_DURATION);
+};
+
+const schedulePromoReminder = () => {
+    if (isClosedToday()) return;
+    if (isPromoDay() && !PROMO_REMINDER_TEST_MODE) return;
+    window.setTimeout(() => showPromoReminder(PROMO_REMINDER_TEST_MODE), PROMO_REMINDER_DELAY);
+};
+
 const COMBOS = [
     {
         id: "individual",
@@ -514,8 +621,8 @@ const renderPizzaCard = (pizza) => {
     card.onclick = () => openProductModal(pizza);
 
     const minPrice = Math.min(...Object.values(pizza.prices));
-    const showPromo = isPromoPizza(pizza);
-    const promoActive = showPromo && isPromoDay();
+    const showPromo = isPromoPizza(pizza) && isPromoDay();
+    const promoActive = showPromo;
     const promoRegularPrice = showPromo ? pizza.prices[PROMO_PIZZA_SIZE] : null;
 
     card.innerHTML = `
@@ -2328,6 +2435,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isClosedToday()) {
         openClosedDayModal();
+    }
+
+    // A promoção aparece no banner apenas nos dias ativos.
+    // Nos demais dias, o banner some e o lembrete discreto é agendado.
+    const promoBanner = document.getElementById('promo-pizzas');
+    const promoActiveToday = isPromoDay() && !PROMO_REMINDER_TEST_MODE;
+    if (promoBanner) {
+        promoBanner.classList.toggle('hidden', !promoActiveToday);
+    }
+
+    if (!promoActiveToday) {
+        schedulePromoReminder();
     }
 
     // Active Category Logic

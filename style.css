@@ -2842,6 +2842,157 @@ h1, h2, h3, .serif-font {
   font-size: 9px;
   letter-spacing: .03em;
 }
+.sanja-promo-notification {
+  --sanja-promo-drag-x: 0px;
+  --sanja-promo-drag-y: 0px;
+  --sanja-promo-exit-x: 0px;
+  --sanja-promo-exit-y: -135%;
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  left: 50%;
+  width: min(420px, calc(100vw - 24px));
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem 2.8rem .7rem .7rem;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  background: rgba(48, 48, 48, .64);
+  color: #fff;
+  box-shadow: 0 14px 36px rgba(0,0,0,.24), 0 4px 14px rgba(0,0,0,.12);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
+  backdrop-filter: blur(24px) saturate(125%);
+  transform: translate3d(calc(-50% + var(--sanja-promo-drag-x)), calc(-135% + var(--sanja-promo-drag-y)), 0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1200;
+  overflow: hidden;
+  will-change: transform, opacity;
+  transition: transform .38s cubic-bezier(.22,1,.36,1), opacity .28s ease;
+}
+.sanja-promo-notification.is-visible {
+  transform: translate3d(calc(-50% + var(--sanja-promo-drag-x)), var(--sanja-promo-drag-y), 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.sanja-promo-notification.is-leaving {
+  transform: translate3d(calc(-50% + var(--sanja-promo-exit-x)), var(--sanja-promo-exit-y), 0);
+  opacity: 0;
+  pointer-events: none;
+}
+.sanja-promo-notification.is-dragging {
+  transition: none;
+}
+.sanja-promo-notification-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  overflow: visible;
+  border-radius: 13px;
+  background: transparent;
+  box-shadow: none;
+}
+.sanja-promo-notification-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+.sanja-promo-notification-content {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sanja-promo-notification-content strong, .sanja-promo-notification-content span {
+  display: block;
+  min-width: 0;
+}
+.sanja-promo-notification-content strong {
+  white-space: nowrap;
+}
+.sanja-promo-notification-content span {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.sanja-promo-notification-content span strong {
+  display: inline;
+  white-space: nowrap;
+}
+.sanja-promo-notification-content strong {
+  font-size: .875rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+}
+.sanja-promo-notification-content span {
+  color: rgba(255,255,255,.84);
+  font-size: .75rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+.sanja-promo-notification-close {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.86);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+.sanja-promo-notification-close:hover {
+  background: rgba(255,255,255,.18);
+  color: #fff;
+}
+.sanja-promo-notification-close:active {
+  transform: scale(.92);
+}
+.sanja-promo-notification-close svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.4;
+}
+@media (max-width: 639px) {
+  .sanja-promo-notification {
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    width: calc(100vw - 20px);
+    min-height: 64px;
+    gap: .65rem;
+    padding: .62rem 2.6rem .62rem .62rem;
+    border-radius: 19px;
+  }
+  .sanja-promo-notification-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    border-radius: 12px;
+  }
+  .sanja-promo-notification-content strong {
+    font-size: .85rem;
+  }
+  .sanja-promo-notification-content span {
+    font-size: .73rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sanja-promo-notification {
+    transition: none;
+  }
+}
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;
