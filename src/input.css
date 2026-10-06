@@ -826,6 +826,7 @@ h1, h2, h3, .serif-font {
     border-top: 1px solid #e5e7eb;
     padding: 16px;
     background: #f9fafb;
+    flex: 0 0 auto;
 }
 
 /* FAB */
@@ -1742,4 +1743,21 @@ h1, h2, h3, .serif-font {
     max-width: 24px;
     max-height: 24px;
     display: block;
+}
+
+/* CARRINHO NO MOBILE — acompanha a viewport dinâmica do Safari/iOS */
+@media (max-width: 767px) {
+    #cart-drawer {
+        height: 100dvh;
+        max-height: 100dvh;
+    }
+
+    .cart-drawer-body {
+        min-height: 0;
+    }
+
+    .cart-drawer-footer {
+        flex: 0 0 auto;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
 }
