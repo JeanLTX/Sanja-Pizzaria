@@ -176,6 +176,27 @@
             </div>
         </div>
 
+        <!-- AVISO DE PROMOÇÃO -->
+        <section id="promo-pizzas" class="promo-pizzas-card mb-8" aria-label="Promoção de pizzas">
+            <div class="promo-pizzas-glow" aria-hidden="true"></div>
+            <div class="promo-pizzas-content">
+                <div class="promo-pizzas-icon" aria-hidden="true">
+                    <img src="assets/category-icons/pizza1.webp" alt="" width="34" height="34" class="promo-pizzas-icon-img">
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                        <span class="promo-pizzas-kicker">Promoção</span>
+                        <span class="promo-pizzas-days">Terça a quinta</span>
+                    </div>
+                    <h2 class="promo-pizzas-title">Pizzas selecionadas por apenas <strong>R$ 45,00</strong></h2>
+                    <p class="promo-pizzas-copy">Confira os sabores participantes e escolha sua pizza favorita.</p>
+                </div>
+                <button type="button" class="promo-pizzas-btn" onclick="scrollToCategory('salgadas')">
+                    <span>Ver sabores</span>
+                </button>
+            </div>
+        </section>
+
         <!-- CONTAINER DE PIZZAS -->
         <div id="pizzas-container" class="space-y-12">
             <!-- Categorias renderizadas via JS -->
@@ -227,7 +248,7 @@
             </div>
 
             <div class="border-t border-gray-800 pt-8 flex flex-col items-center gap-2 text-xs text-gray-500">
-                <a href="https://sanjapizzaria.com.br/" target="_blank"
+                <a href="https://codebyjean.netlify.app/" target="_blank"
                     class="font-bold text-gray-500 hover:text-orange-500 transition-all flex items-center gap-2 group mb-1">
                     Desenvolvido por <span
                         class="text-gray-400 group-hover:text-orange-500 transition-colors underline decoration-gray-700 underline-offset-4">CodeByJean</span>
@@ -388,6 +409,51 @@
                     <span>Adicionar ao Pedido</span>
                     <span id="modal-price-display" class="ml-2 px-3 py-1 bg-white/20 rounded-lg text-sm"></span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODAL DE COMBO DE 10 ESFIHAS -->
+    <div id="esfiha-combo-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center p-3 sm:p-4">
+        <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" onclick="closeEsfihaComboModal()"></div>
+
+        <div class="esfiha-combo-modal-container bg-white w-full max-w-[520px] rounded-3xl overflow-hidden shadow-2xl relative z-10 flex flex-col max-h-[92vh] max-h-[92dvh] my-auto">
+            <button class="modal-close-btn" onclick="closeEsfihaComboModal()" aria-label="Fechar modal">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div class="relative shrink-0 h-44 sm:h-52 w-full bg-gray-100 overflow-hidden">
+                <img id="esfiha-combo-modal-img" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5 pt-12">
+                    <span id="esfiha-combo-modal-badge" class="inline-flex items-center rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">Combo</span>
+                    <h2 id="esfiha-combo-modal-name" class="mt-1 text-xl sm:text-2xl font-bold text-white uppercase font-serif"></h2>
+                </div>
+            </div>
+
+            <div id="esfiha-combo-modal-content" class="flex-1 min-h-0 overflow-y-auto bg-white px-4 py-4 sm:px-5 sm:py-5 no-scrollbar"></div>
+
+            <div class="shrink-0 border-t border-gray-200 bg-white px-4 py-4 sm:px-5">
+                <div id="esfiha-combo-summary" class="esfiha-combo-summary mb-3 rounded-2xl border border-orange-100 bg-orange-50 p-3">
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-orange-500">Seu combo</span>
+                        <span id="esfiha-combo-count" class="text-xs font-bold text-orange-700">0 / 10</span>
+                    </div>
+                    <div id="esfiha-combo-summary-list" class="space-y-1 text-xs text-orange-900">
+                        <span class="text-orange-400">Escolha suas 10 esfihas.</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex flex-col shrink-0">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total</span>
+                        <span id="esfiha-combo-modal-price" class="text-xl sm:text-2xl font-bold text-red-600">R$ 40,00</span>
+                    </div>
+                    <button id="esfiha-combo-add-btn" type="button" onclick="addEsfihaComboToCart()" disabled
+                        class="flex-1 min-h-12 rounded-xl sm:rounded-2xl bg-red-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
+                        <span>Adicionar ao pedido</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
