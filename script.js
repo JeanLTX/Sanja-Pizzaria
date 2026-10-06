@@ -158,27 +158,27 @@ const PORCOES_MEIA = [
 
 const ESFIHAS_SALGADAS = [
     { id: 120, name: "FRANGO", category: "Esfihas Salgadas", desc: "Frango e mussarela.", img: "assets/esfihas/esfihafrango.webp", type: "drink", price: 5.00 },
-    { id: 121, name: "FRANGO C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Frango e catupiry.", img: "assets/esfihas/esfihafrango_com_catupiry.webp", type: "drink", price: 5.00 },
-    { id: 122, name: "FRANGO C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Frango e cheddar.", img: "assets/esfihas/frango_com_cheddar.webp", type: "drink", price: 5.00 },
-    { id: 123, name: "FRANGO C/ CATUPIRY E MUSSARELA", category: "Esfihas Salgadas", desc: "Frango, catupiry e mussarela.", img: "assets/esfihas/esfihafrango_com_catupiry_e_mussarela.webp", type: "drink", price: 5.00 },
+    { id: 121, name: "FRANGO C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Frango e catupiry.", img: "assets/esfihas/esfihafrango_com_catupiry.webp", type: "drink", price: 6.00 },
+    { id: 122, name: "FRANGO C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Frango e cheddar.", img: "assets/esfihas/frango_com_cheddar.webp", type: "drink", price: 6.00 },
+    { id: 123, name: "FRANGO C/ CATUPIRY E MUSSARELA", category: "Esfihas Salgadas", desc: "Frango, catupiry e mussarela.", img: "assets/esfihas/esfihafrango_com_catupiry_e_mussarela.webp", type: "drink", price: 6.50 },
     { id: 124, name: "CALABRESA", category: "Esfihas Salgadas", desc: "Calabresa.", img: "assets/esfihas/esfihacalabresa.webp", type: "drink", price: 5.00 },
-    { id: 125, name: "CALABRESA C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Calabresa e catupiry.", img: "assets/esfihas/calabresa_com_catupiry.webp", type: "drink", price: 5.00 },
-    { id: 126, name: "CALABRESA C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Calabresa e cheddar.", img: "assets/esfihas/calabresa_com_cheddar.webp", type: "drink", price: 5.00 },
+    { id: 125, name: "CALABRESA C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Calabresa e catupiry.", img: "assets/esfihas/calabresa_com_catupiry.webp", type: "drink", price: 6.00 },
+    { id: 126, name: "CALABRESA C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Calabresa e cheddar.", img: "assets/esfihas/calabresa_com_cheddar.webp", type: "drink", price: 6.00 },
     { id: 127, name: "PEPPERONI", category: "Esfihas Salgadas", desc: "Pepperoni e mussarela.", img: "assets/esfihas/esfihapepperoni.webp", type: "drink", price: 5.00 },
-    { id: 128, name: "PEPPERONI C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Pepperoni e cheddar.", img: "assets/esfihas/pepperoni_com_cheddar.webp", type: "drink", price: 5.00 },
-    { id: 129, name: "BRÓCOLIS", category: "Esfihas Salgadas", desc: "Brócolis, bacon e alho.", img: "assets/esfihas/esfihabrocolis.webp", type: "drink", price: 5.00 },
+    { id: 128, name: "PEPPERONI C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Pepperoni e cheddar.", img: "assets/esfihas/pepperoni_com_cheddar.webp", type: "drink", price: 6.00 },
+    { id: 129, name: "BRÓCOLIS", category: "Esfihas Salgadas", desc: "Brócolis, bacon e alho.", img: "assets/esfihas/esfihabrocolis.webp", type: "drink", price: 6.50 },
     { id: 130, name: "ATUM", category: "Esfihas Salgadas", desc: "Atum.", img: "assets/esfihas/esfihaatum.webp", type: "drink", price: 5.00 },
-    { id: 131, name: "ATUM C/ BACON", category: "Esfihas Salgadas", desc: "Atum e bacon.", img: "assets/esfihas/atum_com_bacon.webp", type: "drink", price: 5.00 },
+    { id: 131, name: "ATUM C/ BACON", category: "Esfihas Salgadas", desc: "Atum e bacon.", img: "assets/esfihas/atum_com_bacon.webp", type: "drink", price: 6.00 },
     { id: 132, name: "CARNE", category: "Esfihas Salgadas", desc: "Carne e tomate.", img: "assets/esfihas/esfihacarne.webp", type: "drink", price: 5.00 },
-    { id: 133, name: "CARNE C/ BACON E TOMATE", category: "Esfihas Salgadas", desc: "Carne, bacon e tomate.", img: "assets/esfihas/carne_com_bacon_e_tomate.webp", type: "drink", price: 5.00 },
+    { id: 133, name: "CARNE C/ BACON E TOMATE", category: "Esfihas Salgadas", desc: "Carne, bacon e tomate.", img: "assets/esfihas/carne_com_bacon_e_tomate.webp", type: "drink", price: 6.00 },
     { id: 134, name: "BAURU", category: "Esfihas Salgadas", desc: "Queijo, presunto e tomate.", img: "assets/esfihas/bauru.webp", type: "drink", price: 5.00 },
     { id: 135, name: "MUSSARELA", category: "Esfihas Salgadas", desc: "Mussarela.", img: "assets/esfihas/mussarela.webp", type: "drink", price: 5.00 },
-    { id: 136, name: "4 QUEIJOS", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e catupiry.", img: "assets/esfihas/esfiha4queijos.webp", type: "drink", price: 5.00 },
+    { id: 136, name: "4 QUEIJOS", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e catupiry.", img: "assets/esfihas/esfiha4queijos.webp", type: "drink", price: 6.00 },
     { id: 137, name: "4 QUEIJOS C/ CHEDDAR", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e cheddar.", img: "assets/esfihas/4queijos_com_cheddar.webp", type: "drink", price: 5.00 },
-    { id: 138, name: "4 QUEIJOS C/ BACON", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e bacon.", img: "assets/esfihas/4queijos_com_bacon.webp", type: "drink", price: 5.00 },
+    { id: 138, name: "4 QUEIJOS C/ BACON", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e bacon.", img: "assets/esfihas/4queijos_com_bacon.webp", type: "drink", price: 6.50 },
     { id: 139, name: "OPÇÃO LIGHT", category: "Esfihas Salgadas", desc: "Palmito e mussarela.", img: "assets/esfihas/opçãolight.webp", type: "drink", price: 5.00 },
-    { id: 140, name: "PALMITO ESPECIAL", category: "Esfihas Salgadas", desc: "Palmito, queijo e milho.", img: "assets/esfihas/palmitoespecial.webp", type: "drink", price: 5.00 },
-    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas de sua preferência. (Combo de 10 esfihas: R$ 40,00)", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 40.00 }
+    { id: 140, name: "PALMITO ESPECIAL", category: "Esfihas Salgadas", desc: "Palmito, queijo e milho.", img: "assets/esfihas/palmitoespecial.webp", type: "drink", price: 6.00 },
+    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas de sua preferência. (Combo de 10 esfihas: R$ 45,00)", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 45.00 }
 ];
 
 const ESFIHAS_DOCES = [
@@ -411,7 +411,7 @@ const COMBOS = [
         name: "Combo Família",
         badge: "Família",
         desc: "Combo Família que resolve! 👨‍👩‍👧‍👦\nPizza na lenha, massa artesanal e sabor incomparável!",
-        itens: ["Pizza 35cm · 10 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
+        itens: ["Pizza 35cm · 8 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
         price: 89.90,
         obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/combofamilia2.webp",
@@ -422,7 +422,7 @@ const COMBOS = [
         name: "Combo Perfeito",
         badge: "Perfeito",
         desc: "Experiência completa 🍕✨\nNa lenha, massa artesanal. Não fique na vontade! 😋",
-        itens: ["Pizza 35cm · 10 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
+        itens: ["Pizza 35cm · 8 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
         price: 115.90,
         obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/comboperfeito2.webp",
@@ -1955,7 +1955,7 @@ const renderHalfCard = () => {
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg> Média 6 Fatias
                 </span>
                 <span class="flex items-center gap-2 bg-black/10 px-4 py-2 rounded-xl text-xs font-bold border border-white/10 italic">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg> Grande 10 Fatias
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.5 2.5L16 9"></path></svg> Grande 8 Fatias
                 </span>
             </div>
         </div>
