@@ -194,51 +194,80 @@ const ESFIHAS_DOCES = [
 
 const BEBIDAS = [
     {
-        id: 150, name: "Coca-Cola", category: "Bebidas", desc: "A bebida mais famosa do mundo.",
+        id: 150, name: "Coca-Cola", category: "Bebidas", desc: "Coca-Cola normal e zero em diferentes tamanhos.",
         img: "assets/coca.webp",
         type: "drink",
         prices: {
-            "2L": 14.99,
-            "ZERO": 13.99,
-            "LATA": 8.50
+            "2L_NORMAL": 15.00,
+            "2L_ZERO": 15.00,
+            "LATA_NORMAL": 6.00,
+            "LATA_ZERO": 6.00,
+            "600_NORMAL": 9.00,
+            "600_ZERO": 9.00
         },
         options: {
-            "2L": { label: "Normal 2L", sub: "2 Litros" },
-            "ZERO": { label: "Zero 1.5L", sub: "1.5 Litros" },
-            "LATA": { label: "Lata", sub: "350ml" }
+            "2L_NORMAL": { label: "Normal 2L", sub: "2 Litros" },
+            "2L_ZERO": { label: "Zero 2L", sub: "2 Litros" },
+            "LATA_NORMAL": { label: "Lata normal", sub: "Lata" },
+            "LATA_ZERO": { label: "Lata zero", sub: "Lata" },
+            "600_NORMAL": { label: "Normal 600ml", sub: "600ml" },
+            "600_ZERO": { label: "Zero 600ml", sub: "600ml" }
         }
     },
     {
-        id: 151, name: "Guaraná Antarctica", category: "Bebidas", desc: "O sabor do Brasil.",
+        id: 151, name: "Guaraná Antarctica", category: "Bebidas", desc: "Guaraná Antarctica em diferentes tamanhos.",
         img: "assets/guarana.webp",
         type: "drink",
         prices: {
-            "2L": 14.90,
-            "1.5L_ZERO": 13.50,
-            "LATA": 8.50
+            "2L": 13.00,
+            "LATA": 6.00,
+            "600": 9.00
         },
         options: {
-            "2L": { label: "Normal 2L", sub: "2 Litros" },
-            "1.5L_ZERO": { label: "Zero 1.5L", sub: "1.5 Litros" },
-            "LATA": { label: "Lata", sub: "350ml" }
+            "2L": { label: "2 Litros", sub: "2L" },
+            "LATA": { label: "Lata", sub: "Lata" },
+            "600": { label: "600ml", sub: "600ml" }
         }
     },
     {
-        id: 152, name: "Fanta Laranja 2L", category: "Bebidas", desc: "Muito mais sabor.",
+        id: 152, name: "Fanta", category: "Bebidas", desc: "Fanta nos sabores laranja e uva.",
         img: "assets/fanta.webp",
-        type: "drink", price: 13.90
+        type: "drink",
+        prices: {
+            "LARANJA": 6.00,
+            "UVA": 6.00
+        },
+        options: {
+            "LARANJA": { label: "Laranja", sub: "Lata" },
+            "UVA": { label: "Uva", sub: "Lata" }
+        }
     },
     {
-        id: 153, name: "Água Mineral", category: "Bebidas", desc: "Refrescância pura.",
+        id: 154, name: "Suco Del Valle", category: "Bebidas", desc: "Suco Del Valle nos sabores uva, pêssego e goiaba.",
+        img: "assets/sucodelvalle.webp",
+        type: "drink",
+        prices: {
+            "UVA": 8.00,
+            "PESSEGO": 8.00,
+            "GOIABA": 8.00
+        },
+        options: {
+            "UVA": { label: "Uva", sub: "Del Valle" },
+            "PESSEGO": { label: "Pêssego", sub: "Del Valle" },
+            "GOIABA": { label: "Goiaba", sub: "Del Valle" }
+        }
+    },
+    {
+        id: 153, name: "Água Mineral", category: "Bebidas", desc: "Água mineral sem gás ou com gás.",
         img: "assets/agua.webp",
         type: "drink",
         prices: {
-            "SEM": 3.50,
-            "COM": 4.50
+            "SEM": 3.00,
+            "COM": 4.00
         },
         options: {
-            "SEM": { label: "Sem Gás", sub: "510ml" },
-            "COM": { label: "Com Gás", sub: "510ml" }
+            "SEM": { label: "Sem Gás", sub: "Água mineral" },
+            "COM": { label: "Com Gás", sub: "Água mineral" }
         }
     }
 ];
