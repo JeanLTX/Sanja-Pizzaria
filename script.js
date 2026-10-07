@@ -482,7 +482,46 @@ const CATEGORIES = [
 
 
 // ENTREGA
-// A taxa de entrega da Sanja é confirmada pela equipe conforme o endereço/localização.
+// Taxas fixas por região informadas pela Sanja.
+// Regiões urbanas que não estejam na lista específica usam a taxa padrão de R$ 4,00.
+const TAXAS_ENTREGA = [
+    { id: 'cidade', name: 'Demais regiões da cidade', fee: 4.00 },
+    { id: 'boa-vista', name: 'Boa Vista', fee: 30.00 },
+    { id: 'anhumas', name: 'Anhumas', fee: 25.00 },
+    { id: 'arrozal', name: 'Arrozal', fee: 20.00 },
+    { id: 'alegre-de-baixo', name: 'Alegre de baixo', fee: 25.00 },
+    { id: 'alegre-de-cima', name: 'Alegre de cima', fee: 30.00 },
+    { id: 'anzol', name: 'Anzol', fee: 20.00 },
+    { id: 'can-can-de-baixo', name: 'Can Can de baixo', fee: 6.00 },
+    { id: 'can-can-cima', name: 'Can Can cima', fee: 8.00 },
+    { id: 'cachoeirinha', name: 'Cachoeirinha', fee: 25.00 },
+    { id: 'cruz-vera', name: 'Cruz Vera', fee: 25.00 },
+    { id: 'vale-do-girassol', name: 'Vale do girassol', fee: 15.00 },
+    { id: 'sao-gabriel', name: 'São Gabriel', fee: 18.00 },
+    { id: 'japao', name: 'Japão', fee: 50.00 },
+    { id: 'luminosa', name: 'Luminosa', fee: 50.00 },
+    { id: 'bom-sucesso-comeco', name: 'Bom sucesso começo', fee: 18.00 },
+    { id: 'serra', name: 'Serra', fee: 25.00 },
+    { id: 'bengalau', name: 'Bengalau', fee: 15.00 },
+    { id: 'serra-dos-mendonca', name: 'Serra dos Mendonça', fee: 15.00 },
+    { id: 'farias-ate-o-radar', name: 'Farias até o radar', fee: 18.00 },
+    { id: 'frei-oreste', name: 'Frei Oreste', fee: 6.00 },
+    { id: 'estacao-dias', name: 'Estação Dias', fee: 20.00 },
+    { id: 'floresta', name: 'Floresta', fee: 50.00 },
+    { id: 'teodoros', name: 'Teodoros', fee: 30.00 },
+    { id: 'piraquara', name: 'Piraquara', fee: 18.00 },
+    { id: 'prainha', name: 'Prainha', fee: 18.00 },
+    { id: 'loba', name: 'Loba', fee: 8.00 },
+    { id: 'lagos-da-serra', name: 'Lagos da Serra', fee: 15.00 },
+    { id: 'parque-exposicao', name: 'Parque exposição', fee: 10.00 },
+    { id: 'retiro-anhumas', name: 'Retiro Anhumas', fee: 30.00 }
+];
+
+const normalizeSearchText = value => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 // ==========================================
 // 2. ESTADO DA APLICAÇÃO (STATE)
@@ -493,6 +532,7 @@ let checkoutData = {
     phone: '',
     address: '',
     location: null,
+    deliveryRegion: null,
     paymentMethod: ''
 };
 
@@ -565,8 +605,104 @@ const updateCartItemQuantity = (index, delta) => {
 };
 
 const getCartTotal = () => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-// A taxa de entrega é confirmada pela Sanja conforme a localização.
-const getDeliveryFee = () => 0;
+
+const getDeliveryFee = () => checkoutData.deliveryRegion?.fee || 0;
+
+function getDeliveryRegionMatches(query = '') {
+    const normalizedQuery = normalizeSearchText(query);
+    if (!normalizedQuery) return TAXAS_ENTREGA.slice(0, 8);
+
+    return TAXAS_ENTREGA
+        .filter(region => normalizeSearchText(region.name).includes(normalizedQuery))
+        .slice(0, 8);
+}
+
+function renderDeliveryRegionResults(query = '') {
+    const results = document.getElementById('delivery-region-results');
+    if (!results) return;
+
+    const matches = getDeliveryRegionMatches(query);
+
+    if (matches.length === 0) {
+        results.innerHTML = `
+            <div class="delivery-region-empty">
+                Nenhuma região encontrada.<br>
+                <span>Tente outro termo.</span>
+            </div>
+        `;
+        results.classList.remove('hidden');
+        return;
+    }
+
+    results.innerHTML = matches.map(region => `
+        <button type="button" class="delivery-region-option" onclick="selectDeliveryRegion('${region.id}')">
+            <span class="min-w-0">
+                <span class="delivery-region-option-name">${region.name}</span>
+                <span class="delivery-region-option-sub">Taxa de entrega</span>
+            </span>
+            <strong>${formatCurrency(region.fee)}</strong>
+        </button>
+    `).join('');
+
+    results.classList.remove('hidden');
+}
+
+function openDeliveryRegionSearch() {
+    const input = document.getElementById('delivery-region-search');
+    if (!input) return;
+    renderDeliveryRegionResults(input.value);
+}
+
+function updateDeliveryRegionSearch(query) {
+    const selected = checkoutData.deliveryRegion;
+    if (selected && normalizeSearchText(query) !== normalizeSearchText(selected.name)) {
+        checkoutData.deliveryRegion = null;
+        const selectedEl = document.getElementById('delivery-region-selected');
+        if (selectedEl) selectedEl.classList.add('hidden');
+    }
+    renderDeliveryRegionResults(query);
+    updateCheckoutForm();
+}
+
+function selectDeliveryRegion(regionId) {
+    const region = TAXAS_ENTREGA.find(item => item.id === regionId);
+    if (!region) return;
+
+    checkoutData.deliveryRegion = region;
+
+    const input = document.getElementById('delivery-region-search');
+    if (input) input.value = region.name;
+
+    const results = document.getElementById('delivery-region-results');
+    if (results) results.classList.add('hidden');
+
+    const selected = document.getElementById('delivery-region-selected');
+    if (selected) {
+        selected.innerHTML = `
+            <span>${region.name}</span>
+            <strong>${formatCurrency(region.fee)}</strong>
+        `;
+        selected.classList.remove('hidden');
+    }
+
+    updateCheckoutForm();
+}
+
+function clearDeliveryRegion() {
+    checkoutData.deliveryRegion = null;
+
+    const input = document.getElementById('delivery-region-search');
+    if (input) {
+        input.value = '';
+        input.focus();
+    }
+
+    const selected = document.getElementById('delivery-region-selected');
+    if (selected) selected.classList.add('hidden');
+
+    renderDeliveryRegionResults('');
+    updateCheckoutForm();
+}
 
 // ==========================================
 // 5. RENDERIZAÇÃO DE UI
@@ -2233,6 +2369,34 @@ function renderCheckoutForm() {
             <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
                 placeholder="Rua, Número, Bairro, Complemento" value="${checkoutData.address}" oninput="checkoutData.address = this.value">
         </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Região de Entrega</label>
+            <div class="delivery-region-search-wrap">
+                <span class="delivery-region-search-icon" aria-hidden="true">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
+                <input
+                    id="delivery-region-search"
+                    type="text"
+                    class="delivery-region-search-input"
+                    placeholder="Digite seu bairro ou região"
+                    autocomplete="off"
+                    value="${checkoutData.deliveryRegion?.name || ''}"
+                    onfocus="openDeliveryRegionSearch()"
+                    oninput="updateDeliveryRegionSearch(this.value)"
+                    onblur="setTimeout(() => document.getElementById('delivery-region-results')?.classList.add('hidden'), 150)"
+                >
+                <button type="button" class="delivery-region-clear" onclick="clearDeliveryRegion()" aria-label="Limpar região" title="Limpar região">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+                <div id="delivery-region-results" class="delivery-region-results hidden"></div>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-2">
+                Comece a digitar e selecione sua região para calcular a taxa. Regiões não listadas da cidade usam a taxa de R$ 4,00.
+            </p>
+        </div>
+
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
             <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Localização para entrega</label>
             <p class="text-xs text-gray-500 leading-relaxed mb-3">
@@ -2266,11 +2430,11 @@ function renderCheckoutForm() {
         <div class="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
             <div class="flex justify-between text-gray-600 text-sm mb-1">
                 <span>Taxa de entrega</span>
-                <span>A confirmar</span>
+                <span id="checkout-delivery-fee-display">${checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região'}</span>
             </div>
             <div class="flex justify-between text-gray-900 font-bold">
-                 <span>Total dos itens:</span>
-                 <span id="checkout-total-display">${formatCurrency(getCartTotal())}</span>
+                 <span>Total do pedido:</span>
+                 <span id="checkout-total-display">${formatCurrency(getCartTotal() + getDeliveryFee())}</span>
             </div>
         </div>
     `;
@@ -2287,8 +2451,18 @@ function setPaymentMethod(method) {
 }
 
 function updateCheckoutForm() {
-    const display = document.getElementById('checkout-total-display');
-    if (display) display.textContent = formatCurrency(getCartTotal() + getDeliveryFee());
+    const deliveryDisplay = document.getElementById('checkout-delivery-fee-display');
+    const totalDisplay = document.getElementById('checkout-total-display');
+
+    if (deliveryDisplay) {
+        deliveryDisplay.textContent = checkoutData.deliveryRegion
+            ? formatCurrency(getDeliveryFee())
+            : 'Selecione a região';
+    }
+
+    if (totalDisplay) {
+        totalDisplay.textContent = formatCurrency(getCartTotal() + getDeliveryFee());
+    }
 }
 
 function sendToWhatsApp() {
@@ -2297,8 +2471,8 @@ function sendToWhatsApp() {
         openClosedDayModal();
         return;
     }
-    if (!checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.paymentMethod) {
-        alert("Por favor, preencha todos os campos obrigatórios.");
+    if (!checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.deliveryRegion || !checkoutData.paymentMethod) {
+        alert("Por favor, preencha nome, telefone, endereço, região de entrega e forma de pagamento.");
         return;
     }
 
@@ -2330,8 +2504,8 @@ function sendToWhatsApp() {
     msg += `*--------------------------*\n\n`;
 
     msg += `*➕ RESUMO:* \n`;
-    msg += `📦 *Taxa de Entrega:* A confirmar pela Sanja\n`;
-    msg += `💰 *TOTAL DOS ITENS: ${formatCurrency(total)}*\n\n`;
+    msg += `📦 *Taxa de Entrega:* ${formatCurrency(getDeliveryFee())}\n`;
+    msg += `💰 *TOTAL DO PEDIDO: ${formatCurrency(total)}*\n\n`;
 
     msg += `*--------------------------*\n\n`;
 
@@ -2339,6 +2513,7 @@ function sendToWhatsApp() {
     msg += `*• Nome:* ${checkoutData.name}\n`;
     msg += `*• Telefone:* ${checkoutData.phone}\n`;
     msg += `*• Endereço:* ${checkoutData.address}\n`;
+    msg += `*• Região:* ${checkoutData.deliveryRegion.name}\n`;
     msg += checkoutData.location
         ? `*• Localização (GPS):* ${mapsUrl}\n`
         : `*• Localização (GPS):* Não informada\n`;

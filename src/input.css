@@ -1761,3 +1761,136 @@ h1, h2, h3, .serif-font {
         padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     }
 }
+
+
+/* ==========================================
+   BUSCA DE REGIÃO DE ENTREGA
+=========================================== */
+.delivery-region-search-wrap {
+    position: relative;
+}
+
+.delivery-region-search-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 2.75rem 0.75rem 2.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    color: #111827;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.delivery-region-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.delivery-region-search-input:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.delivery-region-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.delivery-region-clear {
+    position: absolute;
+    right: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9999px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    z-index: 3;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.delivery-region-clear:hover {
+    background: #f3f4f6;
+    color: #ef4444;
+}
+
+.delivery-region-results {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    max-height: 290px;
+    overflow-y: auto;
+    padding: 0.35rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.9rem;
+    background: #ffffff;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    z-index: 80;
+}
+
+.delivery-region-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0.8rem;
+    border: 0;
+    border-radius: 0.7rem;
+    background: #ffffff;
+    color: #111827;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.delivery-region-option:hover,
+.delivery-region-option:focus-visible {
+    background: #fef2f2;
+    outline: none;
+}
+
+.delivery-region-option-name {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: none;
+}
+
+.delivery-region-option-sub {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.68rem;
+    color: #9ca3af;
+}
+
+.delivery-region-option strong {
+    flex-shrink: 0;
+    color: #dc2626;
+    font-size: 0.8rem;
+}
+
+.delivery-region-empty {
+    padding: 0.9rem 0.75rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.75rem;
+    line-height: 1.45;
+}
+
+.delivery-region-empty span {
+    color: #9ca3af;
+}
