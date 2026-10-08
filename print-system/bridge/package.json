@@ -1,0 +1,40 @@
+{
+  "name": "jean-print-bridge",
+  "version": "0.2.0",
+  "description": "Aplicativo local para impressão de pedidos no Windows.",
+  "author": "Impressão",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "com.jeanlucca.printbridge",
+    "productName": "Impressão",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.html",
+      "config.example.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

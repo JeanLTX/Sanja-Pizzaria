@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impressão • Administração</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#edf2fb;background:#08101d;--panel:#111d2f;--panel2:#0e1828;--line:#263750;--muted:#8b98ab;--accent:#7c5cff;--green:#31d39b;--red:#f26f86;--amber:#f6bd43}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 85% -10%,#182642 0,#0b1424 34%,#08101d 72%)}button,input,select{font:inherit}button{cursor:pointer}
+.wrap{width:min(1200px,calc(100% - 34px));margin:0 auto;padding:26px 0 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#9279ff,#5c42e8);font-weight:900}.brand strong{display:block;font-size:16px}.brand span{display:block;font-size:10px;color:var(--muted);margin-top:3px}.status{font-size:11px;color:var(--muted);padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(17,28,45,.72)}
+.card{background:linear-gradient(180deg,rgba(18,30,49,.9),rgba(12,21,35,.84));border:1px solid rgba(255,255,255,.055);border-radius:18px;padding:20px;box-shadow:0 18px 55px rgba(0,0,0,.15);margin-bottom:16px}.card h2,.card h3{margin:0 0 7px}.card p{margin:0 0 18px;color:var(--muted);font-size:11px;line-height:1.55}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.field{margin-bottom:15px}.field label{display:block;color:#acb7ca;font-size:10px;font-weight:800;margin:0 0 6px}.field input,.field select{width:100%;height:40px;border:1px solid #2a3b57;background:#0e1828;color:#f2f5fb;border-radius:10px;padding:0 11px;outline:0}.field input:focus,.field select:focus{border-color:#6b55df}
+.row{display:flex;gap:10px;align-items:center}.btn{height:40px;border-radius:10px;border:1px solid transparent;padding:0 14px;font-weight:850;background:#eff3ff;color:#111a28}.btn.secondary{background:#152238;border-color:#293b58;color:#dce5f5}.btn.danger{background:rgba(242,111,134,.09);border-color:rgba(242,111,134,.2);color:#f4a0ad}.btn:disabled{opacity:.45;cursor:not-allowed}
+#loginCard{max-width:470px;margin:12vh auto}.hidden{display:none!important}.message{padding:11px 12px;border-radius:10px;background:#0e1828;border:1px solid #283752;color:#8997ab;font-size:10px;line-height:1.5;margin-top:12px}.message.error{color:#f4a0ad}.message.success{color:#8ee7c6}
+.est-list{display:grid;gap:9px}.est{padding:13px;border:1px solid #263750;border-radius:13px;background:rgba(10,18,30,.6);display:flex;align-items:center;justify-content:space-between;gap:10px}.est.active{border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.08)}.est strong{display:block;font-size:12px}.est span{display:block;font-size:10px;color:var(--muted);margin-top:3px}.pill{display:inline-flex;padding:6px 8px;border-radius:999px;font-size:9px;font-weight:800;background:rgba(49,211,155,.1);color:var(--green)}.pill.off{background:rgba(148,163,184,.1);color:#9cacbf}
+.code-box{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px;border-radius:15px;background:linear-gradient(135deg,rgba(124,92,255,.14),rgba(18,30,49,.7));border:1px solid rgba(124,92,255,.25);margin-top:14px}.code-box small{display:block;color:#a6b2c7;font-size:9px;text-transform:uppercase;letter-spacing:.08em}.code-value{font:800 25px/1.1 "Consolas","Courier New",monospace;letter-spacing:.14em;margin-top:7px}.subtle{color:var(--muted);font-size:10px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:10px}.table th{text-align:left;color:#8190a7;font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;padding:10px;border-bottom:1px solid rgba(255,255,255,.06)}.table td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.045);vertical-align:top}.table tr:last-child td{border-bottom:0}.muted{color:var(--muted)}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.row{flex-wrap:wrap}.code-box{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="loginCard" class="card">
+  <div class="brand"><div class="logo">I</div><div><strong>Impressão</strong><span>Painel administrativo</span></div></div>
+  <h2 style="margin-top:22px">Entrar</h2>
+  <p>Acesse o painel para gerenciar estabelecimentos e gerar códigos de ativação.</p>
+  <div class="field"><label>E-mail</label><input id="loginEmail" type="email" autocomplete="username"></div>
+  <div class="field"><label>Senha</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+  <button class="btn" id="loginButton" style="width:100%">Entrar</button>
+  <div id="loginMessage" class="message">Use um usuário criado em Supabase Authentication.</div>
+</div>
+
+<div id="app" class="wrap hidden">
+<header class="top">
+  <div class="brand"><div class="logo">I</div><div><strong>Impressão</strong><span>Administração</span></div></div>
+  <div class="row"><div id="adminEmail" class="status">Conectado</div><button class="btn secondary" id="logout">Sair</button></div>
+</header>
+
+<div class="grid">
+  <section class="card">
+    <h2>Estabelecimentos</h2>
+    <p>Gerencie os clientes que terão o aplicativo Impressão instalado.</p>
+    <div id="establishments" class="est-list"></div>
+  </section>
+
+  <section class="card">
+    <h2>Novo estabelecimento</h2>
+    <p>Cadastre um cliente para depois gerar o código de ativação.</p>
+    <div class="field"><label>Nome</label><input id="newName" placeholder="Ex.: Sanja Pizzaria"></div>
+    <div class="field"><label>Identificador</label><input id="newSlug" placeholder="Ex.: sanja-pizzaria"></div>
+    <button class="btn" id="createEst">Cadastrar estabelecimento</button>
+    <div id="createMessage" class="message">O identificador será usado internamente no sistema.</div>
+  </section>
+</div>
+
+<section class="card">
+  <div class="row" style="justify-content:space-between">
+    <div><h2 id="selectedTitle">Selecione um estabelecimento</h2><p>Gere e acompanhe códigos de ativação para cada computador.</p></div>
+    <button class="btn secondary" id="refresh">Atualizar</button>
+  </div>
+  <div id="selectedEmpty" class="message">Selecione um estabelecimento na lista para continuar.</div>
+  <div id="selectedBody" class="hidden">
+    <div class="grid">
+      <div>
+        <div class="card" style="margin:0;background:rgba(10,18,30,.48)">
+          <h3>Gerar código</h3>
+          <p>O código é de uso único. Para cada computador novo, gere um código separado.</p>
+          <div class="field"><label>Identificação</label><input id="codeLabel" placeholder="Ex.: computador principal"></div>
+          <div class="field"><label>Validade</label><select id="codeHours"><option value="1">1 hora</option><option value="6">6 horas</option><option value="24" selected>24 horas</option><option value="72">3 dias</option><option value="168">7 dias</option></select></div>
+          <button class="btn" id="generateCode">Gerar código de ativação</button>
+          <div id="generatedCode" class="code-box hidden"><div><small>Código de ativação</small><div id="codeValue" class="code-value">----</div><div id="codeExpiry" class="subtle" style="margin-top:7px"></div></div><button class="btn secondary" id="copyCode">Copiar</button></div>
+          <div id="generateMessage" class="message">O Bridge Token nunca é exibido aqui.</div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin:0;background:rgba(10,18,30,.48)">
+          <h3>Computadores</h3>
+          <p>Veja quais instalações deste cliente estão conectadas.</p>
+          <div id="bridges" class="est-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin:16px 0 0;background:rgba(10,18,30,.48)">
+      <h3>Códigos recentes</h3>
+      <div class="table-wrap"><table class="table"><thead><tr><th>Identificação</th><th>Criado</th><th>Expira</th><th>Status</th></tr></thead><tbody id="codes"></tbody></table></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+(() => {
+const SUPABASE_URL='https://tbzdpvyotlfzpowsniou.supabase.co';
+const SUPABASE_KEY='sb_publishable_8YfnXsF1P-1rSDRDKfDDBQ_EaeW4eLc';
+const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=id=>document.getElementById(id);
+const state={selected:null,establishments:[]};
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function date(v){return v?new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—';}
+function message(el,text,kind=''){el.className='message'+(kind?' '+kind:'');el.textContent=text;}
+async function rpc(name,args={}){const {data,error}=await client.rpc(name,args);if(error)throw error;return data;}
+
+async function loadEstablishments(){
+  const box=$('establishments');box.innerHTML='<div class="message">Carregando...</div>';
+  try{
+    state.establishments=await rpc('admin_list_establishments')||[];
+    if(!state.establishments.length){box.innerHTML='<div class="message">Nenhum estabelecimento cadastrado.</div>';return;}
+    box.innerHTML=state.establishments.map(e=>'<button class="est '+(state.selected?.id===e.id?'active':'')+'" data-est="'+e.id+'"><div style="text-align:left"><strong>'+esc(e.name)+'</strong><span>'+esc(e.slug)+' · '+e.bridge_count+' computador(es)</span></div><span class="pill '+(e.active?'':'off')+'">'+(e.active?'Ativo':'Inativo')+'</span></button>').join('');
+    document.querySelectorAll('[data-est]').forEach(b=>b.onclick=()=>selectEstablishment(b.dataset.est));
+  }catch(e){box.innerHTML='<div class="message error">'+esc(e.message||'Não foi possível carregar os estabelecimentos.')+'</div>';}
+}
+
+async function selectEstablishment(id){
+  state.selected=state.establishments.find(e=>e.id===id)||null;
+  if(!state.selected)return;
+  $('selectedTitle').textContent=state.selected.name;
+  $('selectedEmpty').classList.add('hidden');
+  $('selectedBody').classList.remove('hidden');
+  await loadEstablishments();
+  await Promise.all([loadCodes(),loadBridges()]);
+}
+
+async function loadCodes(){
+  if(!state.selected)return;
+  try{
+    const rows=await rpc('admin_list_activation_codes',{p_establishment_id:state.selected.id,p_limit:30})||[];
+    $('codes').innerHTML=rows.length?rows.map(x=>{
+      const status=x.status==='used'?'<span class="pill off">Utilizado</span>':x.status==='expired'?'<span class="pill off">Expirado</span>':'<span class="pill">Disponível</span>';
+      return '<tr><td>'+esc(x.label||'Sem identificação')+'</td><td>'+date(x.createdAt)+'</td><td>'+date(x.expiresAt)+'</td><td>'+status+'</td></tr>';
+    }).join(''):'<tr><td colspan="4" class="muted">Nenhum código gerado ainda.</td></tr>';
+  }catch(e){$('codes').innerHTML='<tr><td colspan="4" class="muted">'+esc(e.message||'Falha ao carregar.')+'</td></tr>';}
+}
+
+async function loadBridges(){
+  if(!state.selected)return;
+  try{
+    const rows=await rpc('admin_list_bridges',{p_establishment_id:state.selected.id})||[];
+    $('bridges').innerHTML=rows.length?rows.map(x=>{
+      const online=x.status==='online';
+      const active=x.active!==false; const action=active?'<button class="btn danger" data-toggle-bridge="'+x.id+'" data-active="false">Desativar</button>':'<button class="btn secondary" data-toggle-bridge="'+x.id+'" data-active="true">Reativar</button>';
+      return '<div class="est"><div style="text-align:left"><strong>'+esc(x.deviceName||'Computador')+'</strong><span>Versão '+esc(x.version||'—')+' · último contato '+date(x.lastSeenAt)+'</span></div><div class="row"><span class="pill '+(active?(online?'':'off'):'off')+'">'+(active?(online?'Online':'Offline'):'Desativado')+'</span>'+action+'</div></div>';
+    }).join(''):'<div class="message">Nenhum computador ativado ainda.</div>';
+  }catch(e){$('bridges').innerHTML='<div class="message error">'+esc(e.message||'Falha ao carregar.')+'</div>';}
+  document.querySelectorAll('[data-toggle-bridge]').forEach(btn=>btn.onclick=async()=>{
+    btn.disabled=true;btn.textContent='Salvando...';
+    try{await rpc('admin_set_bridge_active',{p_bridge_id:btn.dataset.toggleBridge,p_active:btn.dataset.active==='true'});await loadBridges();}
+    catch(e){alert(e.message||'Não foi possível alterar o computador.');btn.disabled=false;btn.textContent=btn.dataset.active==='true'?'Reativar':'Desativar';}
+  });
+}
+
+$('loginButton').onclick=async()=>{
+  const b=$('loginButton');b.disabled=true;b.textContent='Entrando...';
+  try{
+    const {error}=await client.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+    if(error)throw error;
+  }catch(e){message($('loginMessage'),e.message||'Não foi possível entrar.','error');}
+  finally{b.disabled=false;b.textContent='Entrar';}
+};
+
+$('logout').onclick=()=>client.auth.signOut();
+$('refresh').onclick=async()=>{await loadEstablishments();if(state.selected)await selectEstablishment(state.selected.id);};
+$('createEst').onclick=async()=>{
+  try{
+    const name=$('newName').value.trim();const slug=$('newSlug').value.trim();
+    await rpc('admin_create_establishment',{p_name:name,p_slug:slug});
+    $('newName').value='';$('newSlug').value='';message($('createMessage'),'Estabelecimento cadastrado com sucesso.','success');await loadEstablishments();
+  }catch(e){message($('createMessage'),e.message||'Não foi possível cadastrar.','error');}
+};
+
+$('generateCode').onclick=async()=>{
+  if(!state.selected)return;
+  const b=$('generateCode');b.disabled=true;b.textContent='Gerando...';
+  try{
+    const result=await rpc('admin_generate_activation_code',{p_establishment_id:state.selected.id,p_label:$('codeLabel').value.trim()||null,p_hours:Number($('codeHours').value)||24});
+    $('generatedCode').classList.remove('hidden');$('codeValue').textContent=result.code;$('codeExpiry').textContent=result.expiresAt?'Expira em '+date(result.expiresAt):'Sem expiração';
+    message($('generateMessage'),'Código criado. Envie somente o código para o cliente.','success');await loadCodes();
+  }catch(e){message($('generateMessage'),e.message||'Não foi possível gerar o código.','error');}
+  finally{b.disabled=false;b.textContent='Gerar código de ativação';}
+};
+
+$('copyCode').onclick=async()=>{
+  const value=$('codeValue').textContent;
+  try{await navigator.clipboard.writeText(value);message($('generateMessage'),'Código copiado para a área de transferência.','success');}
+  catch{message($('generateMessage'),'O código é '+value);}
+};
+
+async function showSession(session){
+  const logged=!!session?.user;
+  $('loginCard').classList.toggle('hidden',logged);$('app').classList.toggle('hidden',!logged);
+  if(logged){
+    $('adminEmail').textContent=session.user.email||'Administrador';
+    await loadEstablishments();
+  }
+}
+
+client.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>showSession(session),0);});
+client.auth.getSession().then(({data})=>showSession(data.session));
+})();
+</script>
+</body>
+</html>

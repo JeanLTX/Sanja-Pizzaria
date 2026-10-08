@@ -2465,7 +2465,7 @@ function updateCheckoutForm() {
     }
 }
 
-function sendToWhatsApp() {
+async function sendToWhatsApp() {
     if (isClosedToday()) {
         closeCheckout();
         openClosedDayModal();
@@ -2550,6 +2550,16 @@ function sendToWhatsApp() {
     }
 
     
+    // Registra o pedido no Supabase antes de abrir o WhatsApp.
+    try {
+        const orderId = await saveOrderToSupabase();
+        console.log('Pedido registrado no Supabase:', orderId);
+    } catch (error) {
+        console.error('Falha ao registrar pedido no Supabase:', error);
+        alert('Não foi possível registrar o pedido no sistema de impressão. Verifique sua conexão e tente novamente.');
+        return;
+    }
+
     const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
 }

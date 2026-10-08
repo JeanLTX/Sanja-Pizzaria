@@ -1,0 +1,10 @@
+# Local Impressão credentials and runtime data
+print-system/bridge/config.json
+print-system/bridge/config.before-activation-test.json
+print-system/bridge/node_modules/
+print-system/bridge/dist/
+print-system/bridge/bridge.log
+
+# Temporary/test scripts
+print-system/bridge/test-claim.js
+.tmp-convert-sweet-esfihas.js

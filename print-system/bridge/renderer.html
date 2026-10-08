@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Impressão</title>
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;--bg:#08101d;--bg2:#0d1727;--panel:#111d2f;--panel2:#16243a;--line:#263750;--text:#f4f7ff;--muted:#8896ab;--accent:#7c5cff;--green:#31d39b;--amber:#f6bd43;--red:#f26f86}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(circle at 85% -10%,#182642 0,#0b1424 34%,#08101d 72%);color:var(--text)}button,input,select{font:inherit}button{cursor:pointer}
+.app{display:flex;height:100vh}.sidebar{width:82px;flex:0 0 82px;background:rgba(6,13,23,.84);border-right:1px solid rgba(255,255,255,.05);padding:18px 10px;display:flex;flex-direction:column;align-items:center}.brand{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#9279ff,#5c42e8);font-weight:900;box-shadow:0 12px 32px rgba(92,66,232,.34);margin-bottom:30px}.nav{display:grid;gap:9px;width:100%}.nav button{height:56px;border-radius:16px;background:transparent;border:1px solid transparent;color:#7d8ba3;display:grid;place-items:center;position:relative;transition:.2s}.nav button svg{width:21px;height:21px}.nav button:hover{background:#101b2d;color:#bdc8da}.nav button.active{background:rgba(124,92,255,.14);border-color:rgba(124,92,255,.22);color:#b7a8ff}.nav button span{position:absolute;left:60px;z-index:5;background:#151f31;color:#fff;padding:7px 10px;border-radius:8px;font-size:11px;font-weight:700;opacity:0;pointer-events:none;white-space:nowrap;transform:translateX(-4px);transition:.18s;box-shadow:0 10px 28px rgba(0,0,0,.28)}.nav button:hover span{opacity:1;transform:none}.side-foot{margin-top:auto;color:#59677e;font-size:10px;text-align:center;line-height:1.35}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}.top{height:78px;flex:0 0 78px;padding:0 28px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;background:rgba(8,14,25,.32)}.top h1{font-size:21px;margin:0 0 3px;letter-spacing:-.03em}.top p{font-size:12px;color:var(--muted);margin:0}.connection{display:flex;align-items:center;gap:8px;background:rgba(17,28,45,.72);border:1px solid var(--line);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:11px}.dot{width:8px;height:8px;border-radius:999px;background:#6b7280}.dot.on{background:var(--green);box-shadow:0 0 11px rgba(49,211,155,.7)}.dot.off{background:var(--red);box-shadow:0 0 11px rgba(242,111,134,.5)}
+.content{flex:1;overflow:auto;padding:27px 30px 36px}.view{display:none}.view.active{display:block}.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}.head h2{font-size:28px;letter-spacing:-.04em;margin:0 0 7px}.head p{font-size:12px;color:var(--muted);margin:0}.actions{display:flex;gap:9px}.btn{height:40px;border-radius:11px;padding:0 14px;border:1px solid transparent;background:#eff3ff;color:#111a28;font-weight:800}.btn.secondary{background:#152238;border-color:#293b58;color:#dce5f5}.btn.ghost{background:transparent;border-color:#293b58;color:#a8b5c8}.btn:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:22px}.stat{background:linear-gradient(180deg,rgba(18,31,51,.85),rgba(13,22,37,.78));border:1px solid rgba(255,255,255,.05);border-radius:17px;padding:17px}.stat .k{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}.stat .v{font-size:26px;font-weight:850;margin-top:8px}.stat .s{font-size:10px;color:#63728a;margin-top:3px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin:0 0 13px}.toolbar strong{font-size:13px}.select{height:38px;border:1px solid #2a3a55;background:#0e1828;color:#f0f4fb;border-radius:10px;padding:0 11px;outline:0}
+.jobs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.job{background:linear-gradient(180deg,rgba(19,31,50,.9),rgba(12,21,35,.88));border:1px solid rgba(255,255,255,.055);border-radius:18px;padding:17px;min-height:230px;display:flex;flex-direction:column}.job-top{display:flex;justify-content:space-between;gap:12px}.order{font-weight:850;font-size:15px}.time{font-size:10px;color:var(--muted);margin-top:4px}.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border-radius:999px;font-size:10px;font-weight:800}.pending{background:rgba(246,189,67,.12);color:var(--amber)}.printing{background:rgba(124,92,255,.13);color:#b4a5ff}.printed{background:rgba(49,211,155,.11);color:var(--green)}.failed{background:rgba(242,111,134,.11);color:var(--red)}.cancelled{background:rgba(148,163,184,.11);color:#9cacbf}.customer{margin-top:14px;font-size:12px;font-weight:750}.subline{font-size:10px;color:var(--muted);margin-top:4px}.items{margin-top:13px;border-top:1px solid rgba(255,255,255,.05);padding-top:11px;display:grid;gap:7px}.item{display:flex;justify-content:space-between;gap:10px;font-size:10px;color:#d3dbea}.item span:last-child{color:#8b98ab;white-space:nowrap}.job-bottom{margin-top:auto;padding-top:13px;display:flex;align-items:center;justify-content:space-between}.total{color:#aebbd0;font-size:11px}.total strong{color:#fff;font-size:15px;margin-left:3px}.empty{grid-column:1/-1;border:1px dashed #2b3a52;border-radius:17px;min-height:235px;display:grid;place-items:center;text-align:center;color:var(--muted);padding:30px}.empty strong{display:block;color:#edf2fb;font-size:14px;margin-bottom:6px}.empty p{margin:0;font-size:11px;line-height:1.55;max-width:420px}
+.panel{background:linear-gradient(180deg,rgba(18,30,49,.88),rgba(12,21,35,.8));border:1px solid rgba(255,255,255,.055);border-radius:20px;padding:24px;max-width:1000px;box-shadow:0 18px 55px rgba(0,0,0,.14)}.panel h3{font-size:15px;margin:0 0 6px}.panel p{font-size:11px;color:var(--muted);line-height:1.55;margin:0 0 20px}.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.field{margin-bottom:18px}.field>label:first-child{display:block;color:#aab6c9;font-size:10px;font-weight:750;margin-bottom:7px}.field input,.field select{width:100%;height:40px;border:1px solid #2a3b57;background:#0e1828;color:#f2f5fb;border-radius:11px;padding:0 12px;outline:0}.field input:focus,.field select:focus{border-color:#6b55df}.switch{display:flex;align-items:center;gap:11px;cursor:pointer;margin-top:12px;font-size:11px;color:#d0d8e7;user-select:none}.switch input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}.track{width:42px;height:24px;flex:0 0 42px;border:1px solid #394861;border-radius:999px;background:#25344c;position:relative;transition:.2s}.track:after{content:'';position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#aeb8c7;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:.2s}.switch input:checked+.track{background:var(--accent);border-color:#8b72ff}.switch input:checked+.track:after{transform:translateX(18px);background:#fff}.notice{margin-top:15px;padding:12px 13px;border-radius:11px;background:#0e1828;border:1px solid #283752;color:#8795aa;font-size:10px;line-height:1.55}.notice.success{color:#8ee7c6}.notice.error{color:#f4a0ad}
+.activation{max-width:720px}.activation-badge{display:inline-flex;padding:7px 9px;border-radius:999px;background:rgba(124,92,255,.14);color:#b6a8ff;font-size:10px;font-weight:800;margin-bottom:13px}.code{font-size:20px;letter-spacing:.16em;text-transform:uppercase}.activation-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}.muted{font-size:10px;color:var(--muted);line-height:1.55}.success-box{display:flex;align-items:center;gap:12px;padding:15px;border-radius:14px;background:rgba(49,211,155,.08);border:1px solid rgba(49,211,155,.18);margin-bottom:18px}.success-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(49,211,155,.12);color:var(--green);font-weight:900}.success-box strong{display:block;font-size:13px}.success-box span{display:block;color:#7fa392;font-size:10px;margin-top:3px}
+.printer-card{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px;border-radius:18px;background:linear-gradient(135deg,rgba(124,92,255,.11),rgba(17,28,46,.76));border:1px solid #273853;margin-bottom:15px}.printer-info{display:flex;gap:13px;align-items:center}.printer-icon{width:48px;height:48px;border-radius:14px;background:#18253c;color:#b7a8ff;display:grid;place-items:center}.printer-info strong{font-size:14px;display:block}.printer-info span{font-size:10px;color:var(--muted);display:block;margin-top:3px}
+.layout-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}.layout-group{padding:16px;border:1px solid rgba(255,255,255,.055);border-radius:15px;background:rgba(9,17,29,.45)}.layout-group h4{font-size:12px;margin:0 0 5px}.layout-group>p{margin-bottom:16px}.preview-wrap{display:flex;justify-content:center;align-items:flex-start;min-height:360px;padding:12px;background:#0a111d;border:1px solid #273750;border-radius:14px;overflow:auto}.receipt-preview{width:min(100%,360px);background:#fff;color:#151515;border-radius:2px;padding:20px 14px;box-shadow:0 12px 30px rgba(0,0,0,.24);font:11px/1.25 "Consolas","Courier New",monospace;white-space:pre-wrap;word-break:break-word}.preview-caption{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5}
+.toast{position:fixed;right:22px;bottom:22px;background:#15233a;border:1px solid #2b3d5b;color:#eef3fb;border-radius:12px;padding:11px 13px;font-size:11px;box-shadow:0 16px 45px rgba(0,0,0,.28);opacity:0;transform:translateY(7px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}
+@media(max-width:1050px){.stats{grid-template-columns:repeat(2,1fr)}.jobs{grid-template-columns:1fr}.panel-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">I</div>
+  <nav class="nav">
+    <button class="active" data-view="dashboard" aria-label="Painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg><span>Painel</span></button>
+    <button data-view="history" aria-label="Histórico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Histórico</span></button>
+    <button data-view="printer" aria-label="Impressora"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V4h12v5M6 18H4V10h16v8h-2M7 15h10v5H7v-5Z"/></svg><span>Impressora</span></button>
+    <button data-view="label" aria-label="Etiqueta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M7 9h10M7 12h6M7 15h8"/></svg><span>Etiqueta</span></button>
+    <button data-view="settings" aria-label="Configuração"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="M19 13.5a7.5 7.5 0 0 0 0-3l2-1.3-2-3.4-2.3.9a7.7 7.7 0 0 0-2.6-1.5L13.9 3h-3.8l-.4 2.2A7.7 7.7 0 0 0 7.1 6.7l-2.3-.9-2 3.4 2 1.3a7.5 7.5 0 0 0 0 3l-2 1.3 2 3.4 2.3-.9a7.7 7.7 0 0 0 2.6 1.5l.4 2.2h3.8l.4-2.2a7.7 7.7 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.3Z"/></svg><span>Configuração</span></button>
+  </nav>
+  <div class="side-foot">Impressão<br>0.2.0</div>
+</aside>
+<section class="main">
+<header class="top"><div><h1 id="topTitle">Painel</h1><p id="topSub">Acompanhe e gerencie os pedidos</p></div><div class="connection"><span id="connDot" class="dot"></span><span id="connText">Verificando conexão...</span></div></header>
+<main class="content">
+
+<section id="dashboard" class="view active">
+<div class="head"><div><h2 id="welcome">Pedidos</h2><p>Os pedidos aparecem aqui enquanto a fila de impressão é processada.</p></div><div class="actions"><button class="btn secondary" id="simulateOrder">Simular pedido</button><button class="btn secondary" id="refreshJobs">Atualizar</button></div></div>
+<div class="stats">
+<div class="stat"><div class="k">Recentes</div><div class="v" id="statTotal">0</div><div class="s">Pedidos carregados</div></div>
+<div class="stat"><div class="k">Pendentes</div><div class="v" id="statPending">0</div><div class="s">Aguardando impressão</div></div>
+<div class="stat"><div class="k">Imprimindo</div><div class="v" id="statPrinting">0</div><div class="s">Em processamento</div></div>
+<div class="stat"><div class="k">Concluídos</div><div class="v" id="statPrinted">0</div><div class="s">Impressões finalizadas</div></div>
+</div>
+<div class="toolbar"><strong>Pedidos</strong><select class="select" id="statusFilter"><option value="all">Todos</option><option value="pending">Pendentes</option><option value="printing">Imprimindo</option><option value="printed">Impressos</option><option value="failed">Com falha</option></select></div>
+<div id="jobs" class="jobs"></div>
+</section>
+
+<section id="history" class="view">
+<div class="head"><div><h2>Histórico</h2><p>Consulte pedidos recentes e faça uma nova impressão quando necessário.</p></div><button class="btn secondary" id="refreshHistory">Atualizar</button></div>
+<div class="toolbar"><strong>Pedidos recentes</strong><select class="select" id="historyFilter"><option value="all">Todos</option><option value="printed">Impressos</option><option value="failed">Com falha</option><option value="cancelled">Cancelados</option></select></div>
+<div id="historyJobs" class="jobs"></div>
+</section>
+
+<section id="printer" class="view">
+<div class="head"><div><h2>Impressora</h2><p>Escolha a impressora deste computador e valide a comunicação.</p></div></div>
+<div class="printer-card"><div class="printer-info"><div class="printer-icon"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V4h12v5M6 18H4V10h16v8h-2M7 15h10v5H7v-5Z"/></svg></div><div><strong id="printerNameView">Nenhuma impressora selecionada</strong><span id="printerState">Selecione uma impressora abaixo.</span></div></div><button class="btn secondary" id="printerRefresh">Atualizar lista</button></div>
+<div class="panel"><h3>Impressora deste computador</h3><p>A configuração fica salva localmente e será usada pelos pedidos automáticos.</p><div class="field"><label>Impressora</label><select id="printerSelect"></select></div><div class="actions"><button class="btn" id="printerSave">Salvar impressora</button><button class="btn secondary" id="printerTest">Testar impressão</button></div><div class="notice">Sem impressora física, ative o modo de simulação na configuração. O teste e os pedidos simulados serão salvos como recibos de texto.</div></div>
+</section>
+
+<section id="label" class="view">
+<div class="head"><div><h2>Etiqueta</h2><p>Ajuste o tamanho, posição e conteúdo da comanda para cada impressora.</p></div></div>
+<div class="panel">
+<div class="layout-grid">
+<div>
+<div class="layout-group">
+<h4>Papel e posicionamento</h4><p>Esses ajustes ficam salvos somente neste computador.</p>
+<div class="field"><label>Largura do papel</label><select id="labelPaperWidth"><option value="58">58 mm</option><option value="80">80 mm</option></select></div>
+<div class="field"><label>Caracteres por linha</label><input id="labelColumns" type="number" min="24" max="64" step="1"></div>
+<div class="field"><label>Margem esquerda</label><input id="labelLeftMargin" type="number" min="0" max="20" step="1"></div>
+<div class="field"><label>Espaço superior</label><input id="labelTopPadding" type="number" min="0" max="20" step="1"></div>
+<div class="field"><label>Espaço inferior</label><input id="labelBottomPadding" type="number" min="0" max="10" step="1"></div>
+<div class="field"><label>Espaçamento entre linhas</label><select id="labelLineSpacing"><option value="0">Compacto</option><option value="1">Normal</option><option value="2">Amplo</option><option value="3">Muito amplo</option></select></div>
+<div class="field"><label>Alinhamento do cabeçalho</label><select id="labelHeaderAlignment"><option value="left">Esquerda</option><option value="center">Centro</option><option value="right">Direita</option></select></div>
+</div>
+<div class="layout-group" style="margin-top:14px">
+<h4>Informações impressas</h4><p>Escolha o que deve aparecer na comanda.</p>
+<label class="switch"><input id="labelShowPhone" type="checkbox"><span class="track"></span><span>Telefone do cliente</span></label>
+<label class="switch"><input id="labelShowAddress" type="checkbox"><span class="track"></span><span>Endereço</span></label>
+<label class="switch"><input id="labelShowRegion" type="checkbox"><span class="track"></span><span>Região de entrega</span></label>
+<label class="switch"><input id="labelShowPayment" type="checkbox"><span class="track"></span><span>Forma de pagamento</span></label>
+<label class="switch"><input id="labelShowNotes" type="checkbox"><span class="track"></span><span>Observações</span></label>
+</div>
+</div>
+<div>
+<div class="layout-group">
+<h4>Pré-visualização</h4><p>Uma referência visual do conteúdo que será enviado para a impressora.</p>
+<div class="preview-wrap"><pre id="labelPreview" class="receipt-preview"></pre></div>
+<div class="preview-caption">A impressão física também depende do driver e das configurações da impressora no Windows. Use o teste de impressão depois de salvar.</div>
+</div>
+</div>
+</div>
+<div class="actions" style="margin-top:18px"><button class="btn" id="saveLabelConfig">Salvar configuração da etiqueta</button><button class="btn secondary" id="testLabelConfig">Testar impressão</button></div>
+<div id="labelMessage" class="notice">Os ajustes são locais e podem ser diferentes em cada computador.</div>
+</div>
+</section>
+
+<section id="settings" class="view">
+<div class="head"><div><h2>Configuração</h2><p>Ative o computador e defina como a impressão deve funcionar.</p></div></div>
+<div id="activationPanel" class="panel activation">
+<span class="activation-badge">PRIMEIRO ACESSO</span>
+<h3>Ative este computador</h3>
+<p>Use o código de ativação fornecido pelo administrador. O código é usado uma única vez e cria uma credencial segura automaticamente.</p>
+<div class="field"><label>Código de ativação</label><input id="activationCode" class="code" maxlength="14" placeholder="AB12-CD34-EF56" autocomplete="off"></div>
+<div class="activation-foot"><span class="muted">Você não precisa saber o Bridge Token. Ele ficará armazenado somente neste computador.</span><button class="btn" id="activateButton">Ativar computador</button></div>
+<div id="activationMessage" class="notice">Depois da ativação, escolha a impressora e configure a impressão automática.</div>
+</div>
+<div id="activeConfigPanel" class="panel" style="display:none">
+<div class="success-box"><div class="success-icon">✓</div><div><strong>Computador ativado</strong><span id="activeInfo">Este computador está autorizado a receber pedidos.</span></div></div>
+<div class="panel-grid">
+<div>
+<h3>Estabelecimento</h3><p>Identificação desta instalação.</p>
+<div class="field"><label>Nome do estabelecimento</label><input id="establishmentInput" type="text" placeholder="Ex.: Sanja Pizzaria"></div>
+<div class="field"><label>Impressão automática</label><label class="switch"><input id="autoPrintInput" type="checkbox"><span class="track"></span><span>Imprimir pedidos automaticamente</span></label></div>
+<div class="field"><label>Modo de simulação</label><label class="switch"><input id="testModeInput" type="checkbox"><span class="track"></span><span>Não enviar para a impressora física</span></label></div>
+</div>
+<div>
+<h3>Estado do dispositivo</h3><p>O aplicativo permanece na bandeja do Windows e continua processando pedidos em segundo plano.</p>
+<div class="notice success" id="deviceState">Conectado e pronto para operar.</div>
+<div class="notice">O Bridge Token não é exibido nesta tela.</div>
+</div>
+</div>
+<div class="actions"><button class="btn" id="saveConfig">Salvar configuração</button><button class="btn secondary" id="openFolder">Abrir pasta de dados</button></div>
+<div id="configMessage" class="notice">As alterações ficam salvas neste computador.</div>
+</div>
+</section>
+
+</main>
+</section>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(async()=>{
+const state={config:null,jobs:[],filter:'all',historyFilter:'all'};
+const $=id=>document.getElementById(id);
+const views={
+ dashboard:['Painel','Acompanhe e gerencie os pedidos'],
+ history:['Histórico','Consulte pedidos e reimprima quando necessário'],
+ printer:['Impressora','Configure e teste a impressora deste computador'],
+ label:['Etiqueta','Ajuste o formato e o conteúdo da comanda'],
+ settings:['Configuração','Ative o computador e defina como a impressão deve funcionar']
+};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function time(v){try{return new Date(v).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}catch{return '--:--';}}
+function typeLabel(v){return ({delivery:'Entrega',pickup:'Retirada',local:'Mesa'}[v]||v||'Pedido');}
+function meta(s){return ({pending:['pending','Pendente'],printing:['printing','Imprimindo'],printed:['printed','Impresso'],failed:['failed','Falhou'],cancelled:['cancelled','Cancelado']}[s]||['cancelled','Desconhecido']);}
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2800);}
+function selectView(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));$('topTitle').textContent=views[v][0];$('topSub').textContent=views[v][1];if(v==='printer')loadPrinters();if(v==='history')renderHistory();if(v==='label')renderLabel();if(v==='settings')renderConfig();}
+function renderConfig(){
+const c=state.config||{};const active=!!c.bridgeToken&&!c.bridgeToken.includes('COLOQUE_');
+$('activationPanel').style.display=active?'none':'block';$('activeConfigPanel').style.display=active?'block':'none';
+if(active){$('establishmentInput').value=c.establishmentName||'';$('autoPrintInput').checked=!!c.autoPrint;$('testModeInput').checked=!!c.testMode;$('activeInfo').textContent=(c.establishmentName||'Estabelecimento')+' • computador autorizado';$('deviceState').textContent=c.testMode?'Modo de simulação ativo.':'Conectado e pronto para operar.';}
+$('welcome').textContent=c.establishmentName?'Pedidos — '+c.establishmentName:'Pedidos';
+}
+function renderJobs(){
+const filtered=state.jobs.filter(j=>state.filter==='all'||j.status===state.filter);
+$('statTotal').textContent=state.jobs.length;$('statPending').textContent=state.jobs.filter(j=>j.status==='pending').length;$('statPrinting').textContent=state.jobs.filter(j=>j.status==='printing').length;$('statPrinted').textContent=state.jobs.filter(j=>j.status==='printed').length;
+if(!filtered.length){$('jobs').innerHTML='<div class="empty"><div><strong>Nenhum pedido para mostrar</strong><p>Novos pedidos aparecerão aqui quando estiverem disponíveis na fila.</p></div></div>';return;}
+$('jobs').innerHTML=filtered.map(j=>{
+const [bc,label]=meta(j.status);
+let action=j.status==='pending'?'<button class="btn" data-print="'+j.job_id+'">Imprimir</button>':j.status==='printed'?'<button class="btn secondary" data-reprint="'+j.job_id+'">Reimprimir</button>':j.status==='failed'?'<button class="btn secondary" data-reprint="'+j.job_id+'">Tentar novamente</button>':'<button class="btn ghost" disabled>'+label+'</button>';
+const items=(j.items||[]).map(i=>'<div class="item"><span>'+i.quantity+'x '+esc(i.product_name)+'</span><span>'+money(Number(i.unit_price)*Number(i.quantity))+'</span></div>').join('');
+return '<article class="job"><div class="job-top"><div><div class="order">Pedido #'+(j.order_number||'-')+'</div><div class="time">'+time(j.order_created_at||j.created_at)+' · '+typeLabel(j.order_type)+'</div></div><div class="badge '+bc+'">'+label+'</div></div><div class="customer">'+esc(j.customer_name||'Cliente')+'</div><div class="subline">'+esc(j.customer_phone||'')+'</div><div class="items">'+(items||'<div class="item"><span>Sem itens</span></div>')+'</div><div class="job-bottom"><div class="total">Total <strong>'+money(j.total)+'</strong></div>'+action+'</div></article>';
+}).join('');
+document.querySelectorAll('[data-print]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='Imprimindo...';try{const r=await window.bridge.printSpecificJob(b.dataset.print);toast(r.test?'Impressão simulada concluída.':'Pedido enviado para a impressora.');await loadJobs();}catch(e){toast(e.message||'Falha na impressão.');b.disabled=false;b.textContent='Imprimir';}});
+document.querySelectorAll('[data-reprint]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='Enviando...';try{await window.bridge.reprintJob(b.dataset.reprint);toast('Reimpressão concluída.');await loadJobs();}catch(e){toast(e.message||'Falha ao reimprimir.');b.disabled=false;b.textContent='Reimprimir';}});
+}
+function renderHistory(){
+const filtered=state.jobs.filter(j=>state.historyFilter==='all'||j.status===state.historyFilter);
+if(!filtered.length){$('historyJobs').innerHTML='<div class="empty"><div><strong>Nenhum pedido encontrado</strong><p>Pedidos impressos e falhas de impressão serão mantidos aqui.</p></div></div>';return;}
+$('historyJobs').innerHTML=filtered.map(j=>{const [bc,label]=meta(j.status);const action=j.status==='printed'?'<button class="btn secondary" data-hr="'+j.job_id+'">Reimprimir</button>':j.status==='failed'?'<button class="btn secondary" data-hr="'+j.job_id+'">Tentar novamente</button>':'<button class="btn ghost" disabled>'+label+'</button>';return '<article class="job"><div class="job-top"><div><div class="order">Pedido #'+(j.order_number||'-')+'</div><div class="time">'+time(j.order_created_at||j.created_at)+' · '+typeLabel(j.order_type)+'</div></div><div class="badge '+bc+'">'+label+'</div></div><div class="customer">'+esc(j.customer_name||'Cliente')+'</div><div class="subline">'+esc(j.customer_phone||'')+'</div><div class="items">'+((j.items||[]).map(i=>'<div class="item"><span>'+i.quantity+'x '+esc(i.product_name)+'</span><span>'+money(Number(i.unit_price)*Number(i.quantity))+'</span></div>').join('')||'<div class="item"><span>Sem itens</span></div>')+'</div><div class="job-bottom"><div class="total">Total <strong>'+money(j.total)+'</strong></div>'+action+'</div></article>';}).join('');
+document.querySelectorAll('[data-hr]').forEach(b=>b.onclick=async()=>{b.disabled=true;b.textContent='Enviando...';try{await window.bridge.reprintJob(b.dataset.hr);toast('Reimpressão concluída.');await loadJobs();}catch(e){toast(e.message||'Falha ao reimprimir.');b.disabled=false;b.textContent='Reimprimir';}});
+}
+function getLayoutFromForm(){return {
+paperWidthMm:Number($('labelPaperWidth').value)||80,
+columns:Math.max(24,Math.min(64,Number($('labelColumns').value)||48)),
+leftMargin:Math.max(0,Math.min(20,Number($('labelLeftMargin').value)||0)),
+topPadding:Math.max(0,Math.min(20,Number($('labelTopPadding').value)||0)),
+bottomPadding:Math.max(0,Math.min(10,Number($('labelBottomPadding').value)||2)),
+lineSpacing:Math.max(0,Math.min(3,Number($('labelLineSpacing').value)||0)),
+headerAlignment:$('labelHeaderAlignment').value||'center',
+showPhone:$('labelShowPhone').checked,
+showAddress:$('labelShowAddress').checked,
+showRegion:$('labelShowRegion').checked,
+showPayment:$('labelShowPayment').checked,
+showNotes:$('labelShowNotes').checked
+};}
+function syncLayoutForm(){const l=state.config?.printLayout||{};$('labelPaperWidth').value=String(l.paperWidthMm||80);$('labelColumns').value=l.columns||48;$('labelLeftMargin').value=l.leftMargin||0;$('labelTopPadding').value=l.topPadding||0;$('labelBottomPadding').value=l.bottomPadding??2;$('labelLineSpacing').value=l.lineSpacing||0;$('labelHeaderAlignment').value=l.headerAlignment||'center';$('labelShowPhone').checked=l.showPhone!==false;$('labelShowAddress').checked=l.showAddress!==false;$('labelShowRegion').checked=l.showRegion!==false;$('labelShowPayment').checked=l.showPayment!==false;$('labelShowNotes').checked=l.showNotes!==false;}
+function renderLabel(){syncLayoutForm();const l=getLayoutFromForm();const name=(state.config?.establishmentName||'ESTABELECIMENTO').toUpperCase();const width=l.paperWidthMm===58?'58 mm':'80 mm';const lines=['================================',name,'NOVO PEDIDO','================================','Pedido: #184','Cliente: Cliente de exemplo',...(l.showPhone?['Telefone: (16) 99999-9999']:[]),'--------------------------------','2x Pizza de teste','  Grande • Catupiry','  Valor: R$ 79,80','','--------------------------------','Subtotal: R$ 79,80','Entrega: R$ 5,00','TOTAL: R$ 84,80','--------------------------------',...(l.showRegion?['Região: Centro']:[]),...(l.showAddress?['Endereço: Rua de exemplo, 123']:[]),...(l.showPayment?['Pagamento: Pix']:[]),...(l.showNotes?['Obs: Sem cebola']:[]),'================================'];let html=lines.map(x=>{let t=x;const max=l.columns;if(t.length>max)t=t.slice(0,max-1)+'…';if(t==='================================'||t==='--------------------------------')t='-'.repeat(max);if(t===name||t==='NOVO PEDIDO'){const total=Math.max(0,max-t.length);if(l.headerAlignment==='center')t=' '.repeat(Math.floor(total/2))+t+' '.repeat(Math.ceil(total/2));if(l.headerAlignment==='right')t=' '.repeat(total)+t;}return esc(t);}).join('\\n');$('labelPreview').textContent=html;$('labelPreview').style.width=l.paperWidthMm===58?'290px':'360px';}
+async function loadJobs(){
+if(!state.config?.bridgeToken){state.jobs=[];renderJobs();renderHistory();return;}
+try{state.jobs=await window.bridge.listJobs(60);if(!Array.isArray(state.jobs))state.jobs=[];}catch{state.jobs=[];}renderJobs();renderHistory();
+}
+async function loadPrinters(){
+const select=$('printerSelect');select.innerHTML='<option value="">Carregando...</option>';
+try{const ps=await window.bridge.listPrinters();select.innerHTML=ps.length?'<option value="">Selecione uma impressora...</option>':'<option value="">Nenhuma impressora encontrada</option>';ps.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;if(n===state.config.printerName)o.selected=true;select.appendChild(o);});$('printerNameView').textContent=state.config.printerName||'Nenhuma impressora selecionada';$('printerState').textContent=ps.length?(state.config.printerName?'Pronta para receber pedidos.':'Selecione uma impressora abaixo.'):'Nenhuma impressora instalada no Windows.';}catch(e){select.innerHTML='<option value="">Erro ao listar impressoras</option>';toast(e.message);}
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>selectView(b.dataset.view));
+$('statusFilter').onchange=e=>{state.filter=e.target.value;renderJobs();};$('historyFilter').onchange=e=>{state.historyFilter=e.target.value;renderHistory();};
+$('refreshJobs').onclick=async()=>{await loadJobs();toast('Pedidos atualizados.');};$('refreshHistory').onclick=async()=>{await loadJobs();toast('Histórico atualizado.');};
+$('simulateOrder').onclick=async()=>{try{const r=await window.bridge.createTestOrder();toast('Pedido de teste #'+r.orderNumber+' criado.');await loadJobs();}catch(e){toast(e.message||'Não foi possível criar o pedido de teste.');}};
+$('printerRefresh').onclick=loadPrinters;$('printerSave').onclick=async()=>{try{const s=await window.bridge.saveConfig({printerName:$('printerSelect').value});state.config=s;renderConfig();await loadPrinters();toast('Impressora salva.');}catch(e){toast(e.message||'Não foi possível salvar.');}};
+$('printerTest').onclick=async()=>{try{if(!$('printerSelect').value){toast('Selecione uma impressora primeiro.');return;}await window.bridge.saveConfig({printerName:$('printerSelect').value});const r=await window.bridge.testPrint();toast(r.test?'Recibo simulado salvo.':'Teste enviado para a impressora.');}catch(e){toast(e.message||'Falha no teste.');}};
+['labelPaperWidth','labelColumns','labelLeftMargin','labelTopPadding','labelBottomPadding','labelLineSpacing','labelHeaderAlignment','labelShowPhone','labelShowAddress','labelShowRegion','labelShowPayment','labelShowNotes'].forEach(id=>$(id).addEventListener('input',renderLabel));
+$('saveLabelConfig').onclick=async()=>{try{const printLayout=getLayoutFromForm();const s=await window.bridge.saveConfig({printLayout});state.config=s;renderLabel();$('labelMessage').className='notice success';$('labelMessage').textContent='Configuração da etiqueta salva com sucesso.';toast('Configuração da etiqueta salva.');}catch(e){$('labelMessage').className='notice error';$('labelMessage').textContent=e.message||'Não foi possível salvar a configuração.';}};
+$('testLabelConfig').onclick=async()=>{try{const printLayout=getLayoutFromForm();await window.bridge.saveConfig({printLayout});state.config=await window.bridge.getConfig();const r=await window.bridge.testPrint();toast(r.test?'Recibo de teste salvo com o novo formato.':'Teste enviado para a impressora.');renderLabel();}catch(e){$('labelMessage').className='notice error';$('labelMessage').textContent=e.message||'Falha no teste de impressão.';}};
+$('activateButton').onclick=async()=>{const b=$('activateButton');const code=$('activationCode').value.trim();if(!code){$('activationMessage').className='notice error';$('activationMessage').textContent='Digite o código de ativação.';return;}b.disabled=true;b.textContent='Ativando...';try{state.config=await window.bridge.activateBridge(code);renderConfig();await loadPrinters();await loadJobs();selectView('dashboard');toast('Computador ativado com sucesso.');}catch(e){$('activationMessage').className='notice error';$('activationMessage').textContent=e.message||'Não foi possível ativar este computador.';}finally{b.disabled=false;b.textContent='Ativar computador';}};
+$('activationCode').addEventListener('input',e=>{let v=e.target.value.toUpperCase().replace(/[^A-F0-9-]/g,'').replace(/-/g,'').slice(0,12);e.target.value=v.replace(/(.{4})(?=.)/g,'$1-').replace(/-$/,'');});
+$('saveConfig').onclick=async()=>{try{const s=await window.bridge.saveConfig({establishmentName:$('establishmentInput').value.trim(),autoPrint:$('autoPrintInput').checked,testMode:$('testModeInput').checked});state.config=s;renderConfig();$('configMessage').className='notice success';$('configMessage').textContent='Configuração salva com sucesso.';await loadJobs();toast('Configuração salva.');}catch(e){$('configMessage').className='notice error';$('configMessage').textContent=e.message||'Não foi possível salvar.';}};
+$('openFolder').onclick=()=>window.bridge.openDataFolder();
+window.bridge.onStatus(d=>{$('connDot').className='dot '+(d.online?'on':'off');$('connText').textContent=d.disabled?'Computador desativado':(d.online?'Conectado':'Desconectado');if(state.config&&!state.config.bridgeToken){$('connText').textContent='Aguardando ativação';}});
+state.config=await window.bridge.getConfig();renderConfig();renderLabel();await loadPrinters();await loadJobs();if(!state.config.bridgeToken)selectView('settings');setInterval(loadJobs,4500);
+})();
+</script>
+</body>
+</html>
