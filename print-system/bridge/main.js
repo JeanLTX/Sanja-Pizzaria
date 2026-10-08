@@ -23,6 +23,7 @@ const CONFIG_PATH = app.isPackaged
     ? path.join(app.getPath('userData'), 'config.json')
     : path.join(__dirname, 'config.json');
 const LOG_PATH = path.join(app.getPath('userData'), 'bridge.log');
+const PRINT_STATE_PATH = path.join(app.getPath('userData'), 'print-state.json');
 
 let tray;
 let windowRef;
@@ -35,6 +36,61 @@ function log(message, error) {
     fs.mkdirSync(path.dirname(LOG_PATH), { recursive: true });
     fs.appendFileSync(LOG_PATH, `[${new Date().toISOString()}] ${message}${suffix}\n`, 'utf8');
     console.log(message, error || '');
+}
+
+function loadPrintState() {
+    try {
+        if (!fs.existsSync(PRINT_STATE_PATH)) return { pendingCompletions: [] };
+        const value = JSON.parse(fs.readFileSync(PRINT_STATE_PATH, 'utf8'));
+        return {
+            pendingCompletions: Array.isArray(value.pendingCompletions) ? value.pendingCompletions : []
+        };
+    } catch (error) {
+        log('Não foi possível ler o estado local de impressão', error);
+        return { pendingCompletions: [] };
+    }
+}
+
+function savePrintState(state) {
+    fs.mkdirSync(path.dirname(PRINT_STATE_PATH), { recursive: true });
+    fs.writeFileSync(PRINT_STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
+}
+
+function rememberPrintedJob(job) {
+    const state = loadPrintState();
+    if (!state.pendingCompletions.some(item => item.jobId === job.job_id)) {
+        state.pendingCompletions.push({
+            jobId: job.job_id,
+            orderId: job.order_id,
+            orderNumber: job.order_number,
+            printedAt: new Date().toISOString()
+        });
+        savePrintState(state);
+    }
+}
+
+function forgetPrintedJob(jobId) {
+    const state = loadPrintState();
+    state.pendingCompletions = state.pendingCompletions.filter(item => item.jobId !== jobId);
+    savePrintState(state);
+}
+
+async function flushPendingCompletions() {
+    const state = loadPrintState();
+    if (!state.pendingCompletions.length || !config?.bridgeToken) return;
+
+    for (const item of [...state.pendingCompletions]) {
+        try {
+            const ok = await completeJob(item.jobId, true);
+            if (ok !== false) {
+                forgetPrintedJob(item.jobId);
+                log(`Confirmação recuperada para o pedido #${item.orderNumber || '-'}.`);
+            }
+        } catch (error) {
+            log(`Ainda não foi possível confirmar o pedido #${item.orderNumber || '-'}.`, error);
+            break;
+        }
+    }
 }
 
 function normalizeConfig(raw) {
@@ -201,10 +257,17 @@ async function requestReprint(jobId) {
 
     try {
         const result = await printWithWindows(job);
-        await completeJob(job.job_id, true);
+        if (!result.test) rememberPrintedJob(job);
+        try {
+            await completeJob(job.job_id, true);
+            if (!result.test) forgetPrintedJob(job.job_id);
+        } catch (confirmError) {
+            if (result.test) throw confirmError;
+            log(`Reimpressão do pedido ${job.order_id} concluída, mas confirmação pendente.`, confirmError);
+        }
         return { test: !!result.test, output: result.output || null, jobId: job.job_id };
     } catch (error) {
-        await completeJob(job.job_id, false, error.message);
+        try { await completeJob(job.job_id, false, error.message); } catch {}
         throw error;
     }
 }
@@ -415,10 +478,25 @@ async function processQueueOnce() {
                 return;
             }
 
-            await completeJob(job.job_id, true);
-            log(`Pedido ${job.order_id} impresso com sucesso.`);
+            // Persistimos localmente antes de confirmar no servidor.
+            // Se a internet cair depois da impressão física, o Bridge
+            // consegue confirmar o mesmo job quando a conexão voltar,
+            // evitando que ele seja reservado novamente.
+            rememberPrintedJob(job);
+
+            try {
+                await completeJob(job.job_id, true);
+                forgetPrintedJob(job.job_id);
+                log(`Pedido ${job.order_id} impresso e confirmado com sucesso.`);
+            } catch (confirmError) {
+                log(`Pedido ${job.order_id} foi impresso, mas a confirmação ficou pendente.`, confirmError);
+            }
         } catch (error) {
-            await completeJob(job.job_id, false, error.message);
+            try {
+                await completeJob(job.job_id, false, error.message);
+            } catch (completeError) {
+                log(`Não foi possível registrar a falha de impressão de ${job.order_id}`, completeError);
+            }
             log(`Falha ao imprimir ${job.order_id}`, error);
         }
     } catch (error) {
@@ -432,6 +510,7 @@ async function refreshStatus() {
     try {
         const ok = await heartbeat();
         if (!ok) throw new Error('Este computador foi desativado pelo administrador.');
+        await flushPendingCompletions();
         updateTray('🟢 Impressão — Online');
         if (windowRef && !windowRef.isDestroyed()) {
             windowRef.webContents.send('status', { online: true, message: 'Conectado ao Supabase.' });

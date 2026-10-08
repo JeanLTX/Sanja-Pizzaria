@@ -135,7 +135,7 @@
 <div id="toast" class="toast"></div>
 <script>
 (async()=>{
-const state={config:null,jobs:[],filter:'all',historyFilter:'all'};
+const state={config:null,jobs:[],filter:'all',historyFilter:'all',disabled:false};
 const $=id=>document.getElementById(id);
 const views={
  dashboard:['Painel','Acompanhe e gerencie os pedidos'],
@@ -152,9 +152,36 @@ function meta(s){return ({pending:['pending','Pendente'],printing:['printing','I
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2800);}
 function selectView(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));$('topTitle').textContent=views[v][0];$('topSub').textContent=views[v][1];if(v==='printer')loadPrinters();if(v==='history')renderHistory();if(v==='label')renderLabel();if(v==='settings')renderConfig();}
 function renderConfig(){
-const c=state.config||{};const active=!!c.bridgeToken&&!c.bridgeToken.includes('COLOQUE_');
-$('activationPanel').style.display=active?'none':'block';$('activeConfigPanel').style.display=active?'block':'none';
-if(active){$('establishmentInput').value=c.establishmentName||'';$('autoPrintInput').checked=!!c.autoPrint;$('testModeInput').checked=!!c.testMode;$('activeInfo').textContent=(c.establishmentName||'Estabelecimento')+' • computador autorizado';$('deviceState').textContent=c.testMode?'Modo de simulação ativo.':'Conectado e pronto para operar.';}
+const c=state.config||{};
+const hasToken=!!c.bridgeToken&&!c.bridgeToken.includes('COLOQUE_');
+const active=hasToken&&!state.disabled;
+$('activationPanel').style.display=active?'none':'block';
+$('activeConfigPanel').style.display=active?'block':'none';
+const badge=$('activationPanel').querySelector('.activation-badge');
+const title=$('activationPanel').querySelector('h3');
+const description=$('activationPanel').querySelector('p');
+const help=$('activationPanel').querySelector('.muted');
+const button=$('activateButton');
+if(state.disabled){
+  badge.textContent='COMPUTADOR DESATIVADO';
+  title.textContent='Reativar este computador';
+  description.textContent='O administrador desativou este computador. Gere um novo código no painel administrativo e informe-o abaixo para voltar a receber pedidos.';
+  help.textContent='A reativação gera uma nova credencial segura para este computador.';
+  button.textContent='Reativar computador';
+}else{
+  badge.textContent='PRIMEIRO ACESSO';
+  title.textContent='Ative este computador';
+  description.textContent='Use o código de ativação fornecido pelo administrador. O código é usado uma única vez e cria uma credencial segura automaticamente.';
+  help.textContent='Você não precisa saber o Bridge Token. Ele ficará armazenado somente neste computador.';
+  button.textContent='Ativar computador';
+}
+if(active){
+  $('establishmentInput').value=c.establishmentName||'';
+  $('autoPrintInput').checked=!!c.autoPrint;
+  $('testModeInput').checked=!!c.testMode;
+  $('activeInfo').textContent=(c.establishmentName||'Estabelecimento')+' • computador autorizado';
+  $('deviceState').textContent=c.testMode?'Modo de simulação ativo.':'Conectado e pronto para operar.';
+}
 $('welcome').textContent=c.establishmentName?'Pedidos — '+c.establishmentName:'Pedidos';
 }
 function renderJobs(){
@@ -191,7 +218,7 @@ showPayment:$('labelShowPayment').checked,
 showNotes:$('labelShowNotes').checked
 };}
 function syncLayoutForm(){const l=state.config?.printLayout||{};$('labelPaperWidth').value=String(l.paperWidthMm||80);$('labelColumns').value=l.columns||48;$('labelLeftMargin').value=l.leftMargin||0;$('labelTopPadding').value=l.topPadding||0;$('labelBottomPadding').value=l.bottomPadding??2;$('labelLineSpacing').value=l.lineSpacing||0;$('labelHeaderAlignment').value=l.headerAlignment||'center';$('labelShowPhone').checked=l.showPhone!==false;$('labelShowAddress').checked=l.showAddress!==false;$('labelShowRegion').checked=l.showRegion!==false;$('labelShowPayment').checked=l.showPayment!==false;$('labelShowNotes').checked=l.showNotes!==false;}
-function renderLabel(){const l=getLayoutFromForm();const name=(state.config?.establishmentName||'ESTABELECIMENTO').toUpperCase();const width=l.paperWidthMm===58?'58 mm':'80 mm';const lines=['================================',name,'NOVO PEDIDO','================================','Pedido: #184','Cliente: Cliente de exemplo',...(l.showPhone?['Telefone: (16) 99999-9999']:[]),'--------------------------------','2x Pizza de teste','  Grande • Catupiry','  Valor: R$ 79,80','','--------------------------------','Subtotal: R$ 79,80','Entrega: R$ 5,00','TOTAL: R$ 84,80','--------------------------------',...(l.showRegion?['Região: Centro']:[]),...(l.showAddress?['Endereço: Rua de exemplo, 123']:[]),...(l.showPayment?['Pagamento: Pix']:[]),...(l.showNotes?['Obs: Sem cebola']:[]),'================================'];let html=lines.map(x=>{let t=x;const max=l.columns;if(t.length>max)t=t.slice(0,max-1)+'…';if(t==='================================'||t==='--------------------------------')t='-'.repeat(max);if(t===name||t==='NOVO PEDIDO'){const total=Math.max(0,max-t.length);if(l.headerAlignment==='center')t=' '.repeat(Math.floor(total/2))+t+' '.repeat(Math.ceil(total/2));if(l.headerAlignment==='right')t=' '.repeat(total)+t;}return esc(t);}).join('\\n');$('labelPreview').textContent=html;$('labelPreview').style.width=l.paperWidthMm===58?'290px':'360px';}
+function renderLabel(){const l=getLayoutFromForm();const name=(state.config?.establishmentName||'ESTABELECIMENTO').toUpperCase();const columns=Math.max(24,Math.min(64,Number(l.columns)||48));const margin=' '.repeat(Math.max(0,Math.min(20,Number(l.leftMargin)||0)));const spacing=Math.max(0,Math.min(3,Number(l.lineSpacing)||0));const separators=new Set(['================================','--------------------------------']);const hidePrefix=[!l.showPhone&&'Telefone:',!l.showAddress&&'Endereço:',!l.showRegion&&'Região:',!l.showPayment&&'Pagamento:',!l.showNotes&&'Obs:'].filter(Boolean);const lines=['================================',name,'          NOVO PEDIDO','================================','Pedido: #184','Cliente: Cliente de exemplo',...(l.showPhone?['Telefone: (16) 99999-9999']:[]),'--------------------------------','2x Pizza de teste','  Grande • Catupiry','  Valor: R$ 79,80','','--------------------------------','Subtotal: R$ 79,80','Entrega: R$ 5,00','TOTAL: R$ 84,80','--------------------------------',...(l.showRegion?['Região: Centro']:[]),...(l.showAddress?['Endereço: Rua de exemplo, 123']:[]),...(l.showPayment?['Pagamento: Pix']:[]),...(l.showNotes?['Obs: Sem cebola']:[]),'================================'];const wrapLine=line=>{const text=String(line??'');if(!text.trim()||separators.has(text.trim()))return [text];const chunks=[];let rest=text.trimStart();while(rest.length>columns){let cut=rest.lastIndexOf(' ',columns);if(cut<10)cut=columns;chunks.push(rest.slice(0,cut));rest=rest.slice(cut).trimStart();}chunks.push(rest);return chunks;};const content=[];let headerIndex=0;for(const original of lines){const clean=original.trim();if(hidePrefix.some(prefix=>clean.startsWith(prefix)))continue;if(separators.has(clean)){content.push('-'.repeat(columns));continue;}const pieces=wrapLine(original);const isHeader=headerIndex<2&&!!clean&&!clean.includes(':');for(const piece of pieces){let t=piece;if(isHeader){const total=Math.max(0,columns-t.length);if(l.headerAlignment==='center')t=' '.repeat(Math.floor(total/2))+t+' '.repeat(Math.ceil(total/2));else if(l.headerAlignment==='right')t=' '.repeat(total)+t;else t=t.padEnd(columns,' ');}else{t=t.slice(0,columns);}content.push(t);}if(clean)headerIndex++;}const final=[];for(let i=0;i<Math.max(0,Math.min(20,Number(l.topPadding)||0));i++)final.push('');for(const line of content){final.push(line?margin+line:'');for(let i=0;i<spacing;i++)final.push('');}for(let i=0;i<Math.max(0,Math.min(10,Number(l.bottomPadding)||0));i++)final.push('');$('labelPreview').textContent=esc(final.join('\n'));$('labelPreview').style.width=l.paperWidthMm===58?'290px':'360px';}
 async function loadJobs(){
 if(!state.config?.bridgeToken){state.jobs=[];renderJobs();renderHistory();return;}
 try{state.jobs=await window.bridge.listJobs(60);if(!Array.isArray(state.jobs))state.jobs=[];}catch{state.jobs=[];}renderJobs();renderHistory();
@@ -206,14 +233,14 @@ $('refreshJobs').onclick=async()=>{await loadJobs();toast('Pedidos atualizados.'
 $('simulateOrder').onclick=async()=>{try{const r=await window.bridge.createTestOrder();toast('Pedido de teste #'+r.orderNumber+' criado.');await loadJobs();}catch(e){toast(e.message||'Não foi possível criar o pedido de teste.');}};
 $('printerRefresh').onclick=loadPrinters;$('printerSave').onclick=async()=>{try{const s=await window.bridge.saveConfig({printerName:$('printerSelect').value});state.config=s;renderConfig();await loadPrinters();toast('Impressora salva.');}catch(e){toast(e.message||'Não foi possível salvar.');}};
 $('printerTest').onclick=async()=>{try{if(!$('printerSelect').value){toast('Selecione uma impressora primeiro.');return;}await window.bridge.saveConfig({printerName:$('printerSelect').value});const r=await window.bridge.testPrint();toast(r.test?'Recibo simulado salvo.':'Teste enviado para a impressora.');}catch(e){toast(e.message||'Falha no teste.');}};
-['labelPaperWidth','labelColumns','labelLeftMargin','labelTopPadding','labelBottomPadding','labelLineSpacing','labelHeaderAlignment','labelShowPhone','labelShowAddress','labelShowRegion','labelShowPayment','labelShowNotes'].forEach(id=>$(id).addEventListener('input',renderLabel));
+['labelPaperWidth','labelColumns','labelLeftMargin','labelTopPadding','labelBottomPadding','labelLineSpacing','labelHeaderAlignment','labelShowPhone','labelShowAddress','labelShowRegion','labelShowPayment','labelShowNotes'].forEach(id=>{const el=$(id);el.addEventListener('input',renderLabel);el.addEventListener('change',renderLabel);});
 $('saveLabelConfig').onclick=async()=>{try{const printLayout=getLayoutFromForm();const s=await window.bridge.saveConfig({printLayout});state.config=s;renderLabel();$('labelMessage').className='notice success';$('labelMessage').textContent='Configuração da etiqueta salva com sucesso.';toast('Configuração da etiqueta salva.');}catch(e){$('labelMessage').className='notice error';$('labelMessage').textContent=e.message||'Não foi possível salvar a configuração.';}};
 $('testLabelConfig').onclick=async()=>{try{const printLayout=getLayoutFromForm();await window.bridge.saveConfig({printLayout});state.config=await window.bridge.getConfig();const r=await window.bridge.testPrint();toast(r.test?'Recibo de teste salvo com o novo formato.':'Teste enviado para a impressora.');renderLabel();}catch(e){$('labelMessage').className='notice error';$('labelMessage').textContent=e.message||'Falha no teste de impressão.';}};
-$('activateButton').onclick=async()=>{const b=$('activateButton');const code=$('activationCode').value.trim();if(!code){$('activationMessage').className='notice error';$('activationMessage').textContent='Digite o código de ativação.';return;}b.disabled=true;b.textContent='Ativando...';try{state.config=await window.bridge.activateBridge(code);renderConfig();await loadPrinters();await loadJobs();selectView('dashboard');toast('Computador ativado com sucesso.');}catch(e){$('activationMessage').className='notice error';$('activationMessage').textContent=e.message||'Não foi possível ativar este computador.';}finally{b.disabled=false;b.textContent='Ativar computador';}};
+$('activateButton').onclick=async()=>{const b=$('activateButton');const wasDisabled=state.disabled;const code=$('activationCode').value.trim();if(!code){$('activationMessage').className='notice error';$('activationMessage').textContent='Digite o código de ativação.';return;}b.disabled=true;b.textContent=wasDisabled?'Reativando...':'Ativando...';try{state.config=await window.bridge.activateBridge(code);state.disabled=false;$('activationCode').value='';$('activationMessage').className='notice success';$('activationMessage').textContent=wasDisabled?'Computador reativado com sucesso.':'Computador ativado com sucesso.';renderConfig();await loadPrinters();await loadJobs();selectView('dashboard');toast(wasDisabled?'Computador reativado com sucesso.':'Computador ativado com sucesso.');}catch(e){$('activationMessage').className='notice error';$('activationMessage').textContent=e.message||'Não foi possível ativar este computador.';}finally{b.disabled=false;b.textContent=state.disabled?'Reativar computador':'Ativar computador';}};
 $('activationCode').addEventListener('input',e=>{let v=e.target.value.toUpperCase().replace(/[^A-F0-9-]/g,'').replace(/-/g,'').slice(0,12);e.target.value=v.replace(/(.{4})(?=.)/g,'$1-').replace(/-$/,'');});
 $('saveConfig').onclick=async()=>{try{const s=await window.bridge.saveConfig({establishmentName:$('establishmentInput').value.trim(),autoPrint:$('autoPrintInput').checked,testMode:$('testModeInput').checked});state.config=s;renderConfig();$('configMessage').className='notice success';$('configMessage').textContent='Configuração salva com sucesso.';await loadJobs();toast('Configuração salva.');}catch(e){$('configMessage').className='notice error';$('configMessage').textContent=e.message||'Não foi possível salvar.';}};
 $('openFolder').onclick=()=>window.bridge.openDataFolder();
-window.bridge.onStatus(d=>{$('connDot').className='dot '+(d.online?'on':'off');$('connText').textContent=d.disabled?'Computador desativado':(d.online?'Conectado':'Desconectado');if(state.config&&!state.config.bridgeToken){$('connText').textContent='Aguardando ativação';}});
+window.bridge.onStatus(d=>{$('connDot').className='dot '+(d.online?'on':'off');state.disabled=!!d.disabled;$('connText').textContent=d.disabled?'Computador desativado':(d.online?'Conectado':'Desconectado');if(state.config&&!state.config.bridgeToken){$('connText').textContent='Aguardando ativação';}if(d.disabled){renderConfig();selectView('settings');}});
 state.config=await window.bridge.getConfig();renderConfig();syncLayoutForm();renderLabel();await loadPrinters();await loadJobs();if(!state.config.bridgeToken)selectView('settings');setInterval(loadJobs,4500);
 })();
 </script>
