@@ -144,7 +144,7 @@ async function loadBridges(){
   }catch(e){$('bridges').innerHTML='<div class="message error">'+esc(e.message||'Falha ao carregar.')+'</div>';}
   document.querySelectorAll('[data-toggle-bridge]').forEach(btn=>btn.onclick=async()=>{
     btn.disabled=true;btn.textContent='Salvando...';
-    try{await rpc('admin_set_bridge_active',{p_bridge_id:btn.dataset.toggleBridge,p_active:btn.dataset.active==='true'});await loadBridges();}
+    try{const nextActive=btn.dataset.active==='true';if(!nextActive&&!confirm('Desativar este computador? Ele deixará de receber e imprimir pedidos até ser reativado.')){btn.disabled=false;btn.textContent='Desativar';return;}await rpc('admin_set_bridge_active',{p_bridge_id:btn.dataset.toggleBridge,p_active:nextActive});await loadBridges();}
     catch(e){alert(e.message||'Não foi possível alterar o computador.');btn.disabled=false;btn.textContent=btn.dataset.active==='true'?'Reativar':'Desativar';}
   });
 }
