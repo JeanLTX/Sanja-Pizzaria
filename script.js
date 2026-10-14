@@ -482,10 +482,10 @@ const CATEGORIES = [
 
 // ENTREGA
 // Taxas fixas por região informadas pela Sanja.
-// Regiões urbanas que não estejam na lista específica usam a taxa padrão de R$ 4,00.
+// Regiões conhecidas usam as taxas fixas do Luan; regiões não identificadas usam rota e R$ 1,50/km ida e volta (mínimo R$ 4,00).
 const TAXAS_ENTREGA = [
     { id: 'centro', name: 'Centro', fee: 4.00 },
-    { id: 'cidade', name: 'Demais regiões da cidade', fee: 4.00 },
+    { id: 'cidade', name: 'Outra região (calcular pelo trajeto)', fee: null },
     { id: 'boa-vista', name: 'Boa Vista', fee: 30.00 },
     { id: 'anhumas', name: 'Anhumas', fee: 25.00 },
     { id: 'arrozal', name: 'Arrozal', fee: 20.00 },
@@ -534,6 +534,10 @@ let checkoutData = {
     location: null,
     locationReverseResult: null,
     locationVerification: null,
+    routeQuote: null,
+    routeDestinationSource: null,
+    routeCalculationStatus: 'idle',
+    routeCalculationError: null,
     deliveryRegion: null,
     orderType: 'delivery',
     paymentMethod: ''
@@ -609,7 +613,212 @@ const updateCartItemQuantity = (index, delta) => {
 
 const getCartTotal = () => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
-const getDeliveryFee = () => checkoutData.orderType === 'pickup' ? 0 : (checkoutData.deliveryRegion?.fee || 0);
+let deliveryRouteCalculationPromise = null;
+let deliveryRouteCalculationKey = '';
+
+function getDeliveryRouteKey() {
+    const location = checkoutData.location;
+    const source = checkoutData.routeDestinationSource || (location && !['outside-area', 'error'].includes(checkoutData.locationVerification?.status) ? 'gps' : 'address');
+    if (source === 'gps' && location) {
+        return 'gps:' + Number(location.latitude).toFixed(5) + ',' + Number(location.longitude).toFixed(5);
+    }
+    return 'address:' + normalizeLocationArea(checkoutData.address);
+}
+
+function hasCurrentRouteQuote() {
+    return Boolean(
+        checkoutData.routeQuote &&
+        checkoutData.routeQuote.key === getDeliveryRouteKey() &&
+        Number.isFinite(Number(checkoutData.routeQuote.fee))
+    );
+}
+
+function isDeliveryFeeReady() {
+    if (checkoutData.orderType === 'pickup') return true;
+    const region = checkoutData.deliveryRegion;
+    if (!region) return false;
+    if (region.id === 'cidade') return hasCurrentRouteQuote();
+    return Number.isFinite(Number(region.fee));
+}
+
+const getDeliveryFee = () => {
+    if (checkoutData.orderType === 'pickup') return 0;
+    if (checkoutData.deliveryRegion?.id === 'cidade') {
+        return hasCurrentRouteQuote() ? Number(checkoutData.routeQuote.fee) : 0;
+    }
+    return checkoutData.deliveryRegion?.fee || 0;
+};
+
+function getDeliveryFeeDisplayText() {
+    if (checkoutData.orderType === 'pickup') return formatCurrency(0);
+    if (!checkoutData.deliveryRegion) return 'Selecione a regi\u00e3o';
+    if (checkoutData.deliveryRegion.id !== 'cidade') return formatCurrency(checkoutData.deliveryRegion.fee);
+    if (hasCurrentRouteQuote()) return formatCurrency(checkoutData.routeQuote.fee);
+    if (checkoutData.routeCalculationStatus === 'calculating') return 'Calculando rota...';
+    if (checkoutData.routeCalculationStatus === 'error') return 'Tente novamente';
+    return checkoutData.location || normalizeLocationArea(checkoutData.address).length >= 5
+        ? 'Aguardando calculo'
+        : 'Informe endere\u00e7o ou GPS';
+}
+
+function getDeliveryRegionSelectedFeeLabel(region) {
+    if (region.id !== 'cidade') return formatCurrency(region.fee);
+    if (hasCurrentRouteQuote()) return formatCurrency(checkoutData.routeQuote.fee);
+    if (checkoutData.routeCalculationStatus === 'calculating') return 'Calculando...';
+    if (checkoutData.routeCalculationStatus === 'error') return 'Tente novamente';
+    return 'Por calcular';
+}
+
+function resetRouteCalculation() {
+    checkoutData.routeQuote = null;
+    checkoutData.routeDestinationSource = null;
+    checkoutData.routeCalculationStatus = 'idle';
+    checkoutData.routeCalculationError = null;
+}
+
+function handleDeliveryAddressInput(value) {
+    checkoutData.address = value;
+    const shouldUseAddress = !checkoutData.location || checkoutData.routeDestinationSource === 'address'
+        || ['outside-area', 'error'].includes(checkoutData.locationVerification?.status);
+    if (checkoutData.deliveryRegion?.id === 'cidade' && shouldUseAddress) {
+        resetRouteCalculation();
+        checkoutData.routeDestinationSource = 'address';
+        checkoutData.locationVerification = {
+            status: 'unverified',
+            message: 'Endere\u00e7o alterado. A taxa ser\u00e1 recalculada pela rota ao sair deste campo.'
+        };
+        updateDeliveryLocationVerificationUI();
+    }
+    updateCheckoutForm();
+}
+
+function handleDeliveryAddressBlur(value) {
+    checkoutData.address = value;
+    const shouldUseAddress = !checkoutData.location || checkoutData.routeDestinationSource === 'address'
+        || ['outside-area', 'error'].includes(checkoutData.locationVerification?.status);
+    if (checkoutData.deliveryRegion?.id === 'cidade' && shouldUseAddress) {
+        calculateRouteDeliveryFee();
+    }
+}
+
+async function calculateRouteDeliveryFee() {
+    if (checkoutData.orderType !== 'delivery' || checkoutData.deliveryRegion?.id !== 'cidade') return null;
+
+    const useGps = checkoutData.routeDestinationSource
+        ? checkoutData.routeDestinationSource === 'gps'
+        : Boolean(checkoutData.location && !['outside-area', 'error'].includes(checkoutData.locationVerification?.status));
+    if (!checkoutData.routeDestinationSource) checkoutData.routeDestinationSource = useGps ? 'gps' : 'address';
+    const key = getDeliveryRouteKey();
+    if (hasCurrentRouteQuote()) return checkoutData.routeQuote;
+    if (deliveryRouteCalculationPromise && deliveryRouteCalculationKey === key) {
+        return deliveryRouteCalculationPromise;
+    }
+    if (!useGps && normalizeLocationArea(checkoutData.address).length < 5) {
+        checkoutData.routeCalculationStatus = 'idle';
+        checkoutData.locationVerification = {
+            status: 'unverified',
+            message: 'Informe a rua e o n\u00famero ou envie sua localiza\u00e7o atual para calcular o frete pela rota.'
+        };
+        updateDeliveryLocationVerificationUI();
+        updateCheckoutForm();
+        return null;
+    }
+
+    const config = window.SUPABASE_CONFIG;
+    if (!config?.url || !config?.publishableKey) {
+        checkoutData.routeCalculationStatus = 'error';
+        checkoutData.routeCalculationError = 'Configuracao indisponivel';
+        checkoutData.locationVerification = {
+            status: 'error',
+            message: 'N\u00e3o foi poss\u00edvel calcular a taxa automaticamente. Confira o endere\u00e7o ou envie sua localiza\u00e7o novamente.'
+        };
+        updateDeliveryLocationVerificationUI();
+        updateCheckoutForm();
+        return null;
+    }
+
+    checkoutData.routeCalculationStatus = 'calculating';
+    checkoutData.routeCalculationError = null;
+    checkoutData.locationVerification = {
+        status: 'checking',
+        message: 'Calculando a rota de carro entre a Sanja e o endere\u00e7o de entrega...'
+    };
+    updateDeliveryLocationVerificationUI();
+    updateCheckoutForm();
+
+    const requestBody = { action: 'route', address: checkoutData.address };
+    if (useGps) {
+        requestBody.latitude = checkoutData.location.latitude;
+        requestBody.longitude = checkoutData.location.longitude;
+        requestBody.accuracy = checkoutData.location.accuracy;
+    }
+
+    const task = (async () => {
+        try {
+            const response = await fetch(config.url.replace(/\/$/, '') + '/functions/v1/verify-delivery-region', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', apikey: config.publishableKey },
+                body: JSON.stringify(requestBody)
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok || !payload.ok || !Number.isFinite(Number(payload.fee)) || !Number.isFinite(Number(payload.distanceKm))) {
+                throw new Error(payload.error || 'Route calculation failed');
+            }
+            if (key !== getDeliveryRouteKey() || checkoutData.deliveryRegion?.id !== 'cidade') return null;
+
+            checkoutData.routeQuote = { ...payload, key };
+            checkoutData.routeCalculationStatus = 'success';
+            const minimumNote = Number(payload.calculatedRoundTripFee) < Number(payload.minimumFee)
+                ? '; aplicada a taxa minima de R$ 4,00'
+                : '';
+            const originApproximationNote = payload.originApproximate
+                ? ' O número 56 não foi confirmado pelo mapa; usamos um ponto de referência da Praça Sagrados Corações, então o frete é estimado.'
+                : '';
+            checkoutData.locationVerification = {
+                status: payload.originApproximate ? 'route-approximate' : 'route',
+                message: 'Taxa calculada pela rota de carro: ' + Number(payload.distanceKm).toFixed(2)
+                    + ' km (ida) x 2 x R$ 1,50/km' + minimumNote + originApproximationNote
+                    + '. Frete: ' + formatCurrency(payload.fee) + '.'
+            };
+            updateDeliveryRegionSelectedDisplay();
+            updateDeliveryLocationVerificationUI();
+            updateCheckoutForm();
+            return checkoutData.routeQuote;
+        } catch (error) {
+            console.warn('Calculo de rota nao concluido:', error);
+            if (key === getDeliveryRouteKey() && checkoutData.deliveryRegion?.id === 'cidade') {
+                checkoutData.routeQuote = null;
+                checkoutData.routeCalculationStatus = 'error';
+                checkoutData.routeCalculationError = String(error?.message || 'Route calculation failed');
+                checkoutData.locationVerification = {
+                    status: 'error',
+                    message: 'N\u00e3o conseguimos calcular a taxa automaticamente. Confira o endere\u00e7o ou envie sua localiza\u00e7o atual; se o problema continuar, selecione uma regi\u00e3o conhecida.'
+                };
+                updateDeliveryRegionSelectedDisplay();
+                updateDeliveryLocationVerificationUI();
+                updateCheckoutForm();
+            }
+            return null;
+        } finally {
+            if (deliveryRouteCalculationKey === key) {
+                deliveryRouteCalculationPromise = null;
+                deliveryRouteCalculationKey = '';
+            }
+        }
+    })();
+
+    deliveryRouteCalculationKey = key;
+    deliveryRouteCalculationPromise = task;
+    return task;
+}
+
+function updateDeliveryRegionSelectedDisplay() {
+    const selected = document.getElementById('delivery-region-selected');
+    const region = checkoutData.deliveryRegion;
+    if (!selected || !region) return;
+    selected.innerHTML = '<span>' + region.name + '</span><strong>' + getDeliveryRegionSelectedFeeLabel(region) + '</strong>';
+    selected.classList.remove('hidden');
+}
 
 function getDeliveryRegionMatches(query = '') {
     const normalizedQuery = normalizeSearchText(query);
@@ -640,9 +849,9 @@ function renderDeliveryRegionResults(query = '') {
         <button type="button" class="delivery-region-option" onclick="selectDeliveryRegion('${region.id}')">
             <span class="min-w-0">
                 <span class="delivery-region-option-name">${region.name}</span>
-                <span class="delivery-region-option-sub">Taxa de entrega</span>
+                <span class="delivery-region-option-sub">${region.id === 'cidade' ? 'Frete calculado pela distância' : 'Taxa fixa de entrega'}</span>
             </span>
-            <strong>${formatCurrency(region.fee)}</strong>
+            <strong>${region.id === 'cidade' ? 'Por rota' : formatCurrency(region.fee)}</strong>
         </button>
     `).join('');
 
@@ -659,6 +868,7 @@ function updateDeliveryRegionSearch(query) {
     const selected = checkoutData.deliveryRegion;
     if (selected && normalizeSearchText(query) !== normalizeSearchText(selected.name)) {
         checkoutData.deliveryRegion = null;
+        resetRouteCalculation();
         const selectedEl = document.getElementById('delivery-region-selected');
         if (selectedEl) selectedEl.classList.add('hidden');
     }
@@ -668,10 +878,17 @@ function updateDeliveryRegionSearch(query) {
 }
 
 function selectDeliveryRegion(regionId) {
-    const region = TAXAS_ENTREGA.find(item => item.id === regionId);
+    let region = TAXAS_ENTREGA.find(item => item.id === regionId);
     if (!region) return;
 
+    if (region.id === 'cidade' && checkoutData.locationReverseResult) {
+        const verification = compareLocationWithSelectedRegion(checkoutData.locationReverseResult);
+        const knownRegion = verification.status === 'outside-area' ? null : findKnownDeliveryRegion(checkoutData.locationReverseResult);
+        if (knownRegion) region = knownRegion;
+    }
+
     checkoutData.deliveryRegion = region;
+    resetRouteCalculation();
     refreshLocationRegionVerification();
 
     const input = document.getElementById('delivery-region-search');
@@ -680,20 +897,17 @@ function selectDeliveryRegion(regionId) {
     const results = document.getElementById('delivery-region-results');
     if (results) results.classList.add('hidden');
 
-    const selected = document.getElementById('delivery-region-selected');
-    if (selected) {
-        selected.innerHTML = `
-            <span>${region.name}</span>
-            <strong>${formatCurrency(region.fee)}</strong>
-        `;
-        selected.classList.remove('hidden');
-    }
-
+    updateDeliveryRegionSelectedDisplay();
     updateCheckoutForm();
+
+    if (region.id === 'cidade') {
+        calculateRouteDeliveryFee();
+    }
 }
 
 function clearDeliveryRegion() {
     checkoutData.deliveryRegion = null;
+    resetRouteCalculation();
 
     const input = document.getElementById('delivery-region-search');
     if (input) {
@@ -2490,6 +2704,16 @@ function getDeliveryRegionAliases(region) {
     return [region.name, ...(aliases[region.id] || [])].map(normalizeLocationArea);
 }
 
+function findKnownDeliveryRegion(reverseResult) {
+    const candidates = Array.isArray(reverseResult?.regionCandidates) ? reverseResult.regionCandidates : [];
+    for (const candidate of candidates) {
+        const name = normalizeLocationArea(candidate?.name);
+        const region = TAXAS_ENTREGA.find(item => item.id !== 'cidade' && getDeliveryRegionAliases(item).includes(name));
+        if (region) return region;
+    }
+    return null;
+}
+
 function compareLocationWithSelectedRegion(reverseResult) {
     const selected = checkoutData.deliveryRegion;
     const candidates = Array.isArray(reverseResult?.regionCandidates) ? reverseResult.regionCandidates : [];
@@ -2538,7 +2762,7 @@ function updateDeliveryLocationVerificationUI() {
     box.className = 'hidden mt-3 rounded-lg border p-3 text-xs leading-relaxed';
     if (!verification) { box.textContent = ''; return; }
     box.classList.remove('hidden');
-    const colors = { checking: ['border-blue-200', 'bg-blue-50', 'text-blue-800'], match: ['border-green-200', 'bg-green-50', 'text-green-800'], mismatch: ['border-amber-300', 'bg-amber-50', 'text-amber-900'], unverified: ['border-amber-200', 'bg-amber-50', 'text-amber-800'], 'low-accuracy': ['border-amber-300', 'bg-amber-50', 'text-amber-900'], error: ['border-amber-200', 'bg-amber-50', 'text-amber-800'] };
+    const colors = { checking: ['border-blue-200', 'bg-blue-50', 'text-blue-800'], route: ['border-green-200', 'bg-green-50', 'text-green-800'], 'route-approximate': ['border-amber-300', 'bg-amber-50', 'text-amber-900'], match: ['border-green-200', 'bg-green-50', 'text-green-800'], mismatch: ['border-amber-300', 'bg-amber-50', 'text-amber-900'], unverified: ['border-amber-200', 'bg-amber-50', 'text-amber-800'], 'low-accuracy': ['border-amber-300', 'bg-amber-50', 'text-amber-900'], error: ['border-amber-200', 'bg-amber-50', 'text-amber-800'] };
     box.classList.add(...(colors[verification.status] || colors.unverified));
     box.textContent = verification.message;
 }
@@ -2566,7 +2790,30 @@ async function verifyDeliveryRegionFromLocation() {
             return;
         }
         checkoutData.locationReverseResult = payload;
-        refreshLocationRegionVerification();
+        const locationCheck = compareLocationWithSelectedRegion(payload);
+        if (locationCheck.status === 'outside-area') {
+            refreshLocationRegionVerification();
+            if (checkoutData.deliveryRegion?.id === 'cidade') {
+                resetRouteCalculation();
+                checkoutData.routeDestinationSource = 'address';
+                if (normalizeLocationArea(checkoutData.address).length >= 5) await calculateRouteDeliveryFee();
+            }
+            return;
+        }
+
+        const knownRegion = findKnownDeliveryRegion(payload);
+        if (knownRegion) {
+            if (checkoutData.deliveryRegion?.id !== knownRegion.id) {
+                selectDeliveryRegion(knownRegion.id);
+            } else {
+                refreshLocationRegionVerification();
+            }
+            return;
+        }
+
+        // Sem correspondência segura na tabela: calcular a taxa pela distância real da rota.
+        selectDeliveryRegion('cidade');
+        return;
     } catch (error) {
         console.warn('Erro ao verificar região pelo GPS:', error);
         checkoutData.locationVerification = { status: 'error', message: 'Localização capturada, mas não foi possível confirmar o bairro automaticamente. A taxa continua baseada em ' + (checkoutData.deliveryRegion?.name || 'sua região selecionada') + '. Confira antes de enviar.' };
@@ -2579,6 +2826,7 @@ function captureUserLocation() {
     navigator.geolocation.getCurrentPosition(
         position => {
             checkoutData.location = { latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: Math.round(position.coords.accuracy) };
+            resetRouteCalculation();
             checkoutData.locationReverseResult = null;
             checkoutData.locationVerification = { status: 'checking', message: 'Localização capturada. Verificando o bairro…' };
             renderCheckoutForm();
@@ -2633,7 +2881,7 @@ function renderCheckoutForm() {
                     class="delivery-region-search-input"
                     placeholder="Digite seu bairro ou região"
                     autocomplete="off"
-                    value="${checkoutData.deliveryRegion?.id === 'cidade' ? '' : (checkoutData.deliveryRegion?.name || '')}"
+                    value="${checkoutData.deliveryRegion?.name || ''}"
                     onfocus="openDeliveryRegionSearch()"
                     oninput="updateDeliveryRegionSearch(this.value)"
                     onblur="setTimeout(() => document.getElementById('delivery-region-results')?.classList.add('hidden'), 150)"
@@ -2648,7 +2896,7 @@ function renderCheckoutForm() {
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Rua e número</label>
             <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none"
-                placeholder="Ex.: Rua das Flores, 123" value="${checkoutData.address}" oninput="checkoutData.address = this.value">
+                placeholder="Ex.: Rua das Flores, 123" value="${checkoutData.address}" oninput="handleDeliveryAddressInput(this.value)" onblur="handleDeliveryAddressBlur(this.value)">
         </div>
 
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
@@ -2663,6 +2911,7 @@ function renderCheckoutForm() {
             </button>
             <div id="delivery-location-verification" class="hidden mt-3 rounded-lg border p-3 text-xs leading-relaxed" role="status" aria-live="polite"></div>
             <p class="text-[11px] text-gray-400 mt-2 text-center">Seu navegador pedirá permissão para acessar sua localização.</p>
+            <p class="text-[10px] text-gray-400 mt-2 text-center">Rotas por <a href="https://locationiq.com" target="_blank" rel="noopener noreferrer" class="underline">Search by LocationIQ.com</a>.</p>
         </div>
         </div>
         <div>
@@ -2686,11 +2935,11 @@ function renderCheckoutForm() {
         <div class="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
             <div class="flex justify-between text-gray-600 text-sm mb-1">
                 <span id="checkout-fee-label">${checkoutData.orderType === 'pickup' ? 'Retirada no local' : 'Taxa de entrega'}</span>
-                <span id="checkout-delivery-fee-display">${checkoutData.orderType === 'pickup' ? formatCurrency(0) : (checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região')}</span>
+                <span id="checkout-delivery-fee-display">${getDeliveryFeeDisplayText()}</span>
             </div>
             <div class="flex justify-between text-gray-900 font-bold">
                  <span>Total do pedido:</span>
-                 <span id="checkout-total-display">${checkoutData.orderType === 'pickup' || checkoutData.deliveryRegion ? formatCurrency(getCartTotal() + getDeliveryFee()) : 'Selecione o bairro/região'}</span>
+                 <span id="checkout-total-display">${isDeliveryFeeReady() ? formatCurrency(getCartTotal() + getDeliveryFee()) : (checkoutData.deliveryRegion?.id === 'cidade' ? 'Aguardando c\u00e1lculo do frete' : 'Selecione o bairro/regi\u00e3o')}</span>
             </div>
         </div>
     `;
@@ -2725,15 +2974,13 @@ function updateCheckoutForm() {
     }
 
     if (deliveryDisplay) {
-        deliveryDisplay.textContent = checkoutData.orderType === 'pickup'
-            ? formatCurrency(0)
-            : (checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região');
+        deliveryDisplay.textContent = getDeliveryFeeDisplayText();
     }
 
     if (totalDisplay) {
-        totalDisplay.textContent = checkoutData.orderType === 'pickup' || checkoutData.deliveryRegion
+        totalDisplay.textContent = isDeliveryFeeReady()
             ? formatCurrency(getCartTotal() + getDeliveryFee())
-            : 'Selecione o bairro/região';
+            : (checkoutData.deliveryRegion?.id === 'cidade' ? 'Aguardando cálculo do frete' : 'Selecione o bairro/região');
     }
 }
 
@@ -2750,6 +2997,25 @@ async function sendToWhatsApp() {
             ? 'Por favor, preencha nome, telefone, rua e número, bairro/região e forma de pagamento.'
             : 'Por favor, preencha nome, telefone e forma de pagamento.');
         return;
+    }
+
+    const whatsappWindow = window.open('about:blank', '_blank');
+    if (whatsappWindow) {
+        try {
+            whatsappWindow.document.title = 'Preparando seu pedido';
+            whatsappWindow.document.body.textContent = 'Preparando seu pedido para o WhatsApp\u2026';
+        } catch (_) {
+            // A navegacao para o WhatsApp continua mesmo se a aba nao puder ser modificada.
+        }
+    }
+
+    if (checkoutData.orderType === 'delivery' && checkoutData.deliveryRegion?.id === 'cidade' && !isDeliveryFeeReady()) {
+        await calculateRouteDeliveryFee();
+        if (!isDeliveryFeeReady()) {
+            if (whatsappWindow && !whatsappWindow.closed) whatsappWindow.close();
+            alert('Nao foi possivel calcular o frete com seguranca. Confira o endereco, envie sua localizacao ou selecione uma regiao conhecida.');
+            return;
+        }
     }
 
     const total = getCartTotal() + getDeliveryFee();
@@ -2783,6 +3049,14 @@ async function sendToWhatsApp() {
     msg += checkoutData.orderType === 'pickup'
         ? `🏪 *Modalidade:* Retirada no local\n📦 *Taxa de entrega:* ${formatCurrency(0)}\n`
         : `🚚 *Modalidade:* Entrega\n📦 *Taxa de entrega:* ${formatCurrency(getDeliveryFee())}\n`;
+    if (checkoutData.orderType === 'delivery' && checkoutData.deliveryRegion?.id === 'cidade' && hasCurrentRouteQuote()) {
+        const quote = checkoutData.routeQuote;
+        msg += '*Dist\u00e2ncia estimada da rota (ida):* ' + Number(quote.distanceKm).toFixed(2) + ' km\n';
+        msg += '*C\u00e1lculo do frete:* ida e volta x R$ 1,50/km';
+        if (Number(quote.calculatedRoundTripFee) < Number(quote.minimumFee)) msg += ' (taxa m\u00ednima R$ 4,00)';
+        msg += '\n';
+        if (quote.originApproximate) msg += '*Observação:* o número 56 não foi confirmado pelo mapa; foi usado um ponto de referência da Praça Sagrados Corações, então o frete é estimado.' + '\n';
+    }
     msg += `💰 *TOTAL DO PEDIDO: ${formatCurrency(total)}*\n\n`;
 
     msg += `*--------------------------*\n\n`;
@@ -2836,18 +3110,34 @@ async function sendToWhatsApp() {
     }
 
     
-    // Registra o pedido no Supabase antes de abrir o WhatsApp.
+    const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(msg)}`;
+
+    // The WhatsApp tab was reserved before route calculation.
+    // Supabase persistence is complementary and must never block WhatsApp ordering.
+    let persistenceTimeout;
     try {
-        const orderId = await saveOrderToSupabase();
+        const orderId = await Promise.race([
+            saveOrderToSupabase(),
+            new Promise((_, reject) => {
+                persistenceTimeout = setTimeout(
+                    () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
+                    4000
+                );
+            })
+        ]);
         console.log('Pedido registrado no Supabase:', orderId);
     } catch (error) {
-        console.error('Falha ao registrar pedido no Supabase:', error);
-        alert('Não foi possível registrar o pedido no sistema de impressão. Verifique sua conexão e tente novamente.');
-        return;
+        console.warn('O pedido seguir\u00e1 para o WhatsApp, mas n\u00e3o foi confirmado no Supabase:', error);
+    } finally {
+        clearTimeout(persistenceTimeout);
     }
 
-    const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+    // If the new tab was blocked or closed, redirect the current tab instead.
+    if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.location.href = url;
+    } else {
+        window.location.href = url;
+    }
 }
 
 
