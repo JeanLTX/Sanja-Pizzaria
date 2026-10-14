@@ -49,10 +49,10 @@ async function saveOrderToSupabase() {
         establishment_id: establishmentId,
         customer_name: checkoutData.name,
         customer_phone: checkoutData.phone,
-        order_type: 'delivery',
-        address: checkoutData.address,
-        delivery_region: checkoutData.deliveryRegion?.name || null,
-        delivery_fee: Number(getDeliveryFee().toFixed(2)),
+        order_type: checkoutData.orderType || 'delivery',
+        address: checkoutData.orderType === 'delivery' ? checkoutData.address : null,
+        delivery_region: checkoutData.orderType === 'delivery' ? (checkoutData.deliveryRegion?.name || null) : null,
+        delivery_fee: checkoutData.orderType === 'delivery' ? Number(getDeliveryFee().toFixed(2)) : 0,
         payment_method: checkoutData.paymentMethod,
         notes: null,
         subtotal: Number(getCartTotal().toFixed(2)),
@@ -84,7 +84,8 @@ async function saveOrderToSupabase() {
             p_payment_method: order.payment_method,
             p_subtotal: order.subtotal,
             p_total: order.total,
-            p_items: items
+            p_items: items,
+            p_order_type: order.order_type
         };
 
         const createdOrderId = await supabaseRest('rpc/create_public_order', {

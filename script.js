@@ -178,7 +178,7 @@ const ESFIHAS_SALGADAS = [
     { id: 138, name: "4 QUEIJOS C/ BACON", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e bacon.", img: "assets/esfihas/4queijos_com_bacon.webp", type: "drink", price: 6.50 },
     { id: 139, name: "OPÇÃO LIGHT", category: "Esfihas Salgadas", desc: "Palmito e mussarela.", img: "assets/esfihas/opçãolight.webp", type: "drink", price: 5.00 },
     { id: 140, name: "PALMITO ESPECIAL", category: "Esfihas Salgadas", desc: "Palmito, queijo e milho.", img: "assets/esfihas/palmitoespecial.webp", type: "drink", price: 6.00 },
-    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas de sua preferência. (Combo de 10 esfihas: R$ 45,00)", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 45.00 }
+    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas doces e/ou salgadas de sua preferência. Você pode combinar e repetir sabores. Combo por R$ 45,00.", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 45.00 }
 ];
 
 const ESFIHAS_DOCES = [
@@ -189,7 +189,6 @@ const ESFIHAS_DOCES = [
     { id: 146, name: "QUEIJADINHA", category: "Esfihas Doces", desc: "Queijo, coco ralado e leite condensado.", img: "assets/esfihas/queijadinha.webp", type: "drink", price: 7.00 },
     { id: 147, name: "ROMEU E JULIETA", category: "Esfihas Doces", desc: "Queijo, goiabada e leite condensado.", img: "assets/esfihas/esfiha_romeu_e_julieta.webp", type: "drink", price: 7.00 },
     { id: 148, name: "CHOCOLATE COM AMENDOIM", category: "Esfihas Doces", desc: "Chocolate com amendoim.", img: "assets/esfihas/chocolate_com_amendoim.webp", type: "drink", price: 7.00 },
-    { id: 149, name: "COMBO DE 10 ESFIHAS DOCES", category: "Esfihas Doces", desc: "Escolha 10 esfihas doces de sua preferência. (Combo de 10 esfihas: R$ 40,00)", img: "assets/esfihas/10esfihadoce.webp", type: "drink", price: 40.00 }
 ];
 
 const BEBIDAS = [
@@ -428,10 +427,10 @@ const COMBOS = [
         id: "casal",
         name: "Combo Casal",
         badge: "Casal",
-        desc: "Na medida! nem muito, nem pouco! 🍕💕\nPizza na lenha, massa artesanal e sabor sem igual!",
-        itens: ["Pizza 25cm · 6 fatias", "Refrigerante 1L", "Borda recheada já inclusa: catupiry, cheddar, chocolate ou mussarela"],
-        price: 75.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
+        desc: "Pizza de 25 cm com 6 fatias e 1 sabor à escolha, acompanhada de Guaraná Antarctica de 2 litros.",
+        itens: ["Pizza 25cm - 6 fatias, 1 sabor à escolha", "Guaraná Antarctica 2L"],
+        price: 45.00,
+        obs: "Borda recheada não inclusa; se desejar, pode ser adicionada à parte. Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
         img: "assets/combocasal.webp",
         type: "combo"
     },
@@ -485,6 +484,7 @@ const CATEGORIES = [
 // Taxas fixas por região informadas pela Sanja.
 // Regiões urbanas que não estejam na lista específica usam a taxa padrão de R$ 4,00.
 const TAXAS_ENTREGA = [
+    { id: 'centro', name: 'Centro', fee: 4.00 },
     { id: 'cidade', name: 'Demais regiões da cidade', fee: 4.00 },
     { id: 'boa-vista', name: 'Boa Vista', fee: 30.00 },
     { id: 'anhumas', name: 'Anhumas', fee: 25.00 },
@@ -532,7 +532,10 @@ let checkoutData = {
     phone: '',
     address: '',
     location: null,
+    locationReverseResult: null,
+    locationVerification: null,
     deliveryRegion: null,
+    orderType: 'delivery',
     paymentMethod: ''
 };
 
@@ -606,15 +609,14 @@ const updateCartItemQuantity = (index, delta) => {
 
 const getCartTotal = () => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
-const getDeliveryFee = () => checkoutData.deliveryRegion?.fee || 0;
+const getDeliveryFee = () => checkoutData.orderType === 'pickup' ? 0 : (checkoutData.deliveryRegion?.fee || 0);
 
 function getDeliveryRegionMatches(query = '') {
     const normalizedQuery = normalizeSearchText(query);
-    if (!normalizedQuery) return TAXAS_ENTREGA.slice(0, 8);
+    if (!normalizedQuery) return TAXAS_ENTREGA;
 
     return TAXAS_ENTREGA
-        .filter(region => normalizeSearchText(region.name).includes(normalizedQuery))
-        .slice(0, 8);
+        .filter(region => normalizeSearchText(region.name).includes(normalizedQuery));
 }
 
 function renderDeliveryRegionResults(query = '') {
@@ -661,6 +663,7 @@ function updateDeliveryRegionSearch(query) {
         if (selectedEl) selectedEl.classList.add('hidden');
     }
     renderDeliveryRegionResults(query);
+    refreshLocationRegionVerification();
     updateCheckoutForm();
 }
 
@@ -669,6 +672,7 @@ function selectDeliveryRegion(regionId) {
     if (!region) return;
 
     checkoutData.deliveryRegion = region;
+    refreshLocationRegionVerification();
 
     const input = document.getElementById('delivery-region-search');
     if (input) input.value = region.name;
@@ -702,6 +706,7 @@ function clearDeliveryRegion() {
 
     renderDeliveryRegionResults('');
     updateCheckoutForm();
+    refreshLocationRegionVerification();
 }
 
 // ==========================================
@@ -887,28 +892,30 @@ const renderComboCard = (combo) => {
 let currentEsfihaCombo = null;
 let esfihaComboCounts = {};
 
-function getEsfihaComboVariants(isSweet) {
-    const source = isSweet ? ESFIHAS_DOCES : ESFIHAS_SALGADAS;
-    const items = source.filter(item => item.id !== 141 && item.id !== 149);
+function getEsfihaComboVariants() {
+    const items = [...ESFIHAS_SALGADAS, ...ESFIHAS_DOCES]
+        .filter(item => item.id !== 141 && item.id !== 149);
 
     return items.flatMap(item => {
-        if (isSweet && item.id === 142) {
+        if (item.id === 142) {
             return [
                 {
-                    key: '142-granulado',
+                    key: "142-granulado",
                     id: item.id,
-                    name: 'CHOCOLATE C/ GRANULADO',
-                    desc: 'Chocolate com granulado.',
+                    category: item.category,
+                    name: "CHOCOLATE C/ GRANULADO",
+                    desc: "Chocolate com granulado.",
                     img: item.img,
-                    choice: 'Granulado'
+                    choice: "Granulado"
                 },
                 {
-                    key: '142-confete',
+                    key: "142-confete",
                     id: item.id,
-                    name: 'CHOCOLATE C/ CONFETE',
-                    desc: 'Chocolate com confete.',
+                    category: item.category,
+                    name: "CHOCOLATE C/ CONFETE",
+                    desc: "Chocolate com confete.",
                     img: item.img,
-                    choice: 'Confete'
+                    choice: "Confete"
                 }
             ];
         }
@@ -916,6 +923,7 @@ function getEsfihaComboVariants(isSweet) {
         return [{
             key: String(item.id),
             id: item.id,
+            category: item.category,
             name: item.name,
             desc: item.desc,
             img: item.img,
@@ -929,7 +937,7 @@ function getEsfihaComboTotalSelected() {
 }
 
 function openEsfihaComboModal(combo) {
-    if (!combo || ![141, 149].includes(combo.id)) return;
+    if (!combo || combo.id !== 141) return;
 
     currentEsfihaCombo = combo;
     esfihaComboCounts = {};
@@ -941,14 +949,13 @@ function openEsfihaComboModal(combo) {
 
     if (!modal) return;
 
-    const isSweet = combo.id === 149;
     image.src = combo.img;
     image.alt = combo.name;
     image.onerror = () => {
         image.src = 'assets/thumbs/logosemfundo.webp';
     };
 
-    badge.textContent = isSweet ? '10 esfihas doces' : '10 esfihas salgadas';
+    badge.textContent = '10 esfihas doces e/ou salgadas';
     name.textContent = combo.name;
 
     modal.classList.remove('hidden');
@@ -972,7 +979,7 @@ function closeEsfihaComboModal() {
 function changeEsfihaComboQty(index, delta) {
     if (!currentEsfihaCombo) return;
 
-    const variants = getEsfihaComboVariants(currentEsfihaCombo.id === 149);
+    const variants = getEsfihaComboVariants();
     const variant = variants[index];
     if (!variant) return;
 
@@ -998,15 +1005,15 @@ function renderEsfihaCombo() {
     const summaryList = document.getElementById('esfiha-combo-summary-list');
     const countDisplay = document.getElementById('esfiha-combo-count');
     const addBtn = document.getElementById('esfiha-combo-add-btn');
-    const variants = getEsfihaComboVariants(currentEsfihaCombo.id === 149);
+    const variants = getEsfihaComboVariants();
     const total = getEsfihaComboTotalSelected();
 
     if (!content || !summaryList || !countDisplay || !addBtn) return;
 
     content.innerHTML = `
         <div class="mb-4 text-center">
-            <h3 class="text-base sm:text-lg font-bold text-gray-900">Escolha suas 10 esfihas</h3>
-            <p class="mt-1 text-xs sm:text-sm text-gray-500">Você pode repetir os sabores como preferir.</p>
+            <h3 class="text-base sm:text-lg font-bold text-gray-900">Escolha suas 10 esfihas doces e/ou salgadas</h3>
+            <p class="mt-1 text-xs sm:text-sm text-gray-500">Misture sabores doces e salgados como preferir. Você precisa escolher exatamente 10.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1023,6 +1030,7 @@ function renderEsfihaCombo() {
 
                         <div class="esfiha-choice-info">
                             <div class="min-w-0 flex-1">
+                                <span class="mb-0.5 text-[9px] font-bold uppercase tracking-wider ${variant.category === "Esfihas Doces" ? "text-pink-600" : "text-gray-500"}">${variant.category}</span>
                                 <span class="esfiha-choice-name">${variant.name}</span>
                                 <span class="esfiha-choice-desc">${variant.desc}</span>
                             </div>
@@ -1340,8 +1348,44 @@ let comboStep = 1; // 1: Detalhes, 2: Sabores Salgados, 3: Sabores Doces (para P
 let comboSelections = {
     flavors: [], // ids de pizzas salgadas
     sweetFlavor: null, // id de pizza doce
-    border: null // catupiry, cheddar, chocolate ou mussarela
+    border: null, // catupiry, cheddar, chocolate ou mussarela
+    customIngredients: [] // ingredientes da pizza personalizada do Combo Casal
 };
+
+const COMBO_CUSTOM_PIZZA_ID = 47;
+const COMBO_CUSTOM_INGREDIENTS = [
+    { id: 'bacon', name: 'Bacon' },
+    { id: 'calabresa', name: 'Calabresa' },
+    { id: 'frango', name: 'Frango' },
+    { id: 'presunto', name: 'Presunto' },
+    { id: 'lombo', name: 'Lombo' },
+    { id: 'atum', name: 'Atum' },
+    { id: 'pepperoni', name: 'Pepperoni' },
+    { id: 'carne-seca', name: 'Carne seca' },
+    { id: 'catupiry', name: 'Catupiry' },
+    { id: 'cheddar', name: 'Cheddar' },
+    { id: 'palmito', name: 'Palmito' },
+    { id: 'champignon', name: 'Champignon' },
+    { id: 'milho', name: 'Milho' },
+    { id: 'tomate', name: 'Tomate' },
+    { id: 'cebola', name: 'Cebola' },
+    { id: 'azeitona', name: 'Azeitona' },
+    { id: 'ovo', name: 'Ovo' },
+    { id: 'brocolis', name: 'Brócolis' },
+    { id: 'provolone', name: 'Provolone' },
+    { id: 'parmesao', name: 'Parmesão' },
+    { id: 'gorgonzola', name: 'Gorgonzola' },
+    { id: 'cream-cheese', name: 'Cream cheese' },
+    { id: 'alho-frito', name: 'Alho frito' },
+    { id: 'oregano', name: 'Orégano' },
+    { id: 'abacaxi', name: 'Abacaxi' },
+    { id: 'ervilha', name: 'Ervilha' },
+    { id: 'batata-palha', name: 'Batata palha' },
+    { id: 'batata-frita', name: 'Batata frita' },
+    { id: 'doritos', name: 'Doritos' },
+    { id: 'ruffles', name: 'Ruffles' },
+    { id: 'manjericao', name: 'Manjericão' }
+];
 
 const COMBO_BORDER_SIZES = {
     individual: 'M',
@@ -1376,7 +1420,7 @@ function updateComboPrice() {
 function openComboModal(combo) {
     currentCombo = combo;
     comboStep = 1;
-    comboSelections = { flavors: [], sweetFlavor: null, border: 'sem_borda', drink: combo.id === 'casal' ? 'guaraná' : null };
+    comboSelections = { flavors: [], sweetFlavor: null, border: 'sem_borda', drink: combo.id === 'casal' ? 'guaraná' : null, customIngredients: [] };
 
     document.getElementById('combo-modal').classList.remove('hidden');
     document.getElementById('combo-modal').classList.add('flex');
@@ -1402,6 +1446,12 @@ function renderComboStep() {
     const priceDisplay = document.getElementById('combo-modal-price');
 
     content.onclick = event => {
+        const ingredientButton = event.target.closest('[data-combo-ingredient]');
+        if (ingredientButton && content.contains(ingredientButton)) {
+            toggleComboCustomIngredient(ingredientButton.dataset.comboIngredient);
+            return;
+        }
+
         const flavorCard = event.target.closest('.flavor-card');
         if (!flavorCard || !content.contains(flavorCard)) return;
         selectComboFlavor(Number(flavorCard.dataset.flavorId), flavorCard.dataset.sweet === 'true');
@@ -1450,6 +1500,41 @@ function renderComboStep() {
                 </div>
             </div>
         `;
+    } else if (comboStep === 5 && currentCombo.id === 'casal') {
+        backBtn.classList.remove('hidden');
+        summaryContainer.classList.remove('hidden');
+        nextText.textContent = "Escolher borda";
+        nextIcon.setAttribute('data-lucide', 'arrow-right');
+
+        content.innerHTML = '<div class="animate-in fade-in slide-in-from-right-4 duration-300 p-4 sm:p-6">' +
+            '<div class="text-center mb-5">' +
+                '<div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600"><i data-lucide="chef-hat" class="h-6 w-6"></i></div>' +
+                '<p class="text-[10px] font-bold uppercase tracking-widest text-red-600 mb-1">Personalização da pizza</p>' +
+                '<h4 class="text-lg sm:text-xl font-bold uppercase tracking-tight text-gray-900 font-serif">Monte sua pizza</h4>' +
+                '<p class="mt-1 text-xs sm:text-sm leading-relaxed text-gray-500">Escolha de 1 a 5 ingredientes para a sua pizza de 25 cm.</p>' +
+            '</div>' +
+            '<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">' +
+                COMBO_CUSTOM_INGREDIENTS.map(ingredient => {
+                    const isSelected = comboSelections.customIngredients.includes(ingredient.id);
+                    const selectedClass = isSelected
+                        ? 'border-red-500 bg-red-600 text-white shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-red-300';
+                    return '<button type="button" data-combo-ingredient="' + ingredient.id + '" aria-pressed="' + isSelected + '" class="min-h-11 rounded-xl border px-3 py-2.5 text-xs sm:text-sm font-semibold text-left transition-colors ' + selectedClass + '">' +
+                        '<span class="inline-flex min-w-4 mr-1">' + (isSelected ? '✓' : '+') + '</span>' + ingredient.name + '</button>';
+                }).join('') +
+            '</div>' +
+            '<div class="mt-4 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3 flex items-center justify-between gap-3">' +
+                '<span class="text-xs font-semibold text-gray-600">Ingredientes selecionados</span>' +
+                '<span class="text-sm font-bold ' + (comboSelections.customIngredients.length > 0 ? 'text-red-600' : 'text-gray-500') + '">' + comboSelections.customIngredients.length + ' / 5</span>' +
+            '</div>' +
+            (comboSelections.customIngredients.length === 0
+                ? '<p class="mt-3 text-center text-xs font-medium text-red-600">Selecione pelo menos 1 ingrediente para continuar.</p>'
+                : '<p class="mt-3 text-center text-xs text-gray-500">Você pode escolher até 5 ingredientes. A seleção não altera o preço do combo.</p>') +
+        '</div>';
+
+        nextBtn.disabled = comboSelections.customIngredients.length === 0;
+        updateComboSummary();
+        updateComboPrice();
     } else if (comboStep === 4) {
         backBtn.classList.remove('hidden');
         summaryContainer.classList.remove('hidden');
@@ -1513,7 +1598,7 @@ function renderComboStep() {
             gridTitle = currentCombo.id === 'perfeito' ? "Escolha a pizza salgada" : "Escolha o sabor da pizza";
             flavorList = ALL_PIZZA_FLAVORS.filter(p => TRADITIONAL_SABORES.includes(p.id));
 
-            nextText.textContent = "Próximo";
+            nextText.textContent = currentCombo.id === 'casal' && comboSelections.flavors[0] === COMBO_CUSTOM_PIZZA_ID ? "Escolher ingredientes" : "Próximo";
             nextIcon.setAttribute('data-lucide', 'arrow-right');
         }
 
@@ -1555,7 +1640,7 @@ function renderComboStep() {
                 const isFamilia = currentCombo.id === 'familia';
                 const isPerfeitoStep3 = currentCombo.id === 'perfeito' && comboStep === 3;
 
-                if (isCasal || isFamilia || isPerfeitoStep3) {
+                if (isFamilia || isPerfeitoStep3) {
                     const drinkSize = (isFamilia || isPerfeitoStep3) ? '2L' : '1L';
                     const drinkLabel = (isFamilia || isPerfeitoStep3) ? '2 Litros' : '1 Litro';
                     drinkHtml = `
@@ -1606,7 +1691,12 @@ function nextComboStep() {
         renderComboStep();
     } else if (comboStep === 2) {
         if (comboSelections.flavors.length === 0) return alert('Escolha o sabor da pizza!');
-        if (currentCombo.id === 'individual') {
+        if (currentCombo.id === 'casal' && comboSelections.flavors[0] === COMBO_CUSTOM_PIZZA_ID) {
+            comboStep = 5;
+            const comboContent = document.getElementById('combo-modal-content');
+            if (comboContent) comboContent.scrollTop = 0;
+            renderComboStep();
+        } else if (currentCombo.id === 'individual' || currentCombo.id === 'casal') {
             comboStep = 4;
             renderComboStep();
         } else if (currentCombo.id === 'perfeito') {
@@ -1623,6 +1713,15 @@ function nextComboStep() {
         }
         comboStep = 4;
         renderComboStep();
+    } else if (comboStep === 5) {
+        if (comboSelections.customIngredients.length === 0) {
+            showToast('Selecione pelo menos 1 ingrediente para a pizza.');
+            return;
+        }
+        comboStep = 4;
+        const comboContent = document.getElementById('combo-modal-content');
+        if (comboContent) comboContent.scrollTop = 0;
+        renderComboStep();
     } else {
         addComboToCart();
     }
@@ -1630,16 +1729,39 @@ function nextComboStep() {
 
 function prevComboStep() {
     if (comboStep > 1) {
-        comboStep = comboStep === 4 && currentCombo.id !== 'perfeito' ? 2 : comboStep - 1;
+        if (comboStep === 5) {
+            comboStep = 2;
+        } else if (comboStep === 4 && currentCombo.id === 'casal' && comboSelections.flavors[0] === COMBO_CUSTOM_PIZZA_ID) {
+            comboStep = 5;
+        } else {
+            comboStep = comboStep === 4 && currentCombo.id !== 'perfeito' ? 2 : comboStep - 1;
+        }
         renderComboStep();
     }
+}
+
+function toggleComboCustomIngredient(ingredientId) {
+    if (!currentCombo || currentCombo.id !== 'casal' || !comboSelections.flavors.includes(COMBO_CUSTOM_PIZZA_ID)) return;
+
+    if (comboSelections.customIngredients.includes(ingredientId)) {
+        comboSelections.customIngredients = comboSelections.customIngredients.filter(id => id !== ingredientId);
+    } else {
+        if (comboSelections.customIngredients.length >= 5) {
+            showToast('Você pode escolher no máximo 5 ingredientes.');
+            return;
+        }
+        comboSelections.customIngredients.push(ingredientId);
+    }
+
+    renderComboStep();
+    updateComboSummary();
 }
 
 function selectComboFlavor(id, isSweet) {
     if (isSweet) {
         comboSelections.sweetFlavor = id;
     } else {
-        const canHalf = ['casal', 'familia', 'perfeito'].includes(currentCombo.id);
+        const canHalf = ['familia', 'perfeito'].includes(currentCombo.id);
         const max = canHalf ? 2 : 1;
 
         if (comboSelections.flavors.includes(id)) {
@@ -1653,11 +1775,21 @@ function selectComboFlavor(id, isSweet) {
             }
         }
     }
+
+    if (currentCombo.id === 'casal') {
+        if (!comboSelections.flavors.includes(COMBO_CUSTOM_PIZZA_ID)) {
+            comboSelections.customIngredients = [];
+        }
+        renderComboStep();
+        updateComboSummary();
+        return;
+    }
+
     syncComboFlavorSelection(isSweet);
 }
 
 function syncComboFlavorSelection(isSweet) {
-    const isTwoFlavorCombo = ['casal', 'familia'].includes(currentCombo.id) || (currentCombo.id === 'perfeito' && !isSweet);
+    const isTwoFlavorCombo = currentCombo.id === 'familia' || (currentCombo.id === 'perfeito' && !isSweet);
 
     document.querySelectorAll('#combo-modal-content .flavor-card').forEach(card => {
         card.classList.remove('selected-1', 'selected-2');
@@ -1699,6 +1831,7 @@ function syncComboFlavorSelection(isSweet) {
 function selectComboBorder(id) {
     comboSelections.border = id;
     renderComboStep();
+    updateComboSummary();
 }
 
 function selectComboDrink(id) {
@@ -1721,22 +1854,33 @@ function updateComboSummary() {
             text += "Escolha seu sabor...";
         }
     } else if (currentCombo.id === 'casal') {
-        const hasFlavor = comboSelections.flavors.length > 0;
-        const hasDrink = !!comboSelections.drink;
+        if (comboSelections.flavors.length > 0) {
+            const pizza = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
+            if (pizza.id === COMBO_CUSTOM_PIZZA_ID) {
+                const selectedIngredients = COMBO_CUSTOM_INGREDIENTS
+                    .filter(ingredient => comboSelections.customIngredients.includes(ingredient.id))
+                    .map(ingredient => ingredient.name);
+                if (comboStep === 2) {
+                    text += 'Escolha os ingredientes na próxima etapa';
+                    ready = true;
+                } else if (selectedIngredients.length > 0) {
+                    text += 'Pizza personalizada: ' + selectedIngredients.join(', ');
+                    ready = true;
+                } else {
+                    text += 'Selecione pelo menos 1 ingrediente';
+                }
+            } else {
+                text += 'Sabor: ' + pizza.name;
+                ready = true;
+            }
+            text += ' | Guaraná Antarctica 2L';
 
-        if (hasFlavor && hasDrink) {
-            const p1 = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
-            const b = comboSelections.border === 'sem_borda' ? 'S/ Borda' : comboSelections.border.replace('_', ' ').toUpperCase();
-            const d = comboSelections.drink === 'coca-cola' ? 'Coca' : 'Guaraná';
-            const flavors = comboSelections.flavors.length === 1
-                ? p1.name
-                : `${p1.name} / ${ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[1]).name}`;
-            text += `${flavors} | ${b} | ${d}`;
-            ready = true;
-        } else if (!hasFlavor) {
-            text += "Escolha o sabor...";
+            const selectedBorder = getComboBorder();
+            if (selectedBorder && selectedBorder.id !== 'sem_borda') {
+                text += ' | Borda adicional: ' + selectedBorder.name + ' (+' + formatCurrency(getComboBorderPrice()) + ')';
+            }
         } else {
-            text += "Escolha o refrigerante...";
+            text += 'Escolha o sabor da pizza...';
         }
     } else if (currentCombo.id === 'familia') {
         const hasFlavors = comboSelections.flavors.length >= 1;
@@ -1807,13 +1951,19 @@ function addComboToCart() {
         const p = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
         details = `Sabor: ${p.name}`;
     } else if (currentCombo.id === 'casal') {
-        const p1 = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
-        const bLabel = comboSelections.border === 'sem_borda' ? 'Sem Borda' : comboSelections.border.replace('_', ' ');
-        const d = comboSelections.drink === 'coca-cola' ? 'Coca-Cola' : 'Guaraná';
-        const flavorDetails = comboSelections.flavors.length === 1
-            ? `Sabor: ${p1.name}`
-            : `Sabores: ${p1.name} / ${ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[1]).name}`;
-        details = `${flavorDetails} • Borda: ${bLabel} • Refri: ${d} 1L`;
+        const pizza = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
+        if (pizza.id === COMBO_CUSTOM_PIZZA_ID) {
+            const selectedIngredients = COMBO_CUSTOM_INGREDIENTS
+                .filter(ingredient => comboSelections.customIngredients.includes(ingredient.id))
+                .map(ingredient => ingredient.name);
+            if (selectedIngredients.length === 0) {
+                showToast('Selecione pelo menos 1 ingrediente para a pizza.');
+                return;
+            }
+            details = 'Pizza personalizada: ' + selectedIngredients.join(', ') + ' ' + String.fromCharCode(7) + ' Refri: Guaraná Antarctica 2L';
+        } else {
+            details = 'Sabor: ' + pizza.name + ' ' + String.fromCharCode(7) + ' Refri: Guaraná Antarctica 2L';
+        }
     } else if (currentCombo.id === 'familia') {
         const p1 = ALL_PIZZA_FLAVORS.find(f => f.id === comboSelections.flavors[0]);
         const d = comboSelections.drink === 'fanta' ? 'Fanta' : 'Guaraná';
@@ -2311,6 +2461,7 @@ function openCheckout() {
     checkoutSection.classList.remove('hidden');
     checkoutSection.classList.add('open');
     document.body.classList.add('modal-open');
+    // Não definir uma região/taxa automaticamente: o cliente precisa confirmar a região de entrega.
     renderCheckoutForm();
 }
 
@@ -2321,39 +2472,144 @@ function closeCheckout() {
     document.body.classList.remove('modal-open');
 }
 
-function captureUserLocation() {
-    if (!navigator.geolocation) {
-        alert("Seu navegador não suporta localização.");
-        return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            checkoutData.location = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: Math.round(position.coords.accuracy)
-            };
-            renderCheckoutForm();
-        },
-        (error) => {
-            let message = "Não foi possível obter sua localização.";
-            if (error.code === 1) message = "Permita o acesso à localização no navegador para enviar sua posição.";
-            if (error.code === 2) message = "Não foi possível determinar sua localização. Tente novamente.";
-            if (error.code === 3) message = "A localização demorou para responder. Tente novamente.";
-            alert(message);
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
-        }
-    );
+function normalizeLocationArea(value) {
+    return normalizeSearchText(value).replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
 
+function getDeliveryRegionAliases(region) {
+    const aliases = {
+        'frei-oreste': ['frei oreste', 'frei orestes'],
+        'can-can-de-baixo': ['can can de baixo', 'can can baixo'],
+        'can-can-cima': ['can can cima', 'can can de cima'],
+        'bom-sucesso-comeco': ['bom sucesso comeco', 'bom sucesso começo', 'bom sucesso'],
+        'farias-ate-o-radar': ['farias ate o radar', 'farias'],
+        'parque-exposicao': ['parque exposicao', 'parque de exposicao'],
+        'alegre-de-baixo': ['alegre de baixo'],
+        'alegre-de-cima': ['alegre de cima']
+    };
+    return [region.name, ...(aliases[region.id] || [])].map(normalizeLocationArea);
+}
+
+function compareLocationWithSelectedRegion(reverseResult) {
+    const selected = checkoutData.deliveryRegion;
+    const candidates = Array.isArray(reverseResult?.regionCandidates) ? reverseResult.regionCandidates : [];
+    const detectedCity = normalizeLocationArea(reverseResult?.city || '');
+    const deliveryCityAliases = ['brazopolis', 'brasopolis'];
+
+    // A localização do GPS pode estar fora do município atendido. Não a trate como Centro ou como região padrão.
+    if (detectedCity && !deliveryCityAliases.includes(detectedCity)) {
+        return { status: 'outside-area', message: 'Sua localização atual parece estar fora de Brazópolis. Se o endereço de entrega fica em Brazópolis, confira se o GPS está apontando para o local correto.' };
+    }
+    if (!selected) return { status: 'unverified', message: 'Localização recebida. Selecione a região do endereço de entrega para calcular a taxa.' };
+    if (!candidates.length) return { status: 'unverified', message: 'Não conseguimos confirmar a região automaticamente. Confira se a região selecionada corresponde ao endereço de entrega.' };
+    const selectedAliases = getDeliveryRegionAliases(selected);
+    const candidateNames = candidates.map(item => String(item.name || '').trim()).filter(Boolean);
+    const matchedSelected = candidateNames.find(name => selectedAliases.includes(normalizeLocationArea(name)));
+    if (matchedSelected) return { status: 'match', message: 'A região selecionada foi conferida com a localização. Taxa de entrega: ' + formatCurrency(selected.fee) + '.', identifiedArea: matchedSelected };
+    let matchedOther = null;
+    let matchedOtherCandidate = null;
+    for (const candidate of candidateNames) {
+        const normalizedCandidate = normalizeLocationArea(candidate);
+        const region = TAXAS_ENTREGA.find(item => item.id !== 'cidade' && getDeliveryRegionAliases(item).includes(normalizedCandidate));
+        if (region) { matchedOther = region; matchedOtherCandidate = candidate; break; }
+    }
+    if (matchedOther && matchedOther.id !== selected.id) return { status: 'mismatch', message: 'O GPS parece indicar ' + matchedOther.name + ', mas você selecionou ' + selected.name + '. A taxa continua ' + formatCurrency(selected.fee) + '; confira a região antes de concluir.', identifiedArea: matchedOtherCandidate, identifiedRegion: matchedOther.name };
+    const bestCandidate = candidateNames[0];
+    return { status: 'unverified', message: 'Não conseguimos confirmar a região pela localização. Confira se a opção selecionada corresponde ao endereço de entrega antes de finalizar.', identifiedArea: bestCandidate };
+}
+
+function refreshLocationRegionVerification() {
+    if (!checkoutData.location) return;
+    if (checkoutData.locationReverseResult) {
+        const result = compareLocationWithSelectedRegion(checkoutData.locationReverseResult);
+        const accuracy = Number(checkoutData.location.accuracy);
+        if (Number.isFinite(accuracy) && accuracy > 1000) { result.status = 'low-accuracy'; result.message += ' A precisão estimada do GPS é de aproximadamente ±' + accuracy + ' m; confirme que esta é a localização do endereço de entrega.'; }
+        checkoutData.locationVerification = result;
+    } else if (!checkoutData.locationVerification || checkoutData.locationVerification.status !== 'checking') {
+        checkoutData.locationVerification = { status: 'unverified', message: 'Localização capturada; ainda não foi possível verificar o bairro.' };
+    }
+    updateDeliveryLocationVerificationUI();
+}
+
+function updateDeliveryLocationVerificationUI() {
+    const box = document.getElementById('delivery-location-verification');
+    const verification = checkoutData.locationVerification;
+    if (!box) return;
+    box.className = 'hidden mt-3 rounded-lg border p-3 text-xs leading-relaxed';
+    if (!verification) { box.textContent = ''; return; }
+    box.classList.remove('hidden');
+    const colors = { checking: ['border-blue-200', 'bg-blue-50', 'text-blue-800'], match: ['border-green-200', 'bg-green-50', 'text-green-800'], mismatch: ['border-amber-300', 'bg-amber-50', 'text-amber-900'], unverified: ['border-amber-200', 'bg-amber-50', 'text-amber-800'], 'low-accuracy': ['border-amber-300', 'bg-amber-50', 'text-amber-900'], error: ['border-amber-200', 'bg-amber-50', 'text-amber-800'] };
+    box.classList.add(...(colors[verification.status] || colors.unverified));
+    box.textContent = verification.message;
+}
+
+async function verifyDeliveryRegionFromLocation() {
+    const location = checkoutData.location;
+    const config = window.SUPABASE_CONFIG;
+    if (!location) return;
+    if (!config?.url || !config?.publishableKey) {
+        checkoutData.locationVerification = { status: 'error', message: 'A localização foi capturada, mas a verificação automática está indisponível. A taxa continua baseada na região selecionada.' };
+        updateDeliveryLocationVerificationUI();
+        return;
+    }
+    try {
+        const response = await fetch(config.url.replace(/\/$/, '') + '/functions/v1/verify-delivery-region', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', apikey: config.publishableKey },
+            body: JSON.stringify({ latitude: location.latitude, longitude: location.longitude, accuracy: location.accuracy })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            console.warn('Verificação GPS da região não concluída:', payload.code || response.status);
+            checkoutData.locationVerification = { status: 'error', message: 'Localização capturada, mas não foi possível confirmar o bairro automaticamente. A taxa continua baseada em ' + (checkoutData.deliveryRegion?.name || 'sua região selecionada') + '. Confira antes de enviar.' };
+            updateDeliveryLocationVerificationUI();
+            return;
+        }
+        checkoutData.locationReverseResult = payload;
+        refreshLocationRegionVerification();
+    } catch (error) {
+        console.warn('Erro ao verificar região pelo GPS:', error);
+        checkoutData.locationVerification = { status: 'error', message: 'Localização capturada, mas não foi possível confirmar o bairro automaticamente. A taxa continua baseada em ' + (checkoutData.deliveryRegion?.name || 'sua região selecionada') + '. Confira antes de enviar.' };
+        updateDeliveryLocationVerificationUI();
+    }
+}
+
+function captureUserLocation() {
+    if (!navigator.geolocation) { alert('Seu navegador não suporta localização.'); return; }
+    navigator.geolocation.getCurrentPosition(
+        position => {
+            checkoutData.location = { latitude: position.coords.latitude, longitude: position.coords.longitude, accuracy: Math.round(position.coords.accuracy) };
+            checkoutData.locationReverseResult = null;
+            checkoutData.locationVerification = { status: 'checking', message: 'Localização capturada. Verificando o bairro…' };
+            renderCheckoutForm();
+            verifyDeliveryRegionFromLocation();
+        },
+        error => {
+            let message = 'Não foi possível obter sua localização.';
+            if (error.code === 1) message = 'Permita o acesso à localização no navegador para enviar sua posição.';
+            if (error.code === 2) message = 'Não foi possível determinar sua localização. Tente novamente.';
+            if (error.code === 3) message = 'A localização demorou para responder. Tente novamente.';
+            alert(message);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+}
 function renderCheckoutForm() {
     const form = document.querySelector('.checkout-form');
     form.innerHTML = `
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Como deseja receber?</label>
+            <div class="fulfillment-method-grid">
+                <button type="button" class="fulfillment-method-btn ${checkoutData.orderType === 'delivery' ? 'active' : ''}" onclick="setOrderType('delivery')" aria-pressed="${checkoutData.orderType === 'delivery'}">
+                    <i data-lucide="truck" class="w-5 h-5"></i>
+                    <span><strong>Entrega</strong><small>Receber em casa</small></span>
+                </button>
+                <button type="button" class="fulfillment-method-btn ${checkoutData.orderType === 'pickup' ? 'active' : ''}" onclick="setOrderType('pickup')" aria-pressed="${checkoutData.orderType === 'pickup'}">
+                    <i data-lucide="store" class="w-5 h-5"></i>
+                    <span><strong>Retirada</strong><small>Buscar na pizzaria</small></span>
+                </button>
+            </div>
+        </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nome Completo</label>
             <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
@@ -2364,14 +2620,9 @@ function renderCheckoutForm() {
             <input type="tel" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
                 placeholder="(XX) XXXXX-XXXX" value="${checkoutData.phone}" oninput="checkoutData.phone = this.value">
         </div>
+        <div id="delivery-fields" class="${checkoutData.orderType === 'delivery' ? '' : 'hidden'}">
         <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Endereço de Entrega</label>
-            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none" 
-                placeholder="Rua, Número, Bairro, Complemento" value="${checkoutData.address}" oninput="checkoutData.address = this.value">
-        </div>
-
-        <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Região de Entrega</label>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bairro / região de entrega</label>
             <div class="delivery-region-search-wrap">
                 <span class="delivery-region-search-icon" aria-hidden="true">
                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -2382,7 +2633,7 @@ function renderCheckoutForm() {
                     class="delivery-region-search-input"
                     placeholder="Digite seu bairro ou região"
                     autocomplete="off"
-                    value="${checkoutData.deliveryRegion?.name || ''}"
+                    value="${checkoutData.deliveryRegion?.id === 'cidade' ? '' : (checkoutData.deliveryRegion?.name || '')}"
                     onfocus="openDeliveryRegionSearch()"
                     oninput="updateDeliveryRegionSearch(this.value)"
                     onblur="setTimeout(() => document.getElementById('delivery-region-results')?.classList.add('hidden'), 150)"
@@ -2392,9 +2643,12 @@ function renderCheckoutForm() {
                 </button>
                 <div id="delivery-region-results" class="delivery-region-results hidden"></div>
             </div>
-            <p class="text-[11px] text-gray-400 mt-2">
-                Comece a digitar e selecione sua região para calcular a taxa. Regiões não listadas da cidade usam a taxa de R$ 4,00.
-            </p>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Rua e número</label>
+            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 outline-none"
+                placeholder="Ex.: Rua das Flores, 123" value="${checkoutData.address}" oninput="checkoutData.address = this.value">
         </div>
 
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
@@ -2407,7 +2661,9 @@ function renderCheckoutForm() {
                 <i data-lucide="map-pin" class="w-5 h-5"></i>
                 <span>${checkoutData.location ? 'Localização capturada ✓' : 'Enviar minha localização atual'}</span>
             </button>
+            <div id="delivery-location-verification" class="hidden mt-3 rounded-lg border p-3 text-xs leading-relaxed" role="status" aria-live="polite"></div>
             <p class="text-[11px] text-gray-400 mt-2 text-center">Seu navegador pedirá permissão para acessar sua localização.</p>
+        </div>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
@@ -2429,12 +2685,12 @@ function renderCheckoutForm() {
         
         <div class="bg-gray-50 p-4 rounded-lg mt-4 border border-gray-200">
             <div class="flex justify-between text-gray-600 text-sm mb-1">
-                <span>Taxa de entrega</span>
-                <span id="checkout-delivery-fee-display">${checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região'}</span>
+                <span id="checkout-fee-label">${checkoutData.orderType === 'pickup' ? 'Retirada no local' : 'Taxa de entrega'}</span>
+                <span id="checkout-delivery-fee-display">${checkoutData.orderType === 'pickup' ? formatCurrency(0) : (checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região')}</span>
             </div>
             <div class="flex justify-between text-gray-900 font-bold">
                  <span>Total do pedido:</span>
-                 <span id="checkout-total-display">${formatCurrency(getCartTotal() + getDeliveryFee())}</span>
+                 <span id="checkout-total-display">${checkoutData.orderType === 'pickup' || checkoutData.deliveryRegion ? formatCurrency(getCartTotal() + getDeliveryFee()) : 'Selecione o bairro/região'}</span>
             </div>
         </div>
     `;
@@ -2443,6 +2699,15 @@ function renderCheckoutForm() {
         window.__sanjaPaymentIconsPromise = import('./payment-icons.js');
     }
     window.__sanjaPaymentIconsPromise.then(({ hydratePaymentIcons }) => hydratePaymentIcons(form)).catch(() => {});
+    updateDeliveryLocationVerificationUI();
+}
+
+function setOrderType(type) {
+    if (!['delivery', 'pickup'].includes(type)) return;
+    checkoutData.orderType = type;
+
+
+    renderCheckoutForm();
 }
 
 function setPaymentMethod(method) {
@@ -2451,17 +2716,24 @@ function setPaymentMethod(method) {
 }
 
 function updateCheckoutForm() {
+    const feeLabel = document.getElementById('checkout-fee-label');
     const deliveryDisplay = document.getElementById('checkout-delivery-fee-display');
     const totalDisplay = document.getElementById('checkout-total-display');
 
+    if (feeLabel) {
+        feeLabel.textContent = checkoutData.orderType === 'pickup' ? 'Retirada no local' : 'Taxa de entrega';
+    }
+
     if (deliveryDisplay) {
-        deliveryDisplay.textContent = checkoutData.deliveryRegion
-            ? formatCurrency(getDeliveryFee())
-            : 'Selecione a região';
+        deliveryDisplay.textContent = checkoutData.orderType === 'pickup'
+            ? formatCurrency(0)
+            : (checkoutData.deliveryRegion ? formatCurrency(getDeliveryFee()) : 'Selecione a região');
     }
 
     if (totalDisplay) {
-        totalDisplay.textContent = formatCurrency(getCartTotal() + getDeliveryFee());
+        totalDisplay.textContent = checkoutData.orderType === 'pickup' || checkoutData.deliveryRegion
+            ? formatCurrency(getCartTotal() + getDeliveryFee())
+            : 'Selecione o bairro/região';
     }
 }
 
@@ -2471,8 +2743,12 @@ async function sendToWhatsApp() {
         openClosedDayModal();
         return;
     }
-    if (!checkoutData.name || !checkoutData.phone || !checkoutData.address || !checkoutData.deliveryRegion || !checkoutData.paymentMethod) {
-        alert("Por favor, preencha nome, telefone, endereço, região de entrega e forma de pagamento.");
+    if (!checkoutData.name || !checkoutData.phone ||
+        (checkoutData.orderType === 'delivery' && (!checkoutData.address || !checkoutData.deliveryRegion)) ||
+        !checkoutData.paymentMethod) {
+        alert(checkoutData.orderType === 'delivery'
+            ? 'Por favor, preencha nome, telefone, rua e número, bairro/região e forma de pagamento.'
+            : 'Por favor, preencha nome, telefone e forma de pagamento.');
         return;
     }
 
@@ -2503,20 +2779,30 @@ async function sendToWhatsApp() {
 
     msg += `*--------------------------*\n\n`;
 
-    msg += `*➕ RESUMO:* \n`;
-    msg += `📦 *Taxa de Entrega:* ${formatCurrency(getDeliveryFee())}\n`;
+    msg += `*➕ RESUMO:*\n`;
+    msg += checkoutData.orderType === 'pickup'
+        ? `🏪 *Modalidade:* Retirada no local\n📦 *Taxa de entrega:* ${formatCurrency(0)}\n`
+        : `🚚 *Modalidade:* Entrega\n📦 *Taxa de entrega:* ${formatCurrency(getDeliveryFee())}\n`;
     msg += `💰 *TOTAL DO PEDIDO: ${formatCurrency(total)}*\n\n`;
 
     msg += `*--------------------------*\n\n`;
-
-    msg += `*👤 DADOS DE ENTREGA:*\n`;
+    msg += `*👤 DADOS DO CLIENTE:*\n`;
     msg += `*• Nome:* ${checkoutData.name}\n`;
     msg += `*• Telefone:* ${checkoutData.phone}\n`;
-    msg += `*• Endereço:* ${checkoutData.address}\n`;
-    msg += `*• Região:* ${checkoutData.deliveryRegion.name}\n`;
-    msg += checkoutData.location
-        ? `*• Localização (GPS):* ${mapsUrl}\n`
-        : `*• Localização (GPS):* Não informada\n`;
+
+    if (checkoutData.orderType === 'delivery') {
+        msg += `*• Endereço:* ${checkoutData.address}\n`;
+        msg += `*• Região:* ${checkoutData.deliveryRegion.name}\n`;
+        msg += checkoutData.location
+            ? `*• Localização (GPS):* ${mapsUrl}\n`
+            : `*• Localização (GPS):* Não informada\n`;
+        if (checkoutData.locationVerification && ['mismatch', 'unverified', 'low-accuracy', 'error'].includes(checkoutData.locationVerification.status)) {
+            msg += '*Conferência da localização:* ' + checkoutData.locationVerification.message + '\n';
+        }
+    } else {
+        msg += `*• Recebimento:* Retirada no balcão da Sanja\n`;
+    }
+
     msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n\n`;
 
     msg += `*--------------------------*\n`;
@@ -2738,6 +3024,7 @@ window.closeProductModal = closeProductModal;
 window.setModalSize = setModalSize;
 window.setModalChoice = setModalChoice;
 window.updateModalPrice = updateModalPrice;
+window.setOrderType = setOrderType;
 window.setPaymentMethod = setPaymentMethod;
 window.closeClosedDayModal = closeClosedDayModal;
 

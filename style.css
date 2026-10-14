@@ -3140,12 +3140,19 @@ h1, h2, h3, .serif-font {
   top: calc(100% + 0.35rem);
   max-height: 290px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: 0.35rem;
   border: 1px solid #e5e7eb;
   border-radius: 0.9rem;
   background: #ffffff;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
   z-index: 80;
+}
+.delivery-region-results::-webkit-scrollbar {
+  display: none;
 }
 .delivery-region-option {
   width: 100%;
@@ -3532,5 +3539,67 @@ h1, h2, h3, .serif-font {
       --tw-scale-y: 1;
       --tw-scale-z: 1;
     }
+  }
+}
+
+
+/* Checkout: escolha entre entrega e retirada */
+.fulfillment-method-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.fulfillment-method-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 72px;
+  padding: 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.85rem;
+  background: #fff;
+  color: #374151;
+  text-align: left;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+.fulfillment-method-btn > svg {
+  flex: 0 0 auto;
+  color: #6b7280;
+}
+.fulfillment-method-btn strong {
+  display: block;
+  font-size: 0.875rem;
+  line-height: 1.2;
+}
+.fulfillment-method-btn small {
+  display: block;
+  margin-top: 0.2rem;
+  color: #6b7280;
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+.fulfillment-method-btn:hover,
+.fulfillment-method-btn:focus-visible {
+  border-color: #f87171;
+  outline: none;
+}
+.fulfillment-method-btn.active {
+  border-color: #dc2626;
+  background: #fef2f2;
+  box-shadow: inset 0 0 0 1px #dc2626;
+  color: #991b1b;
+}
+.fulfillment-method-btn.active > svg {
+  color: #dc2626;
+}
+@media (max-width: 380px) {
+  .fulfillment-method-btn {
+    gap: 0.45rem;
+    padding: 0.7rem 0.6rem;
+  }
+  .fulfillment-method-btn small {
+    font-size: 0.68rem;
   }
 }
