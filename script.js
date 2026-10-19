@@ -311,6 +311,7 @@ const PROMO_REMINDER_DELAY = 4500;
 const PROMO_REMINDER_DURATION = 5000;
 const PROMO_REMINDER_SESSION_KEY = 'sanja-promo-reminder-shown';
 const PROMO_REMINDER_TEST_MODE = new URLSearchParams(window.location.search).get('promoTest') === '1';
+const CHECKOUT_TEST_MODE = new URLSearchParams(window.location.search).get('modoTeste') === '1';
 
 const showPromoReminder = (force = false) => {
     if (isPromoDay() && !force) return;
@@ -406,7 +407,7 @@ const showPromoReminder = (force = false) => {
 };
 
 const schedulePromoReminder = () => {
-    if (isClosedToday()) return;
+    if (CHECKOUT_TEST_MODE || isClosedToday()) return;
     if (isPromoDay() && !PROMO_REMINDER_TEST_MODE) return;
     window.setTimeout(() => showPromoReminder(PROMO_REMINDER_TEST_MODE), PROMO_REMINDER_DELAY);
 };
@@ -3083,13 +3084,17 @@ async function sendToWhatsApp() {
     msg += `_Sanja Pizzaria agradece a preferência!_ 🔥`;
 
     // Gera um ID de transação único (timestamp) para registrar como compra finalizada no GA4
+    if (CHECKOUT_TEST_MODE) {
+        msg = `🧪 *PEDIDO DE TESTE — NÃO PREPARAR* 🧪\n\n${msg}`;
+    }
+
     const transactionId = 'WA_' + new Date().getTime();
 
     // Log para você verificar no console do navegador se o valor está correto antes de enviar
-    console.log("Enviando evento de compra para GA4:", { transactionId, total, items: cart });
+    if (!CHECKOUT_TEST_MODE) console.log("Enviando evento de compra para GA4:", { transactionId, total, items: cart });
 
     // Dispara evento de conversão para o Google Analytics (Padrão de E-commerce GA4)
-    if (typeof gtag === 'function') {
+    if (!CHECKOUT_TEST_MODE && typeof gtag === 'function') {
         gtag('event', 'purchase', {
             'transaction_id': transactionId,
             'currency': 'BRL',
@@ -3117,7 +3122,7 @@ async function sendToWhatsApp() {
     let persistenceTimeout;
     try {
         const orderId = await Promise.race([
-            saveOrderToSupabase(),
+            CHECKOUT_TEST_MODE ? Promise.resolve(null) : saveOrderToSupabase(),
             new Promise((_, reject) => {
                 persistenceTimeout = setTimeout(
                     () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
@@ -3125,7 +3130,8 @@ async function sendToWhatsApp() {
                 );
             })
         ]);
-        console.log('Pedido registrado no Supabase:', orderId);
+        if (orderId) console.log('Pedido registrado no Supabase:', orderId);
+        else if (CHECKOUT_TEST_MODE) console.log('Modo teste: pedido não salvo no Supabase nem enviado à impressão automática.');
     } catch (error) {
         console.warn('O pedido seguir\u00e1 para o WhatsApp, mas n\u00e3o foi confirmado no Supabase:', error);
     } finally {
@@ -3145,7 +3151,18 @@ async function sendToWhatsApp() {
 // 7.5 DIA FECHADO (SEGUNDA-FEIRA)
 // ==========================================
 function isClosedToday() {
-    return new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
+    return !CHECKOUT_TEST_MODE && new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
+}
+
+function showCheckoutTestBanner() {
+    if (!CHECKOUT_TEST_MODE) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'checkout-test-mode-banner';
+    banner.setAttribute('role', 'status');
+    banner.textContent = 'MODO DE TESTE ATIVO — pedidos não serão registrados nem impressos. Se abrir o WhatsApp, não envie o pedido como real.';
+    banner.style.cssText = 'position:relative;width:100%;z-index:10000;padding:12px 16px;background:#fff1b8;color:#713f12;border-bottom:2px solid #f59e0b;text-align:center;font:700 13px/1.45 system-ui,sans-serif;';
+    document.body.insertBefore(banner, document.body.firstChild);
 }
 
 function openClosedDayModal() {
@@ -3172,6 +3189,7 @@ function closeClosedDayModal() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => {
+    showCheckoutTestBanner();
     loadCart();
     renderCategoryButtons();
     let currentActiveCategory = null;
