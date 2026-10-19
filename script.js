@@ -2972,6 +2972,27 @@ const SANJA_PIX_CONFIG = {
     merchantCity: 'Brazopolis'
 };
 
+function createPixOrderCode() {
+    // Identificador alfanumérico de até 25 caracteres para o campo TxID do Pix estático.
+    const timePart = Date.now().toString(36).toUpperCase().slice(-8);
+    const randomBytes = new Uint8Array(6);
+
+    if (window.crypto?.getRandomValues) {
+        window.crypto.getRandomValues(randomBytes);
+    } else {
+        for (let i = 0; i < randomBytes.length; i++) {
+            randomBytes[i] = Math.floor(Math.random() * 256);
+        }
+    }
+
+    const randomPart = Array.from(
+        randomBytes,
+        byte => byte.toString(16).padStart(2, '0')
+    ).join('').toUpperCase();
+
+    return `SANJA${timePart}${randomPart}`;
+}
+
 function resetPixPaymentState() {
     checkoutData.pixPaymentScreen = false;
     checkoutData.pixContinueToWhatsApp = false;
@@ -2983,7 +3004,7 @@ function resetPixPaymentState() {
 
 function showPixPaymentScreen(total) {
     const amount = Number(Number(total).toFixed(2));
-    const reference = 'SANJA' + Date.now().toString(36).toUpperCase();
+    const reference = createPixOrderCode();
     const payload = CHECKOUT_TEST_MODE
         ? 'SANJA-TESTE-NAO-PAGAR'
         : window.SanjaPixQR.buildPixPayload({
@@ -3021,7 +3042,7 @@ function showPixPaymentScreen(total) {
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Valor do pedido</p>
                 <p class="mt-1 text-3xl font-extrabold text-gray-900">${formatCurrency(amount)}</p>
                 <p class="mt-2 text-sm text-gray-600">Recebedor: ${SANJA_PIX_CONFIG.merchantName}</p>
-                <p class="mt-1 text-xs text-gray-500">Referência: ${reference}</p>
+                <p class="mt-1 text-xs text-gray-500">Código do pedido: ${reference}</p>
             </div>
             <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
@@ -3214,7 +3235,7 @@ async function sendToWhatsApp() {
         if (CHECKOUT_TEST_MODE) {
             msg += '*Pix:* Simulação de teste; nenhum pagamento real foi gerado.\n';
         } else {
-            msg += '*Referência Pix:* ' + checkoutData.pixPaymentReference + '\n';
+            msg += '*Código do pedido/Pix:* ' + checkoutData.pixPaymentReference + '\n';
             msg += '*Status do pagamento:* Aguardando conferência manual do recebimento antes do preparo.\n';
         }
     }
