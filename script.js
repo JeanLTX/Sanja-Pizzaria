@@ -311,7 +311,6 @@ const PROMO_REMINDER_DELAY = 4500;
 const PROMO_REMINDER_DURATION = 5000;
 const PROMO_REMINDER_SESSION_KEY = 'sanja-promo-reminder-shown';
 const PROMO_REMINDER_TEST_MODE = new URLSearchParams(window.location.search).get('promoTest') === '1';
-const CHECKOUT_TEST_MODE = new URLSearchParams(window.location.search).get('modoTeste') === '1';
 
 const showPromoReminder = (force = false) => {
     if (isPromoDay() && !force) return;
@@ -407,7 +406,7 @@ const showPromoReminder = (force = false) => {
 };
 
 const schedulePromoReminder = () => {
-    if (CHECKOUT_TEST_MODE || isClosedToday()) return;
+    if (isClosedToday()) return;
     if (isPromoDay() && !PROMO_REMINDER_TEST_MODE) return;
     window.setTimeout(() => showPromoReminder(PROMO_REMINDER_TEST_MODE), PROMO_REMINDER_DELAY);
 };
@@ -3005,8 +3004,7 @@ function resetPixPaymentState() {
 function showPixPaymentScreen(total) {
     const amount = Number(Number(total).toFixed(2));
     const reference = createPixOrderCode();
-    // Gera um payload Pix estático válido em produção e no modo de teste.
-    // O modo de teste é apenas do cardápio: o Pix continua direcionando dinheiro real.
+    // Gera um payload Pix estático válido para este pedido.
     const payload = window.SanjaPixQR.buildPixPayload({
         key: SANJA_PIX_CONFIG.key,
         amount,
@@ -3030,7 +3028,6 @@ function showPixPaymentScreen(total) {
             <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 text-base font-extrabold">PIX</div>
             <h3 id="pix-payment-title" class="text-lg font-bold text-gray-900">Pague com Pix</h3>
             <p class="text-sm leading-relaxed text-gray-600">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.</p>
-            ${CHECKOUT_TEST_MODE ? '<div role="alert" class="rounded-lg border border-amber-300 bg-amber-50 p-3 text-left text-xs font-semibold leading-relaxed text-amber-900">MODO DE TESTE: este QR Code Pix é válido e pode gerar um pagamento real de ' + formatCurrency(amount) + ' para a Sanja. Não conclua o pagamento durante a simulação.</div>' : ''}
             <div class="mx-auto inline-flex rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
                 <img id="pix-payment-qr" class="h-52 w-52 max-w-full object-contain" width="208" height="208" alt="QR Code Pix do pedido" />
             </div>
@@ -3045,7 +3042,7 @@ function showPixPaymentScreen(total) {
                 <p class="mt-2 text-sm text-gray-600">Recebedor: ${SANJA_PIX_CONFIG.merchantName}</p>
                 <p class="mt-1 text-xs text-gray-500">Código do pedido: ${reference}</p>
             </div>
-            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">${CHECKOUT_TEST_MODE ? 'Simulação do cardápio: não conclua pagamentos. Use o botão abaixo apenas para verificar o envio do pedido de teste ao WhatsApp.' : 'Depois de pagar, volte a esta tela e continue para o WhatsApp'}</p>
+            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
             <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
         </section>
@@ -3234,11 +3231,7 @@ async function sendToWhatsApp() {
     msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n`;
     if (checkoutData.paymentMethod === 'Pix') {
         msg += '*Código do pedido/Pix:* ' + checkoutData.pixPaymentReference + '\n';
-        if (CHECKOUT_TEST_MODE) {
-            msg += '*Pix:* Modo de teste do cardápio. O QR Code é válido, mas não efetue pagamento. NÃO PREPARAR.\n';
-        } else {
-            msg += '*Status do pagamento:* Aguardando conferência manual do recebimento antes do preparo.\n';
-        }
+        msg += '*Status do pagamento:* Aguardando conferência manual do recebimento antes do preparo.\n';
     }
     msg += '\n';
 
@@ -3246,17 +3239,13 @@ async function sendToWhatsApp() {
     msg += `_Sanja Pizzaria agradece a preferência!_ 🔥`;
 
     // Gera um ID de transação único (timestamp) para registrar como compra finalizada no GA4
-    if (CHECKOUT_TEST_MODE) {
-        msg = `🧪 *PEDIDO DE TESTE — NÃO PREPARAR* 🧪\n\n${msg}`;
-    }
-
     const transactionId = 'WA_' + new Date().getTime();
 
     // Log para você verificar no console do navegador se o valor está correto antes de enviar
-    if (!CHECKOUT_TEST_MODE) console.log("Enviando evento de compra para GA4:", { transactionId, total, items: cart });
+    console.log("Enviando evento de compra para GA4:", { transactionId, total, items: cart });
 
     // Dispara evento de conversão para o Google Analytics (Padrão de E-commerce GA4)
-    if (!CHECKOUT_TEST_MODE && typeof gtag === 'function') {
+    if (typeof gtag === 'function') {
         gtag('event', 'purchase', {
             'transaction_id': transactionId,
             'currency': 'BRL',
@@ -3284,7 +3273,7 @@ async function sendToWhatsApp() {
     let persistenceTimeout;
     try {
         const orderId = await Promise.race([
-            (CHECKOUT_TEST_MODE || checkoutData.paymentMethod === 'Pix') ? Promise.resolve(null) : saveOrderToSupabase(),
+            checkoutData.paymentMethod === 'Pix' ? Promise.resolve(null) : saveOrderToSupabase(),
             new Promise((_, reject) => {
                 persistenceTimeout = setTimeout(
                     () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
@@ -3293,7 +3282,6 @@ async function sendToWhatsApp() {
             })
         ]);
         if (orderId) console.log('Pedido registrado no Supabase:', orderId);
-        else if (CHECKOUT_TEST_MODE) console.log('Modo teste: pedido não salvo no Supabase nem enviado à impressão automática.');
         else if (checkoutData.paymentMethod === 'Pix') console.log('Pedido Pix enviado ao WhatsApp; registro e impressão automática não acionados até confirmação manual do pagamento.');
     } catch (error) {
         console.warn('O pedido seguir\u00e1 para o WhatsApp, mas n\u00e3o foi confirmado no Supabase:', error);
@@ -3314,18 +3302,7 @@ async function sendToWhatsApp() {
 // 7.5 DIA FECHADO (SEGUNDA-FEIRA)
 // ==========================================
 function isClosedToday() {
-    return !CHECKOUT_TEST_MODE && new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
-}
-
-function showCheckoutTestBanner() {
-    if (!CHECKOUT_TEST_MODE) return;
-
-    const banner = document.createElement('div');
-    banner.id = 'checkout-test-mode-banner';
-    banner.setAttribute('role', 'status');
-    banner.textContent = 'MODO DE TESTE ATIVO — pedidos não serão registrados nem impressos. Se abrir o WhatsApp, não envie o pedido como real.';
-    banner.style.cssText = 'position:relative;width:100%;z-index:10000;padding:12px 16px;background:#fff1b8;color:#713f12;border-bottom:2px solid #f59e0b;text-align:center;font:700 13px/1.45 system-ui,sans-serif;';
-    document.body.insertBefore(banner, document.body.firstChild);
+    return new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
 }
 
 function openClosedDayModal() {
@@ -3352,7 +3329,6 @@ function closeClosedDayModal() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => {
-    showCheckoutTestBanner();
     loadCart();
     renderCategoryButtons();
     let currentActiveCategory = null;
