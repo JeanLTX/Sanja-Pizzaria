@@ -85,10 +85,13 @@ async function saveOrderToSupabase() {
             p_subtotal: order.subtotal,
             p_total: order.total,
             p_items: items,
-            p_order_type: order.order_type
+            p_order_type: order.order_type,
+            p_pix_order_code: checkoutData.paymentMethod === 'Pix'
+                ? checkoutData.pixPaymentReference
+                : null
         };
 
-        const createdOrderId = await supabaseRest('rpc/create_public_order', {
+        const createdOrderId = await supabaseRest('rpc/create_public_order_with_payment', {
             method: 'POST',
             body: JSON.stringify(rpcPayload)
         });

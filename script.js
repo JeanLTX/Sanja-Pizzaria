@@ -3273,7 +3273,7 @@ async function sendToWhatsApp() {
     let persistenceTimeout;
     try {
         const orderId = await Promise.race([
-            checkoutData.paymentMethod === 'Pix' ? Promise.resolve(null) : saveOrderToSupabase(),
+            saveOrderToSupabase(),
             new Promise((_, reject) => {
                 persistenceTimeout = setTimeout(
                     () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
@@ -3282,7 +3282,6 @@ async function sendToWhatsApp() {
             })
         ]);
         if (orderId) console.log('Pedido registrado no Supabase:', orderId);
-        else if (checkoutData.paymentMethod === 'Pix') console.log('Pedido Pix enviado ao WhatsApp; registro e impressão automática não acionados até confirmação manual do pagamento.');
     } catch (error) {
         console.warn('O pedido seguir\u00e1 para o WhatsApp, mas n\u00e3o foi confirmado no Supabase:', error);
     } finally {
