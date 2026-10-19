@@ -3023,7 +3023,7 @@ function showPixPaymentScreen(total) {
                 <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100" style="text-overflow:clip;" />
                 <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">Copiar Pix copia e cola</button>
             </div>
-            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp. A Sanja precisa conferir o recebimento no banco antes de preparar o pedido.</p>
+            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
             <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
         </section>
