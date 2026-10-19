@@ -541,7 +541,12 @@ let checkoutData = {
     routeCalculationError: null,
     deliveryRegion: null,
     orderType: 'delivery',
-    paymentMethod: ''
+    paymentMethod: '',
+    pixPaymentScreen: false,
+    pixContinueToWhatsApp: false,
+    pixPaymentReference: '',
+    pixPaymentAmount: null,
+    pixPaymentPayload: ''
 };
 
 // ==========================================
@@ -2681,6 +2686,7 @@ function openCheckout() {
 }
 
 function closeCheckout() {
+    resetPixPaymentState();
     const checkoutSection = document.getElementById('checkout-section');
     checkoutSection.classList.add('hidden');
     checkoutSection.classList.remove('open');
@@ -2954,13 +2960,125 @@ function renderCheckoutForm() {
 
 function setOrderType(type) {
     if (!['delivery', 'pickup'].includes(type)) return;
+    resetPixPaymentState();
     checkoutData.orderType = type;
-
-
     renderCheckoutForm();
 }
 
+const SANJA_PIX_CONFIG = {
+    // A chave Pix é pública por natureza: ela será incluída no QR Code exibido ao pagador.
+    key: '45097930819',
+    merchantName: 'Luan Vinicius da Silva Gonçalves',
+    merchantCity: 'Brazopolis'
+};
+
+function resetPixPaymentState() {
+    checkoutData.pixPaymentScreen = false;
+    checkoutData.pixContinueToWhatsApp = false;
+    checkoutData.pixPaymentReference = '';
+    checkoutData.pixPaymentAmount = null;
+    checkoutData.pixPaymentPayload = '';
+    document.querySelector('.checkout-actions')?.classList.remove('hidden');
+}
+
+function showPixPaymentScreen(total) {
+    const amount = Number(Number(total).toFixed(2));
+    const reference = 'SANJA' + Date.now().toString(36).toUpperCase();
+    const payload = CHECKOUT_TEST_MODE
+        ? 'SANJA-TESTE-NAO-PAGAR'
+        : window.SanjaPixQR.buildPixPayload({
+            key: SANJA_PIX_CONFIG.key,
+            amount,
+            merchantName: SANJA_PIX_CONFIG.merchantName,
+            merchantCity: SANJA_PIX_CONFIG.merchantCity,
+            txid: reference
+        });
+
+    checkoutData.pixPaymentReference = reference;
+    checkoutData.pixPaymentAmount = amount;
+    checkoutData.pixPaymentPayload = payload;
+    checkoutData.pixPaymentScreen = true;
+
+    const form = document.querySelector('.checkout-form');
+    const actions = document.querySelector('.checkout-actions');
+    if (!form || !actions) throw new Error('A tela de pagamento não está disponível.');
+    actions.classList.add('hidden');
+
+    form.innerHTML = `
+        <section class="space-y-4 text-center" aria-labelledby="pix-payment-title">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700 text-lg font-extrabold">PIX</div>
+            <h3 id="pix-payment-title" class="text-xl font-bold text-gray-900">${CHECKOUT_TEST_MODE ? 'Demonstração de Pix' : 'Pague com Pix'}</h3>
+            <p class="text-sm leading-relaxed text-gray-600">${CHECKOUT_TEST_MODE ? 'Este modo serve apenas para testar a tela. O QR Code abaixo não é um Pix válido e não deve ser pago.' : 'Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.'}</p>
+            <div class="mx-auto inline-flex rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
+                <img id="pix-payment-qr" class="h-56 w-56 max-w-full object-contain" width="224" height="224" alt="QR Code Pix do pedido" />
+            </div>
+            <div class="rounded-xl bg-gray-50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Valor do pedido</p>
+                <p class="mt-1 text-3xl font-extrabold text-gray-900">${formatCurrency(amount)}</p>
+                <p class="mt-2 text-sm text-gray-600">Recebedor: ${SANJA_PIX_CONFIG.merchantName}</p>
+                <p class="mt-1 text-xs text-gray-500">Referência: ${reference}</p>
+            </div>
+            <div class="text-left">
+                <label for="pix-payment-code" class="mb-2 block text-xs font-bold uppercase text-gray-500">${CHECKOUT_TEST_MODE ? 'Código de demonstração' : 'Pix copia e cola'}</label>
+                <textarea id="pix-payment-code" readonly rows="4" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-xs leading-relaxed text-gray-700" style="overflow-wrap:anywhere;word-break:break-all;resize:vertical;">${payload}</textarea>
+                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">${CHECKOUT_TEST_MODE ? 'Copiar código de demonstração' : 'Copiar Pix copia e cola'}</button>
+            </div>
+            <p class="rounded-lg border ${CHECKOUT_TEST_MODE ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-gray-200 bg-gray-50 text-gray-600'} p-3 text-left text-xs leading-relaxed">${CHECKOUT_TEST_MODE ? 'MODO DE TESTE: não faça nenhum pagamento. O código é apenas ilustrativo.' : 'Depois de pagar, volte a esta tela e continue para o WhatsApp. A Sanja precisa conferir o recebimento no banco antes de preparar o pedido.'}</p>
+            <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
+            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
+        </section>
+    `;
+
+    const qrImage = document.getElementById('pix-payment-qr');
+    if (qrImage && window.SanjaPixQR?.qrDataUrl) {
+        qrImage.src = window.SanjaPixQR.qrDataUrl(payload, 6, 4);
+    } else if (qrImage) {
+        qrImage.alt = 'Não foi possível gerar a imagem do QR Code';
+        qrImage.classList.add('hidden');
+        throw new Error('Não foi possível carregar o gerador de QR Code. Atualize a página e tente novamente.');
+    }
+}
+
+async function copyPixPaymentCode() {
+    const field = document.getElementById('pix-payment-code');
+    if (!field) return;
+    try {
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+            await navigator.clipboard.writeText(field.value);
+        } else {
+            field.focus();
+            field.select();
+            if (!document.execCommand('copy')) throw new Error('Cópia indisponível');
+        }
+        showToast(CHECKOUT_TEST_MODE ? 'Código de demonstração copiado.' : 'Pix copia e cola copiado!');
+    } catch (error) {
+        field.focus();
+        field.select();
+        alert('Não foi possível copiar automaticamente. Selecione o código e copie manualmente.');
+    }
+}
+
+function returnToCheckoutForm() {
+    checkoutData.pixPaymentScreen = false;
+    checkoutData.pixContinueToWhatsApp = false;
+    document.querySelector('.checkout-actions')?.classList.remove('hidden');
+    renderCheckoutForm();
+}
+
+function continuePixToWhatsApp() {
+    const expectedTotal = Number((getCartTotal() + getDeliveryFee()).toFixed(2));
+    if (!checkoutData.pixPaymentScreen || Number(checkoutData.pixPaymentAmount) !== expectedTotal) {
+        returnToCheckoutForm();
+        showToast('O total mudou. Confira o pedido e gere o Pix novamente.');
+        return;
+    }
+    checkoutData.pixPaymentScreen = false;
+    checkoutData.pixContinueToWhatsApp = true;
+    sendToWhatsApp();
+}
+
 function setPaymentMethod(method) {
+    resetPixPaymentState();
     checkoutData.paymentMethod = method;
     renderCheckoutForm();
 }
@@ -3000,13 +3118,16 @@ async function sendToWhatsApp() {
         return;
     }
 
-    const whatsappWindow = window.open('about:blank', '_blank');
+    // Reserve a WhatsApp tab synchronously for non-Pix orders and the second Pix step,
+    // so iOS Safari and other browsers are less likely to block the navigation.
+    const shouldOpenWhatsAppNow = checkoutData.paymentMethod !== 'Pix' || checkoutData.pixContinueToWhatsApp;
+    const whatsappWindow = shouldOpenWhatsAppNow ? window.open('about:blank', '_blank') : null;
     if (whatsappWindow) {
         try {
             whatsappWindow.document.title = 'Preparando seu pedido';
             whatsappWindow.document.body.textContent = 'Preparando seu pedido para o WhatsApp\u2026';
         } catch (_) {
-            // A navegacao para o WhatsApp continua mesmo se a aba nao puder ser modificada.
+            // The WhatsApp navigation continues even if this tab cannot be modified.
         }
     }
 
@@ -3014,12 +3135,22 @@ async function sendToWhatsApp() {
         await calculateRouteDeliveryFee();
         if (!isDeliveryFeeReady()) {
             if (whatsappWindow && !whatsappWindow.closed) whatsappWindow.close();
-            alert('Nao foi possivel calcular o frete com seguranca. Confira o endereco, envie sua localizacao ou selecione uma regiao conhecida.');
+            alert('Não foi possível calcular o frete com segurança. Confira o endereço, envie sua localização ou selecione uma região conhecida.');
             return;
         }
     }
 
     const total = getCartTotal() + getDeliveryFee();
+    if (checkoutData.paymentMethod === 'Pix' && !checkoutData.pixContinueToWhatsApp) {
+        try {
+            showPixPaymentScreen(total);
+        } catch (error) {
+            console.error('Não foi possível gerar o QR Code Pix:', error);
+            alert(error?.message || 'Não foi possível gerar o Pix. Tente novamente.');
+        }
+        return;
+    }
+    checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
         ? `https://www.google.com/maps?q=${checkoutData.location.latitude},${checkoutData.location.longitude}`
         : '';
@@ -3078,7 +3209,16 @@ async function sendToWhatsApp() {
         msg += `*• Recebimento:* Retirada no balcão da Sanja\n`;
     }
 
-    msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n\n`;
+    msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n`;
+    if (checkoutData.paymentMethod === 'Pix') {
+        if (CHECKOUT_TEST_MODE) {
+            msg += '*Pix:* Simulação de teste; nenhum pagamento real foi gerado.\n';
+        } else {
+            msg += '*Referência Pix:* ' + checkoutData.pixPaymentReference + '\n';
+            msg += '*Status do pagamento:* Aguardando conferência manual do recebimento antes do preparo.\n';
+        }
+    }
+    msg += '\n';
 
     msg += `*--------------------------*\n`;
     msg += `_Sanja Pizzaria agradece a preferência!_ 🔥`;
@@ -3122,7 +3262,7 @@ async function sendToWhatsApp() {
     let persistenceTimeout;
     try {
         const orderId = await Promise.race([
-            CHECKOUT_TEST_MODE ? Promise.resolve(null) : saveOrderToSupabase(),
+            (CHECKOUT_TEST_MODE || checkoutData.paymentMethod === 'Pix') ? Promise.resolve(null) : saveOrderToSupabase(),
             new Promise((_, reject) => {
                 persistenceTimeout = setTimeout(
                     () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
@@ -3132,6 +3272,7 @@ async function sendToWhatsApp() {
         ]);
         if (orderId) console.log('Pedido registrado no Supabase:', orderId);
         else if (CHECKOUT_TEST_MODE) console.log('Modo teste: pedido não salvo no Supabase nem enviado à impressão automática.');
+        else if (checkoutData.paymentMethod === 'Pix') console.log('Pedido Pix enviado ao WhatsApp; registro e impressão automática não acionados até confirmação manual do pagamento.');
     } catch (error) {
         console.warn('O pedido seguir\u00e1 para o WhatsApp, mas n\u00e3o foi confirmado no Supabase:', error);
     } finally {
@@ -3334,6 +3475,9 @@ window.setModalChoice = setModalChoice;
 window.updateModalPrice = updateModalPrice;
 window.setOrderType = setOrderType;
 window.setPaymentMethod = setPaymentMethod;
+window.copyPixPaymentCode = copyPixPaymentCode;
+window.returnToCheckoutForm = returnToCheckoutForm;
+window.continuePixToWhatsApp = continuePixToWhatsApp;
 window.closeClosedDayModal = closeClosedDayModal;
 
 // Meio a Meio
