@@ -3007,8 +3007,8 @@ function showPixPaymentScreen(total) {
     form.innerHTML = `
         <section class="space-y-4 text-center" aria-labelledby="pix-payment-title">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700 text-lg font-extrabold">PIX</div>
-            <h3 id="pix-payment-title" class="text-xl font-bold text-gray-900">${CHECKOUT_TEST_MODE ? 'Demonstração de Pix' : 'Pague com Pix'}</h3>
-            <p class="text-sm leading-relaxed text-gray-600">${CHECKOUT_TEST_MODE ? 'Este modo serve apenas para testar a tela. O QR Code abaixo não é um Pix válido e não deve ser pago.' : 'Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.'}</p>
+            <h3 id="pix-payment-title" class="text-xl font-bold text-gray-900">Pague com Pix</h3>
+            <p class="text-sm leading-relaxed text-gray-600">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.</p>
             <div class="mx-auto inline-flex rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
                 <img id="pix-payment-qr" class="h-56 w-56 max-w-full object-contain" width="224" height="224" alt="QR Code Pix do pedido" />
             </div>
@@ -3019,11 +3019,11 @@ function showPixPaymentScreen(total) {
                 <p class="mt-1 text-xs text-gray-500">Referência: ${reference}</p>
             </div>
             <div class="text-left">
-                <label for="pix-payment-code" class="mb-2 block text-xs font-bold uppercase text-gray-500">${CHECKOUT_TEST_MODE ? 'Código de demonstração' : 'Pix copia e cola'}</label>
-                <textarea id="pix-payment-code" readonly rows="4" class="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-xs leading-relaxed text-gray-700" style="overflow-wrap:anywhere;word-break:break-all;resize:vertical;">${payload}</textarea>
-                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">${CHECKOUT_TEST_MODE ? 'Copiar código de demonstração' : 'Copiar Pix copia e cola'}</button>
+                <label for="pix-payment-code" class="mb-2 block text-xs font-bold uppercase text-gray-500">Pix copia e cola</label>
+                <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100" style="text-overflow:clip;" />
+                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">Copiar Pix copia e cola</button>
             </div>
-            <p class="rounded-lg border ${CHECKOUT_TEST_MODE ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-gray-200 bg-gray-50 text-gray-600'} p-3 text-left text-xs leading-relaxed">${CHECKOUT_TEST_MODE ? 'MODO DE TESTE: não faça nenhum pagamento. O código é apenas ilustrativo.' : 'Depois de pagar, volte a esta tela e continue para o WhatsApp. A Sanja precisa conferir o recebimento no banco antes de preparar o pedido.'}</p>
+            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp. A Sanja precisa conferir o recebimento no banco antes de preparar o pedido.</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
             <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
         </section>
@@ -3050,7 +3050,7 @@ async function copyPixPaymentCode() {
             field.select();
             if (!document.execCommand('copy')) throw new Error('Cópia indisponível');
         }
-        showToast(CHECKOUT_TEST_MODE ? 'Código de demonstração copiado.' : 'Pix copia e cola copiado!');
+        showToast('Pix copia e cola copiado!');
     } catch (error) {
         field.focus();
         field.select();
