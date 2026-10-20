@@ -289,6 +289,7 @@ async function activateBridge(code) {
         establishmentId: result.establishmentId,
         establishmentName: result.establishmentName,
         printerId: result.printerId,
+        // Ativar em modo seguro até o cliente confirmar impressora e configuração.
         autoPrint: false,
         testMode: true
     };
@@ -346,12 +347,20 @@ function buildReceipt(job) {
         ]),
         '--------------------------------',
         `Subtotal: R$ ${money(job.subtotal)}`,
-        `Entrega: R$ ${money(job.delivery_fee)}`,
+        job.order_type === 'pickup' ? 'MODALIDADE: RETIRADA NO LOCAL' : `Entrega: R$ ${money(job.delivery_fee)}`,
         `TOTAL: R$ ${money(job.total)}`,
         '--------------------------------',
-        job.delivery_region ? `Região: ${job.delivery_region}` : null,
-        job.address ? `Endereço: ${job.address}` : null,
+        job.order_type !== 'pickup' && job.delivery_region ? `Região: ${job.delivery_region}` : null,
+        job.order_type !== 'pickup' && job.address ? `Endereço: ${job.address}` : null,
         job.payment_method ? `Pagamento: ${job.payment_method}` : null,
+        String(job.payment_method || '').toLowerCase() === 'pix'
+            ? (job.payment_status === 'paid'
+                ? 'PIX: PAGAMENTO CONFIRMADO'
+                : 'PIX PENDENTE: CONFERIR RECEBIMENTO ANTES DE PREPARAR')
+            : null,
+        String(job.payment_method || '').toLowerCase() === 'pix' && job.pix_order_code
+            ? `Código Pix: ${job.pix_order_code}`
+            : null,
         job.notes ? `Obs: ${job.notes}` : null,
         '================================',
         '',

@@ -1,6 +1,6 @@
 {
   "name": "jean-print-bridge",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Aplicativo local para impressão de pedidos no Windows.",
   "author": "Impressão",
   "main": "main.js",
