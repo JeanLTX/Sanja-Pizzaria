@@ -545,7 +545,9 @@ let checkoutData = {
     pixContinueToWhatsApp: false,
     pixPaymentReference: '',
     pixPaymentAmount: null,
-    pixPaymentPayload: ''
+    pixPaymentPayload: '',
+    pixOrderSupabaseId: null,
+    pixOrderRegistrationPromise: null
 };
 
 // ==========================================
@@ -2998,7 +3000,40 @@ function resetPixPaymentState() {
     checkoutData.pixPaymentReference = '';
     checkoutData.pixPaymentAmount = null;
     checkoutData.pixPaymentPayload = '';
+    checkoutData.pixOrderSupabaseId = null;
+    checkoutData.pixOrderRegistrationPromise = null;
     document.querySelector('.checkout-actions')?.classList.remove('hidden');
+}
+
+function registerPixOrderForPrinting() {
+    if (checkoutData.pixOrderSupabaseId) {
+        return Promise.resolve(checkoutData.pixOrderSupabaseId);
+    }
+    if (checkoutData.pixOrderRegistrationPromise) {
+        return checkoutData.pixOrderRegistrationPromise;
+    }
+
+    const reference = checkoutData.pixPaymentReference;
+    const registrationPromise = saveOrderToSupabase()
+        .then(orderId => {
+            if (checkoutData.pixPaymentReference === reference) {
+                checkoutData.pixOrderSupabaseId = orderId;
+            }
+            console.log('Pedido Pix registrado para impressão:', orderId);
+            return orderId;
+        })
+        .catch(error => {
+            console.warn('Não foi possível registrar o pedido Pix antes do pagamento:', error);
+            return null;
+        })
+        .finally(() => {
+            if (checkoutData.pixPaymentReference === reference) {
+                checkoutData.pixOrderRegistrationPromise = null;
+            }
+        });
+
+    checkoutData.pixOrderRegistrationPromise = registrationPromise;
+    return registrationPromise;
 }
 
 function showPixPaymentScreen(total) {
@@ -3056,6 +3091,10 @@ function showPixPaymentScreen(total) {
         qrImage.classList.add('hidden');
         throw new Error('Não foi possível carregar o gerador de QR Code. Atualize a página e tente novamente.');
     }
+
+    // Registrar assim que o QR for exibido para que a comanda entre na fila
+    // sem esperar o cliente pagar ou tocar em "Continuar para o WhatsApp".
+    registerPixOrderForPrinting();
 }
 
 async function copyPixPaymentCode() {
@@ -3078,9 +3117,7 @@ async function copyPixPaymentCode() {
 }
 
 function returnToCheckoutForm() {
-    checkoutData.pixPaymentScreen = false;
-    checkoutData.pixContinueToWhatsApp = false;
-    document.querySelector('.checkout-actions')?.classList.remove('hidden');
+    resetPixPaymentState();
     renderCheckoutForm();
 }
 
@@ -3272,8 +3309,18 @@ async function sendToWhatsApp() {
     // Supabase persistence is complementary and must never block WhatsApp ordering.
     let persistenceTimeout;
     try {
+        const pixAlreadyRegistered = checkoutData.paymentMethod === 'Pix'
+            && checkoutData.pixPaymentReference
+            && checkoutData.pixPaymentAmount !== null;
+        const orderSavePromise = pixAlreadyRegistered
+            ? (checkoutData.pixOrderSupabaseId
+                ? Promise.resolve(checkoutData.pixOrderSupabaseId)
+                : (checkoutData.pixOrderRegistrationPromise || Promise.resolve(null))
+                    .then(orderId => orderId || saveOrderToSupabase()))
+            : saveOrderToSupabase();
+
         const orderId = await Promise.race([
-            saveOrderToSupabase(),
+            orderSavePromise,
             new Promise((_, reject) => {
                 persistenceTimeout = setTimeout(
                     () => reject(new Error('Tempo limite ao registrar pedido no Supabase.')),
