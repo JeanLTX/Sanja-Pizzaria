@@ -3060,7 +3060,7 @@ function showPixPaymentScreen(total) {
 
     form.innerHTML = `
         <section class="-mt-2 space-y-3 text-center" aria-labelledby="pix-payment-title">
-            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 text-base font-extrabold">PIX</div>
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-700 text-base font-extrabold">PIX</div>
             <h3 id="pix-payment-title" class="text-lg font-bold text-gray-900">Pague com Pix</h3>
             <p class="text-sm leading-relaxed text-gray-600">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.</p>
             <div class="mx-auto inline-flex rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
@@ -3068,8 +3068,8 @@ function showPixPaymentScreen(total) {
             </div>
             <div class="text-left">
                 <label for="pix-payment-code" class="mb-2 block text-xs font-bold uppercase text-gray-500">Pix copia e cola</label>
-                <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100" style="text-overflow:clip;" />
-                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">Copiar Pix copia e cola</button>
+                <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-100" style="text-overflow:clip;" />
+                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-gray-400 px-4 py-3 font-bold text-gray-700 transition hover:bg-gray-100">Copiar Pix copia e cola</button>
             </div>
             <div class="rounded-xl bg-gray-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Valor do pedido</p>
@@ -3079,7 +3079,7 @@ function showPixPaymentScreen(total) {
             </div>
             <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
-            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
+            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-gray-700 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-gray-800">Continuar para o WhatsApp</button>
         </section>
     `;
 
