@@ -1,0 +1,16 @@
+# Sanja Pizzaria — regras de rastreamento
+User-agent: *
+Allow: /
+
+# Permitir descoberta em buscas com IA
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# GPTBot é separado do rastreamento de busca; permitido por decisão do site
+User-agent: GPTBot
+Allow: /
+
+Sitemap: https://sanjapizzaria.com.br/sitemap.xml
