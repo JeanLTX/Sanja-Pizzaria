@@ -563,7 +563,63 @@ const loadCart = () => {
 
 const saveCart = () => {
     try { localStorage.setItem('sanja-pizzaria-cart', JSON.stringify(cart)); } catch (e) { }
+    saveCheckoutDraft();
 };
+
+const CHECKOUT_DRAFT_KEY = 'sanja-pizzaria-checkout-draft-v1';
+
+function saveCheckoutDraft() {
+    try {
+        const draft = {
+            savedAt: Date.now(),
+            name: checkoutData.name,
+            phone: checkoutData.phone,
+            address: checkoutData.address,
+            location: checkoutData.location,
+            locationReverseResult: checkoutData.locationReverseResult,
+            locationVerification: checkoutData.locationVerification,
+            routeQuote: checkoutData.routeQuote,
+            routeDestinationSource: checkoutData.routeDestinationSource,
+            deliveryRegion: checkoutData.deliveryRegion,
+            orderType: checkoutData.orderType,
+            paymentMethod: checkoutData.paymentMethod,
+            pixPaymentScreen: checkoutData.pixPaymentScreen,
+            pixPaymentReference: checkoutData.pixPaymentReference,
+            pixPaymentAmount: checkoutData.pixPaymentAmount,
+            pixPaymentPayload: checkoutData.pixPaymentPayload
+        };
+        localStorage.setItem(CHECKOUT_DRAFT_KEY, JSON.stringify(draft));
+    } catch (error) {
+        console.warn('Não foi possível salvar o rascunho do pedido neste navegador.', error);
+    }
+}
+
+function restoreCheckoutDraft() {
+    try {
+        const raw = localStorage.getItem(CHECKOUT_DRAFT_KEY);
+        if (!raw) return false;
+        const draft = JSON.parse(raw);
+        if (!draft || typeof draft !== 'object' || Date.now() - Number(draft.savedAt || 0) > 7 * 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(CHECKOUT_DRAFT_KEY);
+            return false;
+        }
+        for (const key of ['name', 'phone', 'address', 'location', 'locationReverseResult', 'locationVerification', 'routeQuote', 'routeDestinationSource', 'deliveryRegion', 'orderType', 'paymentMethod', 'pixPaymentScreen', 'pixPaymentReference', 'pixPaymentAmount', 'pixPaymentPayload']) {
+            if (Object.prototype.hasOwnProperty.call(draft, key)) checkoutData[key] = draft[key];
+        }
+        if (!['delivery', 'pickup'].includes(checkoutData.orderType)) checkoutData.orderType = 'delivery';
+        checkoutData.pixContinueToWhatsApp = false;
+        checkoutData.pixOrderSupabaseId = null;
+        checkoutData.pixOrderRegistrationPromise = null;
+        return true;
+    } catch (error) {
+        console.warn('Não foi possível recuperar o rascunho do pedido.', error);
+        return false;
+    }
+}
+
+function clearCheckoutDraft() {
+    try { localStorage.removeItem(CHECKOUT_DRAFT_KEY); } catch (error) { }
+}
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const formatCurrency = (val) => currencyFormatter.format(val);
@@ -2684,10 +2740,16 @@ function openCheckout() {
     document.body.classList.add('modal-open');
     // Não definir uma região/taxa automaticamente: o cliente precisa confirmar a região de entrega.
     renderCheckoutForm();
+    saveCheckoutDraft();
+    if (checkoutData.pixPaymentScreen && checkoutData.pixPaymentPayload && Number(checkoutData.pixPaymentAmount) > 0) {
+        showPixPaymentScreen(checkoutData.pixPaymentAmount, true);
+    } else if (localStorage.getItem(CHECKOUT_DRAFT_KEY)) {
+        showToast('Recuperamos os dados do seu pedido neste aparelho.');
+    }
 }
 
 function closeCheckout() {
-    resetPixPaymentState();
+    saveCheckoutDraft();
     const checkoutSection = document.getElementById('checkout-section');
     checkoutSection.classList.add('hidden');
     checkoutSection.classList.remove('open');
@@ -3036,17 +3098,21 @@ function registerPixOrderForPrinting() {
     return registrationPromise;
 }
 
-function showPixPaymentScreen(total) {
+function showPixPaymentScreen(total, restoreExisting = false) {
     const amount = Number(Number(total).toFixed(2));
-    const reference = createPixOrderCode();
-    // Gera um payload Pix estático válido para este pedido.
-    const payload = window.SanjaPixQR.buildPixPayload({
-        key: SANJA_PIX_CONFIG.key,
-        amount,
-        merchantName: SANJA_PIX_CONFIG.merchantName,
-        merchantCity: SANJA_PIX_CONFIG.merchantCity,
-        txid: reference
-    });
+    const reference = restoreExisting && checkoutData.pixPaymentReference
+        ? checkoutData.pixPaymentReference
+        : createPixOrderCode();
+    // Ao retomar um pedido, manter o mesmo código Pix em vez de gerar outro.
+    const payload = restoreExisting && checkoutData.pixPaymentPayload
+        ? checkoutData.pixPaymentPayload
+        : window.SanjaPixQR.buildPixPayload({
+            key: SANJA_PIX_CONFIG.key,
+            amount,
+            merchantName: SANJA_PIX_CONFIG.merchantName,
+            merchantCity: SANJA_PIX_CONFIG.merchantCity,
+            txid: reference
+        });
 
     checkoutData.pixPaymentReference = reference;
     checkoutData.pixPaymentAmount = amount;
@@ -3060,7 +3126,12 @@ function showPixPaymentScreen(total) {
 
     form.innerHTML = `
         <section class="-mt-2 space-y-3 text-center" aria-labelledby="pix-payment-title">
-            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-700 text-base font-extrabold">PIX</div>
+            <div class="rounded-lg border border-green-200 bg-green-50 p-3 text-left text-sm leading-relaxed text-green-900" role="status" aria-live="polite">
+                <p class="font-bold text-red-700">⚠️ Importante: finalize seu pedido</p>
+                <p class="mt-1">Depois de pagar no aplicativo do banco, volte para esta página e toque em <strong>Continuar para o WhatsApp</strong> para enviar o pedido à Sanja.</p>
+                <p class="mt-1 text-xs text-green-800">Se você sair desta página ou ela recarregar, os dados do pedido ficam salvos. Abra o cardápio novamente e entre no carrinho para retomar.</p>
+            </div>
+            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 text-base font-extrabold">PIX</div>
             <h3 id="pix-payment-title" class="text-lg font-bold text-gray-900">Pague com Pix</h3>
             <p class="text-sm leading-relaxed text-gray-600">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.</p>
             <div class="mx-auto inline-flex rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
@@ -3068,8 +3139,8 @@ function showPixPaymentScreen(total) {
             </div>
             <div class="text-left">
                 <label for="pix-payment-code" class="mb-2 block text-xs font-bold uppercase text-gray-500">Pix copia e cola</label>
-                <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-100" style="text-overflow:clip;" />
-                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-gray-400 px-4 py-3 font-bold text-gray-700 transition hover:bg-gray-100">Copiar Pix copia e cola</button>
+                <input id="pix-payment-code" type="text" readonly value="${payload}" aria-label="Código Pix copia e cola" class="w-full h-12 rounded-lg border border-gray-300 bg-gray-50 px-3 text-sm text-gray-700 outline-none focus:border-green-600 focus:ring-2 focus:ring-green-100" style="text-overflow:clip;" />
+                <button type="button" onclick="copyPixPaymentCode()" class="mt-2 w-full rounded-lg border-2 border-green-600 px-4 py-3 font-bold text-green-700 transition hover:bg-green-50">Copiar Pix copia e cola</button>
             </div>
             <div class="rounded-xl bg-gray-50 p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Valor do pedido</p>
@@ -3077,9 +3148,8 @@ function showPixPaymentScreen(total) {
                 <p class="mt-2 text-sm text-gray-600">Recebedor: ${SANJA_PIX_CONFIG.merchantName}</p>
                 <p class="mt-1 text-xs text-gray-500">Código do pedido: ${reference}</p>
             </div>
-            <p class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-left text-xs leading-relaxed text-gray-600">Depois de pagar, volte a esta tela e continue para o WhatsApp</p>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
-            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-gray-700 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-gray-800">Continuar para o WhatsApp</button>
+            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
         </section>
     `;
 
@@ -3092,6 +3162,7 @@ function showPixPaymentScreen(total) {
         throw new Error('Não foi possível carregar o gerador de QR Code. Atualize a página e tente novamente.');
     }
 
+    saveCheckoutDraft();
     // Registrar assim que o QR for exibido para que a comanda entre na fila
     // sem esperar o cliente pagar ou tocar em "Continuar para o WhatsApp".
     registerPixOrderForPrinting();
@@ -3374,6 +3445,14 @@ function closeClosedDayModal() {
 // 8. INICIALIZAÇÃO
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    restoreCheckoutDraft();
+    document.addEventListener('input', event => {
+        if (event.target.closest('#checkout-section')) saveCheckoutDraft();
+    });
+    document.addEventListener('click', event => {
+        if (event.target.closest('#checkout-section')) saveCheckoutDraft();
+    });
+    window.addEventListener('pagehide', saveCheckoutDraft);
     requestAnimationFrame(() => {
     loadCart();
     renderCategoryButtons();
