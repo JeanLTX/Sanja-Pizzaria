@@ -1856,7 +1856,7 @@ function renderComboStep() {
                                 : `Borda de ${border.name}`;
 
                             return `
-                                <button type="button" onclick="selectComboBorder('${border.id}')"
+                                <button type="button" data-combo-border="${border.id}" onclick="selectComboBorder('${border.id}')"
                                     class="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border bg-white px-3.5 py-2.5 text-left transition-all cursor-pointer ${isSelected ? 'border-red-500 bg-red-50 shadow-sm' : 'border-gray-200 hover:border-red-300'}">
                                     <span class="flex min-w-0 flex-col">
                                         <span class="text-xs sm:text-sm font-bold text-gray-800">${borderName}</span>
@@ -2122,8 +2122,19 @@ function syncComboFlavorSelection(isSweet) {
 
 function selectComboBorder(id) {
     comboSelections.border = id;
-    renderComboStep();
+
+    // Atualiza a seleção sem recriar os cards/imagens das bordas.
+    document.querySelectorAll('#combo-modal-content [data-combo-border]').forEach(button => {
+        const selected = button.dataset.comboBorder === id;
+        button.classList.toggle('border-red-500', selected);
+        button.classList.toggle('bg-red-50', selected);
+        button.classList.toggle('shadow-sm', selected);
+        button.classList.toggle('border-gray-200', !selected);
+        button.classList.toggle('hover:border-red-300', !selected);
+    });
+
     updateComboSummary();
+    updateComboPrice();
 }
 
 function selectComboDrink(id) {
