@@ -1943,7 +1943,7 @@ function renderComboStep() {
                         const dId = d.toLowerCase();
                         const isSelected = comboSelections.drink === dId;
                         return `
-                                        <button type="button" onclick="selectComboDrink('${dId}')"
+                                        <button type="button" data-combo-drink="${dId}" onclick="selectComboDrink('${dId}')"
                                                 class="p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center cursor-pointer
                                                 ${isSelected ? 'border-red-500 bg-red-50 text-red-700 font-bold' : 'border-gray-200 text-gray-600 hover:border-red-200'}>
                                             <span class="text-xs sm:text-sm">${d}</span>
@@ -2128,7 +2128,21 @@ function selectComboBorder(id) {
 
 function selectComboDrink(id) {
     comboSelections.drink = id;
-    renderComboStep();
+
+    // Atualiza somente os botões do refrigerante. Recriar toda a etapa
+    // fazia as imagens das pizzas recarregarem e piscarem no mobile.
+    document.querySelectorAll('#combo-modal-content [data-combo-drink]').forEach(button => {
+        const selected = button.dataset.comboDrink === id;
+        button.classList.toggle('border-red-500', selected);
+        button.classList.toggle('bg-red-50', selected);
+        button.classList.toggle('text-red-700', selected);
+        button.classList.toggle('font-bold', selected);
+        button.classList.toggle('border-gray-200', !selected);
+        button.classList.toggle('text-gray-600', !selected);
+        button.classList.toggle('hover:border-red-200', !selected);
+    });
+
+    updateComboSummary();
 }
 
 function updateComboSummary() {
