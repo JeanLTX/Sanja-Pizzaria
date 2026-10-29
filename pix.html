@@ -46,7 +46,13 @@
  try{
    // Link autossuficiente: /p/VALOR-REFERENCIA. Não consulta o Supabase.
    if(token){
-     const match=token.match(/^(\d{1,8})-([A-Za-z0-9@.+_-]{1,25})$/);
+     // Token Base64URL opaco: valor e referência seguem no link sem expor o valor.
+     let decodedToken;
+     try {
+       const normalizedToken=token.replace(/-/g,'+').replace(/_/g,'/');
+       decodedToken=atob(normalizedToken + '='.repeat((4-normalizedToken.length%4)%4));
+     } catch (_) { return fail(); }
+     const match=decodedToken.match(/^(\d{1,8})-([A-Za-z0-9@.+_-]{1,25})$/);
      if(!match) return fail();
      amount=(Number(match[1])/100).toFixed(2);
      reference=match[2];

@@ -3245,7 +3245,7 @@ function continuePixToWhatsApp() {
         return;
     }
     const message = `Olá! Acabei de realizar o Pix do pedido ${checkoutData.pixPaymentReference}, no valor de ${formatCurrency(checkoutData.pixPaymentAmount)}. Podem conferir o recebimento, por favor?`;
-    const url = `https://api.whatsapp.com/send?phone=5516992640814&text=${encodeURIComponent(message)}`;
+    const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(message)}`;
     const whatsappWindow = window.open(url, '_blank');
     if (!whatsappWindow) window.location.href = url;
 }
@@ -3343,7 +3343,8 @@ async function sendToWhatsApp() {
         registerPixOrderForPrinting().catch(error => console.error('Registro do pedido indisponível; link Pix independente mantido.', error));
         const amountInCents = Math.round(Number(checkoutData.pixPaymentAmount) * 100);
         const pixReference = String(checkoutData.pixPaymentReference).replace(/[^A-Za-z0-9@.+_-]/g, '').slice(-25);
-        pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?c=' + amountInCents + '-' + pixReference;
+        const pixToken = btoa(amountInCents + '-' + pixReference).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/g, '');
+        pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?c=' + pixToken;
     }
     checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
@@ -3446,7 +3447,7 @@ async function sendToWhatsApp() {
     }
 
     
-    const url = `https://api.whatsapp.com/send?phone=5516992640814&text=${encodeURIComponent(msg)}`;
+    const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(msg)}`;
 
     // The WhatsApp tab was reserved before route calculation.
     // Supabase persistence is complementary and must never block WhatsApp ordering.
