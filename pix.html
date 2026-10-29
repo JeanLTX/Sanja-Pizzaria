@@ -25,7 +25,7 @@
   <p id="status" class="hint" role="status" aria-live="polite"><span class="status-icon"></span>Preparando os dados do pagamento...</p>
 </main>
 <script>window.SUPABASE_CONFIG=Object.freeze({url:"https://tbzdpvyotlfzpowsniou.supabase.co",publishableKey:"sb_publishable_8YfnXsF1P-1rSDRDKfDDBQ_EaeW4eLc"});</script>
-<script src="pix-qr.min.js?v=20261019-pix-v1"></script>
+<script src="pix-qr.min.js?v=20261029-pix-self-contained-v2"></script>
 <script>
 (async()=>{
  const field=document.getElementById('payload');
@@ -38,9 +38,9 @@
  let amount=params.get('v');
  let reference=params.get('r');
  const token=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9-]+)\/?$/)?.[1];
- const fail=(message='Este link Pix é inválido ou expirou. Peça à Sanja para enviar um novo link.')=>{
-   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indisponível';
-   status.textContent='Não foi possível carregar o pagamento. Solicite um novo link à Sanja.';
+ const fail=(message='Este link Pix n\u00e3o Ǹ v\u00e1lido ou expirou. Pe\u00e7a \u00e0 Sanja para enviar um novo link.')=>{
+   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indispon\u00edvel';
+   status.textContent='N\u00e3o foi poss\u00edvel carregar o pagamento. Solicite um novo link \u00e0 Sanja.';
    status.classList.add('error');
  };
  try{

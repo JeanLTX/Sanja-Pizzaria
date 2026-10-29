@@ -3343,7 +3343,7 @@ async function sendToWhatsApp() {
         registerPixOrderForPrinting().catch(error => console.error('Registro do pedido indisponível; link Pix independente mantido.', error));
         const amountInCents = Math.round(Number(checkoutData.pixPaymentAmount) * 100);
         const pixReference = String(checkoutData.pixPaymentReference).replace(/[^A-Za-z0-9@.+_-]/g, '').slice(-25);
-        pixPaymentUrl = 'https://sanjapizzaria.com.br/p/' + amountInCents + '-' + pixReference;
+        pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?c=' + amountInCents + '-' + pixReference;
     }
     checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
