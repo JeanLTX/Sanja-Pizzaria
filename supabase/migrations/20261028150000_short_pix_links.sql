@@ -2,6 +2,8 @@
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS pix_short_code text;
 CREATE UNIQUE INDEX IF NOT EXISTS orders_pix_short_code_unique ON public.orders (pix_short_code) WHERE pix_short_code IS NOT NULL;
 
+DROP FUNCTION IF EXISTS public.create_public_order_with_payment(uuid,text,text,text,text,numeric,text,numeric,numeric,jsonb,text,text);
+
 CREATE OR REPLACE FUNCTION public.create_public_order_with_payment(p_establishment_id uuid, p_customer_name text, p_customer_phone text, p_address text, p_delivery_region text, p_delivery_fee numeric, p_payment_method text, p_subtotal numeric, p_total numeric, p_items jsonb, p_order_type text, p_pix_order_code text, p_pix_short_code text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $function$
 declare
