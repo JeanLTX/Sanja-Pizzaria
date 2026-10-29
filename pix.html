@@ -24,7 +24,7 @@
   <div class="receiver"><strong>Antes de confirmar</strong>Confira o nome do recebedor e o valor no aplicativo do banco.</div>
   <p id="status" class="hint" role="status" aria-live="polite"><span class="status-icon"></span>Preparando os dados do pagamento...</p>
 </main>
-<script src="supabase-config.js?v=20261029-pix-page-v3"></script>
+<script>window.SUPABASE_CONFIG=Object.freeze({url:"https://tbzdpvyotlfzpowsniou.supabase.co",publishableKey:"sb_publishable_8YfnXsF1P-1rSDRDKfDDBQ_EaeW4eLc"});</script>
 <script src="pix-qr.min.js?v=20261019-pix-v1"></script>
 <script>
 (async()=>{
@@ -38,35 +38,35 @@
  let amount=params.get('v');
  let reference=params.get('r');
  const shortCode=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9]{8})\/?$/)?.[1];
- const fail=(message='Este link Pix \\u00e9 inv\\u00e1lido ou expirou. Pe\\u00e7a \\u00e0 Sanja para enviar um novo link.')=>{
-   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indispon\\u00edvel';
-   status.textContent='N\\u00e3o foi poss\\u00edvel carregar o pagamento. Solicite um novo link \\u00e0 Sanja.';
+ const fail=(message='Este link Pix \u00e9 inv\u00e1lido ou expirou. Pe\u00e7a \u00e0 Sanja para enviar um novo link.')=>{
+   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indispon\u00edvel';
+   status.textContent='N\u00e3o foi poss\u00edvel carregar o pagamento. Solicite um novo link \u00e0 Sanja.';
    status.classList.add('error');
  };
  try{
    if(shortCode){
      if(!/^[A-Za-z0-9]{8}$/.test(shortCode)) return fail();
      const config=window.SUPABASE_CONFIG||{};
-     if(!config.url||!config.publishableKey) return fail('N\\u00e3o foi poss\\u00edvel conectar ao servi\\u00e7o de pagamento.');
+     if(!config.url||!config.publishableKey) return fail('N\u00e3o foi poss\u00edvel conectar ao servi\u00e7o de pagamento.');
      const response=await fetch(config.url+'/rest/v1/rpc/resolve_public_pix_link',{
        method:'POST',headers:{apikey:config.publishableKey,Authorization:'Bearer '+config.publishableKey,'Content-Type':'application/json'},
        body:JSON.stringify({p_code:shortCode})
      });
-     if(!response.ok) throw new Error('Pedido Pix n\\u00e3o encontrado.');
+     if(!response.ok) throw new Error('Pedido Pix n\u00e3o encontrado.');
      const result=await response.json();const record=Array.isArray(result)?result[0]:result;
      if(!record) return fail();amount=Number(record.amount).toFixed(2);reference=record.reference;
    }
    if(!amount||!/^\d+\.\d{2}$/.test(amount)||Number(amount)<=0||!reference||!/^[A-Za-z0-9@.+_-]{1,25}$/.test(reference)||!window.SanjaPixQR) return fail();
-   const payload=window.SanjaPixQR.buildPixPayload({key:'45097930819',amount:Number(amount),merchantName:'Luan Vinicius da Silva Gonçalves',merchantCity:'Brazopolis',txid:reference});
+   const payload=window.SanjaPixQR.buildPixPayload({key:'45097930819',amount:Number(amount),merchantName:'Luan Vinicius da Silva Goncalves',merchantCity:'Brazopolis',txid:reference});
    field.value=payload;
    amountEl.textContent='R$ '+Number(amount).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});amountEl.hidden=false;
-   if(window.SanjaPixQR.qrDataUrl){qr.src=window.SanjaPixQR.qrDataUrl(payload,6,4);qrWrap.hidden=false;}else{throw new Error('Gerador do QR Code indispon\\u00edvel.');}
-   button.disabled=false;button.textContent='Copiar c\\u00f3digo Pix';
+   if(window.SanjaPixQR.qrDataUrl){qr.src=window.SanjaPixQR.qrDataUrl(payload,6,4);qrWrap.hidden=false;}else{throw new Error('Gerador do QR Code indispon\u00edvel.');}
+   button.disabled=false;button.textContent='Copiar c\u00f3digo Pix';
    status.textContent='Depois de pagar, confirme o pagamento com a Sanja pelo WhatsApp.';
- }catch(error){fail('N\\u00e3o foi poss\\u00edvel carregar este pagamento Pix. Pe\\u00e7a um novo link \\u00e0 Sanja.');}
+ }catch(error){fail('N\u00e3o foi poss\u00edvel carregar este pagamento Pix. Pe\u00e7a um novo link \u00e0 Sanja.');}
  button.addEventListener('click',async()=>{
-   try{if(navigator.clipboard&&isSecureContext)await navigator.clipboard.writeText(field.value);else{field.focus();field.select();if(!document.execCommand('copy'))throw Error('copy failed');}status.textContent='C\\u00f3digo Pix copiado! Cole no aplicativo do seu banco.';button.textContent='C\\u00f3digo copiado!';}
-   catch(_){field.focus();field.select();status.textContent='Selecione o c\\u00f3digo acima e copie manualmente.';}
+   try{if(navigator.clipboard&&isSecureContext)await navigator.clipboard.writeText(field.value);else{field.focus();field.select();if(!document.execCommand('copy'))throw Error('copy failed');}status.textContent='C\u00f3digo Pix copiado! Cole no aplicativo do seu banco.';button.textContent='C\u00f3digo copiado!';}
+   catch(_){field.focus();field.select();status.textContent='Selecione o c\u00f3digo acima e copie manualmente.';}
  });
 })();
 </script>
