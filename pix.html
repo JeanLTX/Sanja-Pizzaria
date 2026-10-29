@@ -56,7 +56,10 @@
      const result=await response.json();const record=Array.isArray(result)?result[0]:result;
      if(!record) return fail();amount=Number(record.amount).toFixed(2);reference=record.reference;
    }
-   if(!amount||!/^\d+\.\d{2}$/.test(amount)||Number(amount)<=0||!reference||!/^[A-Za-z0-9@.+_-]{1,25}$/.test(reference)||!window.SanjaPixQR) return fail();
+   if(!amount||!/^\d+\.\d{2}$/.test(amount)||Number(amount)<=0||!reference||!window.SanjaPixQR) return fail();
+   // O TXID do Pix aceita no máximo 25 caracteres.
+   reference=String(reference).replace(/[^A-Za-z0-9@.+_-]/g,'').slice(-25);
+   if(!reference) return fail();
    const payload=window.SanjaPixQR.buildPixPayload({key:'45097930819',amount:Number(amount),merchantName:'Luan Vinicius da Silva Goncalves',merchantCity:'Brazopolis',txid:reference});
    field.value=payload;
    amountEl.textContent='R$ '+Number(amount).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});amountEl.hidden=false;
