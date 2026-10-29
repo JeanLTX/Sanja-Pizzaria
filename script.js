@@ -3547,20 +3547,24 @@ function isClosedToday() {
 function isOrderingClosedNow(now = new Date()) {
     const clock = getSanjaBusinessClock(now);
     if (clock.day === 1) return true;
-    // Terça a quinta: fecha às 23h; sexta a domingo: fecha à meia-noite.
+    // Não aceita pedidos antes das 18h nem nos cinco minutos finais do expediente.
     const cutoffMinutes = [0, 5, 6].includes(clock.day) ? (23 * 60 + 55) : (22 * 60 + 55);
-    return clock.minutes >= cutoffMinutes;
+    return clock.minutes < (18 * 60) || clock.minutes >= cutoffMinutes;
 }
 
 function openClosedDayModal() {
     const modal = document.getElementById('closed-day-modal');
     const title = document.getElementById('closed-day-title');
     const message = document.getElementById('closed-day-message');
-    const weeklyClosed = getSanjaBusinessClock().day === 1;
-    if (title) title.textContent = weeklyClosed ? 'Hoje estamos fechados' : 'Pedidos encerrados por hoje';
+    const businessClock = getSanjaBusinessClock();
+    const weeklyClosed = businessClock.day === 1;
+    const beforeOpening = !weeklyClosed && businessClock.minutes < (18 * 60);
+    if (title) title.textContent = weeklyClosed ? 'Hoje estamos fechados' : (beforeOpening ? 'Ainda não estamos recebendo pedidos' : 'Pedidos encerrados por hoje');
     if (message) message.textContent = weeklyClosed
         ? 'Não trabalhamos às segundas-feiras. Voltamos no próximo dia de funcionamento, a partir das 18h!'
-        : 'Nosso horário de pedidos de hoje foi encerrado para que a equipe consiga concluir a produção no horário. Voltamos no próximo dia de funcionamento, a partir das 18h!';
+        : (beforeOpening
+            ? 'Nosso atendimento começa às 18h. Volte a partir desse horário para finalizar seu pedido.'
+            : 'Nosso horário de pedidos de hoje foi encerrado para que a equipe consiga concluir a produção no horário. Voltamos no próximo dia de funcionamento, a partir das 18h!');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('modal-open');
