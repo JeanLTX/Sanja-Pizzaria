@@ -37,24 +37,19 @@
  const params=new URLSearchParams(location.search);
  let amount=params.get('v');
  let reference=params.get('r');
- const shortCode=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9]{8})\/?$/)?.[1];
- const fail=(message='Este link Pix \u00e9 inv\u00e1lido ou expirou. Pe\u00e7a \u00e0 Sanja para enviar um novo link.')=>{
-   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indispon\u00edvel';
-   status.textContent='N\u00e3o foi poss\u00edvel carregar o pagamento. Solicite um novo link \u00e0 Sanja.';
+ const token=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9-]+)\/?$/)?.[1];
+ const fail=(message='Este link Pix é inválido ou expirou. Peça à Sanja para enviar um novo link.')=>{
+   field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indisponível';
+   status.textContent='Não foi possível carregar o pagamento. Solicite um novo link à Sanja.';
    status.classList.add('error');
  };
  try{
-   if(shortCode){
-     if(!/^[A-Za-z0-9]{8}$/.test(shortCode)) return fail();
-     const config=window.SUPABASE_CONFIG||{};
-     if(!config.url||!config.publishableKey) return fail('N\u00e3o foi poss\u00edvel conectar ao servi\u00e7o de pagamento.');
-     const response=await fetch(config.url+'/rest/v1/rpc/resolve_public_pix_link',{
-       method:'POST',headers:{apikey:config.publishableKey,Authorization:'Bearer '+config.publishableKey,'Content-Type':'application/json'},
-       body:JSON.stringify({p_code:shortCode})
-     });
-     if(!response.ok) throw new Error('Pedido Pix n\u00e3o encontrado.');
-     const result=await response.json();const record=Array.isArray(result)?result[0]:result;
-     if(!record) return fail();amount=Number(record.amount).toFixed(2);reference=record.reference;
+   // Link autossuficiente: /p/VALOR-REFERENCIA. Não consulta o Supabase.
+   if(token){
+     const match=token.match(/^(\d{1,8})-([A-Za-z0-9@.+_-]{1,25})$/);
+     if(!match) return fail();
+     amount=(Number(match[1])/100).toFixed(2);
+     reference=match[2];
    }
    if(!amount||!/^\d+\.\d{2}$/.test(amount)||Number(amount)<=0||!reference||!window.SanjaPixQR) return fail();
    // O TXID do Pix aceita no máximo 25 caracteres.

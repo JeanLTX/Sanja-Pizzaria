@@ -3094,7 +3094,7 @@ function createPixOrderCode() {
         byte => byte.toString(16).padStart(2, '0')
     ).join('').toUpperCase();
 
-    return `SANJA${timePart}${randomPart}`;
+    return `${timePart}${randomPart}`;
 }
 
 function resetPixPaymentState() {
@@ -3338,13 +3338,12 @@ async function sendToWhatsApp() {
             return;
         }
         saveCheckoutDraft();
-        const registeredOrderId = await registerPixOrderForPrinting();
-        if (registeredOrderId) {
-            pixPaymentUrl = 'https://sanjapizzaria.com.br/p/' + checkoutData.pixShortCode;
-        } else {
-            const fallbackParams = new URLSearchParams({ v: Number(checkoutData.pixPaymentAmount).toFixed(2), r: checkoutData.pixPaymentReference });
-            pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?' + fallbackParams.toString();
-        }
+        // O link Pix leva o valor e a referência no próprio caminho; não depende do Supabase.
+        // O registro do pedido continua sendo tentado para impressão/gestão, sem controlar o pagamento.
+        registerPixOrderForPrinting().catch(error => console.error('Registro do pedido indisponível; link Pix independente mantido.', error));
+        const amountInCents = Math.round(Number(checkoutData.pixPaymentAmount) * 100);
+        const pixReference = String(checkoutData.pixPaymentReference).replace(/[^A-Za-z0-9@.+_-]/g, '').slice(-25);
+        pixPaymentUrl = 'https://sanjapizzaria.com.br/p/' + amountInCents + '-' + pixReference;
     }
     checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
