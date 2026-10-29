@@ -2765,7 +2765,7 @@ function closeCartDrawer() {
 // 7. CHECKOUT E WHATSAPP
 // ==========================================
 function openCheckout() {
-    if (isClosedToday()) {
+    if (isOrderingClosedNow()) {
         closeCartDrawer();
         openClosedDayModal();
         return;
@@ -3078,7 +3078,7 @@ const SANJA_PIX_CONFIG = {
 
 function createPixOrderCode() {
     // Identificador alfanumérico de até 25 caracteres para o campo TxID do Pix estático.
-    const timePart = Date.now().toString(36).toUpperCase().slice(-8);
+    const timePart = Math.floor(Date.now() / 1000).toString(36).toUpperCase();
     const randomBytes = new Uint8Array(6);
 
     if (window.crypto?.getRandomValues) {
@@ -3094,7 +3094,33 @@ function createPixOrderCode() {
         byte => byte.toString(16).padStart(2, '0')
     ).join('').toUpperCase();
 
-    return `${timePart}${randomPart}`;
+    return `SANJA${timePart}${randomPart}`;
+}
+
+function encodeCompactPixLink(amount, reference) {
+    const cents = Math.round(Number(amount) * 100);
+    if (!Number.isSafeInteger(cents) || cents <= 0 || cents > 0xFFFFFF) return null;
+
+    // Referência criada localmente: SANJA + timestamp Unix em base36 + 6 bytes aleatórios em hex.
+    const match = String(reference || '').match(/^SANJA([0-9A-Z]{1,7})([0-9A-F]{12})$/i);
+    if (!match) return null;
+    const timestamp = Number.parseInt(match[1], 36);
+    if (!Number.isInteger(timestamp) || timestamp < 0 || timestamp > 0xFFFFFFFF ||
+        timestamp.toString(36).toUpperCase() !== match[1].toUpperCase()) return null;
+
+    // 13 bytes: timestamp (4), aleatoriedade (6) e valor em centavos (3).
+    const bytes = new Uint8Array(13);
+    bytes[0] = Math.floor(timestamp / 0x1000000) & 0xFF;
+    bytes[1] = Math.floor(timestamp / 0x10000) & 0xFF;
+    bytes[2] = Math.floor(timestamp / 0x100) & 0xFF;
+    bytes[3] = timestamp & 0xFF;
+    for (let i = 0; i < 6; i++) bytes[4 + i] = Number.parseInt(match[2].slice(i * 2, i * 2 + 2), 16);
+    bytes[10] = Math.floor(cents / 0x10000) & 0xFF;
+    bytes[11] = Math.floor(cents / 0x100) & 0xFF;
+    bytes[12] = cents & 0xFF;
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/g, '');
 }
 
 function resetPixPaymentState() {
@@ -3277,7 +3303,7 @@ function updateCheckoutForm() {
 }
 
 async function sendToWhatsApp() {
-    if (isClosedToday()) {
+    if (isOrderingClosedNow()) {
         closeCheckout();
         openClosedDayModal();
         return;
@@ -3312,6 +3338,14 @@ async function sendToWhatsApp() {
         }
     }
 
+    // Revalidar após uma eventual consulta de rota: o checkout pode ter atravessado o horário limite.
+    if (isOrderingClosedNow()) {
+        if (whatsappWindow && !whatsappWindow.closed) whatsappWindow.close();
+        closeCheckout();
+        openClosedDayModal();
+        return;
+    }
+
     const total = getCartTotal() + getDeliveryFee();
     let pixPaymentUrl = '';
     if (checkoutData.paymentMethod === 'Pix') {
@@ -3338,13 +3372,17 @@ async function sendToWhatsApp() {
             return;
         }
         saveCheckoutDraft();
-        // O link Pix leva o valor e a referência no próprio caminho; não depende do Supabase.
-        // O registro do pedido continua sendo tentado para impressão/gestão, sem controlar o pagamento.
-        registerPixOrderForPrinting().catch(error => console.error('Registro do pedido indisponível; link Pix independente mantido.', error));
-        const amountInCents = Math.round(Number(checkoutData.pixPaymentAmount) * 100);
-        const pixReference = String(checkoutData.pixPaymentReference).replace(/[^A-Za-z0-9@.+_-]/g, '').slice(-25);
-        const pixToken = btoa(amountInCents + '-' + pixReference).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/g, '');
-        pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?c=' + pixToken;
+        // O registro no Supabase continua em segundo plano para impressão, mas o link Pix
+        // é reconstruído localmente e não depende de lookup ou resposta do banco.
+        registerPixOrderForPrinting();
+        const compactToken = encodeCompactPixLink(checkoutData.pixPaymentAmount, checkoutData.pixPaymentReference);
+        if (compactToken) {
+            pixPaymentUrl = 'https://sanjapizzaria.com.br/p/' + compactToken;
+        } else {
+            // Compatibilidade com rascunhos antigos guardados no navegador.
+            const fallbackParams = new URLSearchParams({ v: Number(checkoutData.pixPaymentAmount).toFixed(2), r: checkoutData.pixPaymentReference });
+            pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?' + fallbackParams.toString();
+        }
     }
     checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
@@ -3493,12 +3531,36 @@ async function sendToWhatsApp() {
 // ==========================================
 // 7.5 DIA FECHADO (SEGUNDA-FEIRA)
 // ==========================================
+function getSanjaBusinessClock(now = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Sao_Paulo', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(now);
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const weekday = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[values.weekday];
+    return { day: weekday, minutes: Number(values.hour) * 60 + Number(values.minute) };
+}
+
 function isClosedToday() {
-    return new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
+    return getSanjaBusinessClock().day === 1; // A pizzaria não abre às segundas-feiras.
+}
+
+function isOrderingClosedNow(now = new Date()) {
+    const clock = getSanjaBusinessClock(now);
+    if (clock.day === 1) return true;
+    // Terça a quinta: fecha às 23h; sexta a domingo: fecha à meia-noite.
+    const cutoffMinutes = [0, 5, 6].includes(clock.day) ? (23 * 60 + 55) : (22 * 60 + 55);
+    return clock.minutes >= cutoffMinutes;
 }
 
 function openClosedDayModal() {
     const modal = document.getElementById('closed-day-modal');
+    const title = document.getElementById('closed-day-title');
+    const message = document.getElementById('closed-day-message');
+    const weeklyClosed = getSanjaBusinessClock().day === 1;
+    if (title) title.textContent = weeklyClosed ? 'Hoje estamos fechados' : 'Pedidos encerrados por hoje';
+    if (message) message.textContent = weeklyClosed
+        ? 'Não trabalhamos às segundas-feiras. Voltamos no próximo dia de funcionamento, a partir das 18h!'
+        : 'Nosso horário de pedidos de hoje foi encerrado para que a equipe consiga concluir a produção no horário. Voltamos no próximo dia de funcionamento, a partir das 18h!';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('modal-open');

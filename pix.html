@@ -25,7 +25,7 @@
   <p id="status" class="hint" role="status" aria-live="polite"><span class="status-icon"></span>Preparando os dados do pagamento...</p>
 </main>
 <script>window.SUPABASE_CONFIG=Object.freeze({url:"https://tbzdpvyotlfzpowsniou.supabase.co",publishableKey:"sb_publishable_8YfnXsF1P-1rSDRDKfDDBQ_EaeW4eLc"});</script>
-<script src="pix-qr.min.js?v=20261029-pix-self-contained-v2"></script>
+<script src="/pix-qr.min.js?v=20261029-pix-self-contained-v2"></script>
 <script>
 (async()=>{
  const field=document.getElementById('payload');
@@ -37,25 +37,42 @@
  const params=new URLSearchParams(location.search);
  let amount=params.get('v');
  let reference=params.get('r');
- const token=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9-]+)\/?$/)?.[1];
+ const token=params.get('c') || location.pathname.match(/^\/p\/([A-Za-z0-9_-]+)\/?$/)?.[1];
  const fail=(message='Este link Pix n\u00e3o Ǹ v\u00e1lido ou expirou. Pe\u00e7a \u00e0 Sanja para enviar um novo link.')=>{
    field.value='';field.placeholder=message;button.disabled=true;button.textContent='Link indispon\u00edvel';
    status.textContent='N\u00e3o foi poss\u00edvel carregar o pagamento. Solicite um novo link \u00e0 Sanja.';
    status.classList.add('error');
  };
  try{
-   // Link autossuficiente: /p/VALOR-REFERENCIA. Não consulta o Supabase.
+   // Link autossuficiente: novos links usam 13 bytes compactados no token binário.
+   // A decodificação do token novo acontece localmente; nenhuma consulta ao Supabase é necessária.
    if(token){
-     // Token Base64URL opaco: valor e referência seguem no link sem expor o valor.
-     let decodedToken;
-     try {
-       const normalizedToken=token.replace(/-/g,'+').replace(/_/g,'/');
-       decodedToken=atob(normalizedToken + '='.repeat((4-normalizedToken.length%4)%4));
-     } catch (_) { return fail(); }
-     const match=decodedToken.match(/^(\d{1,8})-([A-Za-z0-9@.+_-]{1,25})$/);
-     if(!match) return fail();
-     amount=(Number(match[1])/100).toFixed(2);
-     reference=match[2];
+     if(/^[A-Za-z0-9_-]{18}$/.test(token)){
+       let rawToken;
+       try {
+         const normalizedToken=token.replace(/-/g,'+').replace(/_/g,'/');
+         rawToken=atob(normalizedToken + '='.repeat((4-normalizedToken.length%4)%4));
+       } catch (_) { return fail(); }
+       if(rawToken.length!==13) return fail();
+       const byteAt=(i)=>rawToken.charCodeAt(i);
+       const timestamp=byteAt(0)*0x1000000+byteAt(1)*0x10000+byteAt(2)*0x100+byteAt(3);
+       const randomHex=Array.from({length:6},(_,i)=>byteAt(4+i).toString(16).padStart(2,'0')).join('').toUpperCase();
+       const cents=byteAt(10)*0x10000+byteAt(11)*0x100+byteAt(12);
+       if(!timestamp||!cents) return fail();
+       amount=(cents/100).toFixed(2);
+       reference='SANJA'+timestamp.toString(36).toUpperCase()+randomHex;
+     } else {
+       // Compatibilidade com links legados Base64URL já enviados a clientes.
+       let decodedToken;
+       try {
+         const normalizedToken=token.replace(/-/g,'+').replace(/_/g,'/');
+         decodedToken=atob(normalizedToken + '='.repeat((4-normalizedToken.length%4)%4));
+       } catch (_) { return fail(); }
+       const match=decodedToken.match(/^(\d{1,8})-([A-Za-z0-9@.+_-]{1,25})$/);
+       if(!match) return fail();
+       amount=(Number(match[1])/100).toFixed(2);
+       reference=match[2];
+     }
    }
    if(!amount||!/^\d+\.\d{2}$/.test(amount)||Number(amount)<=0||!reference||!window.SanjaPixQR) return fail();
    // O TXID do Pix aceita no máximo 25 caracteres.
