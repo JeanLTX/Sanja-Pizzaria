@@ -88,6 +88,9 @@ async function saveOrderToSupabase() {
             p_order_type: order.order_type,
             p_pix_order_code: checkoutData.paymentMethod === 'Pix'
                 ? checkoutData.pixPaymentReference
+                : null,
+            p_pix_short_code: checkoutData.paymentMethod === 'Pix'
+                ? checkoutData.pixShortCode
                 : null
         };
 
