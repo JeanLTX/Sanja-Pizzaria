@@ -23,6 +23,7 @@ const CONFIG_PATH = app.isPackaged
     ? path.join(app.getPath('userData'), 'config.json')
     : path.join(__dirname, 'config.json');
 const LOG_PATH = path.join(app.getPath('userData'), 'bridge.log');
+const APP_ICON_PATH = path.join(__dirname, 'app-icon.ico');
 const PRINT_STATE_PATH = path.join(app.getPath('userData'), 'print-state.json');
 
 let tray;
@@ -30,6 +31,20 @@ let windowRef;
 let timer;
 let busy = false;
 let config = null;
+
+let showWindowWhenReady = false;
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+if (!hasSingleInstanceLock) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (!windowRef || windowRef.isDestroyed()) {
+            showWindowWhenReady = true;
+            return;
+        }
+        showMainWindow();
+    });
+}
 
 function log(message, error) {
     const suffix = error ? ` | ${error.stack || error.message || error}` : '';
@@ -547,6 +562,7 @@ function createWindow() {
         resizable: true,
         show: false,
         backgroundColor: '#0b1220',
+        icon: APP_ICON_PATH,
         autoHideMenuBar: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -565,13 +581,30 @@ function createWindow() {
     });
 }
 
+function showMainWindow() {
+    if (!windowRef || windowRef.isDestroyed()) return;
+    if (windowRef.isMinimized()) windowRef.restore();
+    windowRef.show();
+    windowRef.focus();
+}
+
 function createTray() {
-    tray = new Tray(nativeImage.createEmpty());
-    tray.setToolTip(APP_NAME);
+    const pngIconPath = path.join(__dirname, 'app-icon.png');
+    let icon = nativeImage.createFromPath(APP_ICON_PATH);
+    if (icon.isEmpty() && fs.existsSync(pngIconPath)) icon = nativeImage.createFromPath(pngIconPath);
+    if (icon.isEmpty()) {
+        log('N?o foi poss?vel carregar app-icon.ico nem app-icon.png para a bandeja.');
+    } else {
+        icon = icon.resize({ width: 16, height: 16 });
+    }
+    tray = new Tray(icon);
+    tray.setToolTip('Impressão - clique para abrir');
+    tray.on('click', showMainWindow);
+    tray.on('double-click', showMainWindow);
     tray.setContextMenu(Menu.buildFromTemplate([
         {
             label: 'Abrir Impressão',
-            click: () => windowRef?.show()
+            click: showMainWindow
         },
         {
             label: 'Verificar conexão',
@@ -676,6 +709,7 @@ ipcMain.handle('test-print', async () => {
 });
 
 app.whenReady().then(async () => {
+    if (!hasSingleInstanceLock) return;
     config = loadConfig();
 
     // Inicia automaticamente com o Windows somente na versão empacotada.
@@ -686,15 +720,15 @@ app.whenReady().then(async () => {
             enabled: true,
             name: APP_NAME,
             path: process.execPath,
-            args: []
+            args: ['--hidden']
         });
     }
 
     createWindow();
     createTray();
 
-    if (process.argv.includes('--show') || !config.bridgeToken || config.bridgeToken.includes('COLOQUE_')) {
-        windowRef.show();
+    if (!process.argv.includes('--hidden')) {
+        showMainWindow();
     }
 
     await refreshStatus();

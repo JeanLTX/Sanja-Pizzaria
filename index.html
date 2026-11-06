@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -448,7 +448,7 @@
                 <div class="flex items-center justify-between gap-3">
                     <div class="flex flex-col shrink-0">
                         <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Total</span>
-                        <span id="esfiha-combo-modal-price" class="text-xl sm:text-2xl font-bold text-red-600">R$ 40,00</span>
+                        <span id="esfiha-combo-modal-price" class="text-xl sm:text-2xl font-bold text-red-600">R$ 45,00</span>
                     </div>
                     <button id="esfiha-combo-add-btn" type="button" onclick="addEsfihaComboToCart()" disabled
                         class="flex-1 min-h-12 rounded-xl sm:rounded-2xl bg-red-600 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
@@ -596,8 +596,8 @@
                 class="closed-day-icon w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i data-lucide="moon" class="text-orange-600 w-8 h-8"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2 font-serif">Hoje estamos fechados</h2>
-            <p class="text-gray-600 leading-relaxed mb-6">
+            <h2 id="closed-day-title" class="text-2xl font-bold text-gray-900 mb-2 font-serif">Hoje estamos fechados</h2>
+            <p id="closed-day-message" class="text-gray-600 leading-relaxed mb-6">
                 Não trabalhamos as segundas-feiras, mas fique à vontade para conhecer nosso cardápio e deixar o seu
                 pedido pronto, voltamos amanhã a partir das 18h! 🍕
             </p>
@@ -661,13 +661,13 @@
 
     <!-- Configuração pública do Supabase -->
     <script defer src="supabase-config.js"></script>
-    <script defer src="supabase-client.js?v=20261019-pix-orders-v1"></script>
+    <script defer src="supabase-client.js?v=20261028-short-pix-v1"></script>
 
     <!-- Pix QR generator (bundled locally; no external QR API) -->
     <script defer src="pix-qr.min.js?v=20261019-pix-v1"></script>
 
     <!-- JavaScript -->
-    <script defer src="script.min.js?v=20261027-pix-resume-v1"></script>
+    <script defer src="script.min.js?v=20261105-esfiha-combo-price-refresh-v1"></script>
 </body>
 
 </html>

@@ -32,14 +32,14 @@
     <button data-view="label" aria-label="Etiqueta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M7 9h10M7 12h6M7 15h8"/></svg><span>Etiqueta</span></button>
     <button data-view="settings" aria-label="Configuração"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="M19 13.5a7.5 7.5 0 0 0 0-3l2-1.3-2-3.4-2.3.9a7.7 7.7 0 0 0-2.6-1.5L13.9 3h-3.8l-.4 2.2A7.7 7.7 0 0 0 7.1 6.7l-2.3-.9-2 3.4 2 1.3a7.5 7.5 0 0 0 0 3l-2 1.3 2 3.4 2.3-.9a7.7 7.7 0 0 0 2.6 1.5l.4 2.2h3.8l.4-2.2a7.7 7.7 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.3Z"/></svg><span>Configuração</span></button>
   </nav>
-  <div class="side-foot">Impressão<br>0.2.0</div>
+  <div class="side-foot">Impressão<br>0.4.0</div>
 </aside>
 <section class="main">
 <header class="top"><div><h1 id="topTitle">Painel</h1><p id="topSub">Acompanhe e gerencie os pedidos</p></div><div class="connection"><span id="connDot" class="dot"></span><span id="connText">Verificando conexão...</span></div></header>
 <main class="content">
 
 <section id="dashboard" class="view active">
-<div class="head"><div><h2 id="welcome">Pedidos</h2><p>Os pedidos aparecem aqui enquanto a fila de impressão é processada.</p></div><div class="actions"><button class="btn secondary" id="simulateOrder">Simular pedido</button><button class="btn secondary" id="refreshJobs">Atualizar</button></div></div>
+<div class="head"><div><h2 id="welcome">Pedidos</h2><p>Os pedidos aparecem aqui enquanto a fila de impressão é processada.</p></div><div class="actions"><button class="btn secondary" id="refreshJobs">Atualizar</button></div></div>
 <div class="stats">
 <div class="stat"><div class="k">Recentes</div><div class="v" id="statTotal">0</div><div class="s">Pedidos carregados</div></div>
 <div class="stat"><div class="k">Pendentes</div><div class="v" id="statPending">0</div><div class="s">Aguardando impressão</div></div>
@@ -230,7 +230,6 @@ try{const ps=await window.bridge.listPrinters();select.innerHTML=ps.length?'<opt
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>selectView(b.dataset.view));
 $('statusFilter').onchange=e=>{state.filter=e.target.value;renderJobs();};$('historyFilter').onchange=e=>{state.historyFilter=e.target.value;renderHistory();};
 $('refreshJobs').onclick=async()=>{await loadJobs();toast('Pedidos atualizados.');};$('refreshHistory').onclick=async()=>{await loadJobs();toast('Histórico atualizado.');};
-$('simulateOrder').onclick=async()=>{try{const r=await window.bridge.createTestOrder();toast('Pedido de teste #'+r.orderNumber+' criado.');await loadJobs();}catch(e){toast(e.message||'Não foi possível criar o pedido de teste.');}};
 $('printerRefresh').onclick=loadPrinters;$('printerSave').onclick=async()=>{try{const s=await window.bridge.saveConfig({printerName:$('printerSelect').value});state.config=s;renderConfig();await loadPrinters();toast('Impressora salva.');}catch(e){toast(e.message||'Não foi possível salvar.');}};
 $('printerTest').onclick=async()=>{try{if(!$('printerSelect').value){toast('Selecione uma impressora primeiro.');return;}await window.bridge.saveConfig({printerName:$('printerSelect').value});const r=await window.bridge.testPrint();toast(r.test?'Recibo simulado salvo.':'Teste enviado para a impressora.');}catch(e){toast(e.message||'Falha no teste.');}};
 ['labelPaperWidth','labelColumns','labelLeftMargin','labelTopPadding','labelBottomPadding','labelLineSpacing','labelHeaderAlignment','labelShowPhone','labelShowAddress','labelShowRegion','labelShowPayment','labelShowNotes'].forEach(id=>{const el=$(id);el.addEventListener('input',renderLabel);el.addEventListener('change',renderLabel);});

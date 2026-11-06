@@ -156,6 +156,8 @@ const PORCOES_MEIA = [
     { id: 111, name: "½ Mandioca c/ contra filé acebolado", category: "Porções - Meia", desc: "Mandioca frita com contra filé.", img: "assets/mandioca_com_contrafile.jpg", type: "drink", prices: { P: 35.00, G: 40.00 }, options: { P: { label: "P", sub: "" }, G: { label: "G", sub: "" } } }
 ];
 
+const ESFIHA_COMBO_PRICE = 45.00;
+
 const ESFIHAS_SALGADAS = [
     { id: 120, name: "FRANGO", category: "Esfihas Salgadas", desc: "Frango e mussarela.", img: "assets/esfihas/esfihafrango.webp", type: "drink", price: 5.00 },
     { id: 121, name: "FRANGO C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Frango e catupiry.", img: "assets/esfihas/esfihafrango_com_catupiry.webp", type: "drink", price: 6.00 },
@@ -178,7 +180,7 @@ const ESFIHAS_SALGADAS = [
     { id: 138, name: "4 QUEIJOS C/ BACON", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e bacon.", img: "assets/esfihas/4queijos_com_bacon.webp", type: "drink", price: 6.50 },
     { id: 139, name: "OPÇÃO LIGHT", category: "Esfihas Salgadas", desc: "Palmito e mussarela.", img: "assets/esfihas/opçãolight.webp", type: "drink", price: 5.00 },
     { id: 140, name: "PALMITO ESPECIAL", category: "Esfihas Salgadas", desc: "Palmito, queijo e milho.", img: "assets/esfihas/palmitoespecial.webp", type: "drink", price: 6.00 },
-    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas doces e/ou salgadas de sua preferência. Você pode combinar e repetir sabores. Combo por R$ 45,00.", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 45.00 }
+    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas doces e/ou salgadas de sua preferência. Você pode combinar e repetir sabores. Combo por R$ 45,00.", img: "assets/esfihas/10esfiha.webp", type: "drink", price: ESFIHA_COMBO_PRICE }
 ];
 
 const ESFIHAS_DOCES = [
@@ -559,6 +561,7 @@ let checkoutData = {
     pixPaymentScreen: false,
     pixContinueToWhatsApp: false,
     pixPaymentReference: '',
+    pixShortCode: '',
     pixPaymentAmount: null,
     pixPaymentPayload: '',
     pixOrderSupabaseId: null,
@@ -618,7 +621,7 @@ function restoreCheckoutDraft() {
             localStorage.removeItem(CHECKOUT_DRAFT_KEY);
             return false;
         }
-        for (const key of ['name', 'phone', 'address', 'location', 'locationReverseResult', 'locationVerification', 'routeQuote', 'routeDestinationSource', 'deliveryRegion', 'orderType', 'paymentMethod', 'pixPaymentScreen', 'pixPaymentReference', 'pixPaymentAmount', 'pixPaymentPayload']) {
+        for (const key of ['name', 'phone', 'address', 'location', 'locationReverseResult', 'locationVerification', 'routeQuote', 'routeDestinationSource', 'deliveryRegion', 'orderType', 'paymentMethod', 'pixPaymentScreen', 'pixPaymentReference', 'pixShortCode', 'pixPaymentAmount', 'pixPaymentPayload']) {
             if (Object.prototype.hasOwnProperty.call(draft, key)) checkoutData[key] = draft[key];
         }
         if (!['delivery', 'pickup'].includes(checkoutData.orderType)) checkoutData.orderType = 'delivery';
@@ -1249,6 +1252,8 @@ function openEsfihaComboModal(combo) {
 
     badge.textContent = '10 esfihas doces e/ou salgadas';
     name.textContent = combo.name;
+    const priceDisplay = document.getElementById('esfiha-combo-modal-price');
+    if (priceDisplay) priceDisplay.textContent = formatCurrency(ESFIHA_COMBO_PRICE);
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -1376,7 +1381,7 @@ function renderEsfihaCombo() {
 }
 
 function addEsfihaComboToCart() {
-    if (!currentEsfihaCombo) return;
+    if (!currentEsfihaCombo || currentEsfihaCombo.id !== 141) return;
 
     const variants = getEsfihaComboVariants(currentEsfihaCombo.id === 149);
     const total = getEsfihaComboTotalSelected();
@@ -1393,7 +1398,7 @@ function addEsfihaComboToCart() {
 
     const item = {
         name: currentEsfihaCombo.name,
-        price: currentEsfihaCombo.price,
+        price: ESFIHA_COMBO_PRICE,
         details,
         type: 'combo',
         isCombo: true
@@ -2764,7 +2769,7 @@ function closeCartDrawer() {
 // 7. CHECKOUT E WHATSAPP
 // ==========================================
 function openCheckout() {
-    if (isClosedToday()) {
+    if (isOrderingClosedNow()) {
         closeCartDrawer();
         openClosedDayModal();
         return;
@@ -2781,9 +2786,7 @@ function openCheckout() {
     // Não definir uma região/taxa automaticamente: o cliente precisa confirmar a região de entrega.
     renderCheckoutForm();
     saveCheckoutDraft();
-    if (checkoutData.pixPaymentScreen && checkoutData.pixPaymentPayload && Number(checkoutData.pixPaymentAmount) > 0) {
-        showPixPaymentScreen(checkoutData.pixPaymentAmount, true);
-    } else if (localStorage.getItem(CHECKOUT_DRAFT_KEY)) {
+    if (localStorage.getItem(CHECKOUT_DRAFT_KEY)) {
         showToast('Recuperamos os dados do seu pedido neste aparelho.');
     }
 }
@@ -3028,15 +3031,21 @@ function renderCheckoutForm() {
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
             <div class="payment-method-grid">
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Pix' ? 'active' : ''}" onclick="setPaymentMethod('Pix')">
-                    <span class="payment-icon payment-icon-pix" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-pix" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.2 3.8 4.8 4.8 4.8-4.8a3.4 3.4 0 0 0-4.8 0l-4.8 4.8-2.4-2.4a3.4 3.4 0 0 0-4.8 4.8l4.8 4.8 4.8-4.8"/><path d="m16.8 20.2-4.8-4.8-4.8 4.8a3.4 3.4 0 0 0 4.8 0l4.8-4.8 2.4 2.4a3.4 3.4 0 0 0 4.8-4.8l-4.8-4.8-4.8 4.8"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Pix</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Dinheiro' ? 'active' : ''}" onclick="setPaymentMethod('Dinheiro')">
-                    <span class="payment-icon payment-icon-cash" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-cash" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Dinheiro</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Cartão' ? 'active' : ''}" onclick="setPaymentMethod('Cartão')">
-                    <span class="payment-icon payment-icon-card" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-card" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="M2 9h20M6 15h4"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Cartão</span>
                 </div>
             </div>
@@ -3058,6 +3067,8 @@ function renderCheckoutForm() {
         window.__sanjaPaymentIconsPromise = import('./payment-icons.js');
     }
     window.__sanjaPaymentIconsPromise.then(({ hydratePaymentIcons }) => hydratePaymentIcons(form)).catch(() => {});
+    const checkoutButtonLabel = document.querySelector('#btn-send-whatsapp span');
+    if (checkoutButtonLabel) checkoutButtonLabel.textContent = 'Finalizar Pedido';
     updateDeliveryLocationVerificationUI();
 }
 
@@ -3077,7 +3088,7 @@ const SANJA_PIX_CONFIG = {
 
 function createPixOrderCode() {
     // Identificador alfanumérico de até 25 caracteres para o campo TxID do Pix estático.
-    const timePart = Date.now().toString(36).toUpperCase().slice(-8);
+    const timePart = Math.floor(Date.now() / 1000).toString(36).toUpperCase();
     const randomBytes = new Uint8Array(6);
 
     if (window.crypto?.getRandomValues) {
@@ -3096,15 +3107,49 @@ function createPixOrderCode() {
     return `SANJA${timePart}${randomPart}`;
 }
 
+function encodeCompactPixLink(amount, reference) {
+    const cents = Math.round(Number(amount) * 100);
+    if (!Number.isSafeInteger(cents) || cents <= 0 || cents > 0xFFFFFF) return null;
+
+    // Referência criada localmente: SANJA + timestamp Unix em base36 + 6 bytes aleatórios em hex.
+    const match = String(reference || '').match(/^SANJA([0-9A-Z]{1,7})([0-9A-F]{12})$/i);
+    if (!match) return null;
+    const timestamp = Number.parseInt(match[1], 36);
+    if (!Number.isInteger(timestamp) || timestamp < 0 || timestamp > 0xFFFFFFFF ||
+        timestamp.toString(36).toUpperCase() !== match[1].toUpperCase()) return null;
+
+    // 13 bytes: timestamp (4), aleatoriedade (6) e valor em centavos (3).
+    const bytes = new Uint8Array(13);
+    bytes[0] = Math.floor(timestamp / 0x1000000) & 0xFF;
+    bytes[1] = Math.floor(timestamp / 0x10000) & 0xFF;
+    bytes[2] = Math.floor(timestamp / 0x100) & 0xFF;
+    bytes[3] = timestamp & 0xFF;
+    for (let i = 0; i < 6; i++) bytes[4 + i] = Number.parseInt(match[2].slice(i * 2, i * 2 + 2), 16);
+    bytes[10] = Math.floor(cents / 0x10000) & 0xFF;
+    bytes[11] = Math.floor(cents / 0x100) & 0xFF;
+    bytes[12] = cents & 0xFF;
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/g, '');
+}
+
 function resetPixPaymentState() {
     checkoutData.pixPaymentScreen = false;
     checkoutData.pixContinueToWhatsApp = false;
     checkoutData.pixPaymentReference = '';
+    checkoutData.pixShortCode = '';
     checkoutData.pixPaymentAmount = null;
     checkoutData.pixPaymentPayload = '';
     checkoutData.pixOrderSupabaseId = null;
     checkoutData.pixOrderRegistrationPromise = null;
     document.querySelector('.checkout-actions')?.classList.remove('hidden');
+}
+
+function createPixShortCode() {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    const bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, byte => alphabet[byte % alphabet.length]).join('');
 }
 
 function registerPixOrderForPrinting() {
@@ -3155,6 +3200,7 @@ function showPixPaymentScreen(total, restoreExisting = false) {
         });
 
     checkoutData.pixPaymentReference = reference;
+    if (!checkoutData.pixShortCode) checkoutData.pixShortCode = createPixShortCode();
     checkoutData.pixPaymentAmount = amount;
     checkoutData.pixPaymentPayload = payload;
     checkoutData.pixPaymentScreen = true;
@@ -3166,11 +3212,6 @@ function showPixPaymentScreen(total, restoreExisting = false) {
 
     form.innerHTML = `
         <section class="-mt-2 space-y-3 text-center" aria-labelledby="pix-payment-title">
-            <div class="rounded-lg border border-green-200 bg-green-50 p-3 text-left text-sm leading-relaxed text-green-900" role="status" aria-live="polite">
-                <p class="font-bold text-red-700">⚠️ Importante: finalize seu pedido</p>
-                <p class="mt-1">Depois de pagar no aplicativo do banco, volte para esta página e toque em <strong>Continuar para o WhatsApp</strong> para enviar o pedido à Sanja.</p>
-                <p class="mt-1 text-xs text-green-800">Se você sair desta página ou ela recarregar, os dados do pedido ficam salvos. Abra o cardápio novamente e entre no carrinho para retomar.</p>
-            </div>
             <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700 text-base font-extrabold">PIX</div>
             <h3 id="pix-payment-title" class="text-lg font-bold text-gray-900">Pague com Pix</h3>
             <p class="text-sm leading-relaxed text-gray-600">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix para pagar no mesmo celular.</p>
@@ -3189,7 +3230,7 @@ function showPixPaymentScreen(total, restoreExisting = false) {
                 <p class="mt-1 text-xs text-gray-500">Código do pedido: ${reference}</p>
             </div>
             <button type="button" onclick="returnToCheckoutForm()" class="w-full rounded-lg py-3 font-semibold text-gray-600 hover:bg-gray-50">Voltar ao pedido</button>
-            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Continuar para o WhatsApp</button>
+            <button type="button" onclick="continuePixToWhatsApp()" class="w-full rounded-lg bg-green-600 px-4 py-3 font-bold text-white shadow-sm transition hover:bg-green-700">Já paguei — avisar a Sanja no WhatsApp</button>
         </section>
     `;
 
@@ -3239,9 +3280,10 @@ function continuePixToWhatsApp() {
         showToast('O total mudou. Confira o pedido e gere o Pix novamente.');
         return;
     }
-    checkoutData.pixPaymentScreen = false;
-    checkoutData.pixContinueToWhatsApp = true;
-    sendToWhatsApp();
+    const message = `Olá! Acabei de realizar o Pix do pedido ${checkoutData.pixPaymentReference}, no valor de ${formatCurrency(checkoutData.pixPaymentAmount)}. Podem conferir o recebimento, por favor?`;
+    const url = `https://api.whatsapp.com/send?phone=553591142433&text=${encodeURIComponent(message)}`;
+    const whatsappWindow = window.open(url, '_blank');
+    if (!whatsappWindow) window.location.href = url;
 }
 
 function setPaymentMethod(method) {
@@ -3271,7 +3313,7 @@ function updateCheckoutForm() {
 }
 
 async function sendToWhatsApp() {
-    if (isClosedToday()) {
+    if (isOrderingClosedNow()) {
         closeCheckout();
         openClosedDayModal();
         return;
@@ -3285,10 +3327,9 @@ async function sendToWhatsApp() {
         return;
     }
 
-    // Reserve a WhatsApp tab synchronously for non-Pix orders and the second Pix step,
-    // so iOS Safari and other browsers are less likely to block the navigation.
-    const shouldOpenWhatsAppNow = checkoutData.paymentMethod !== 'Pix' || checkoutData.pixContinueToWhatsApp;
-    const whatsappWindow = shouldOpenWhatsAppNow ? window.open('about:blank', '_blank') : null;
+    // Reserve a WhatsApp tab synchronously so browsers do not block it after async work.
+    // For Pix, the order is sent first and the Pix screen remains in the original tab.
+    const whatsappWindow = window.open('about:blank', '_blank');
     if (whatsappWindow) {
         try {
             whatsappWindow.document.title = 'Preparando seu pedido';
@@ -3307,15 +3348,51 @@ async function sendToWhatsApp() {
         }
     }
 
-    const total = getCartTotal() + getDeliveryFee();
-    if (checkoutData.paymentMethod === 'Pix' && !checkoutData.pixContinueToWhatsApp) {
-        try {
-            showPixPaymentScreen(total);
-        } catch (error) {
-            console.error('Não foi possível gerar o QR Code Pix:', error);
-            alert(error?.message || 'Não foi possível gerar o Pix. Tente novamente.');
-        }
+    // Revalidar após uma eventual consulta de rota: o checkout pode ter atravessado o horário limite.
+    if (isOrderingClosedNow()) {
+        if (whatsappWindow && !whatsappWindow.closed) whatsappWindow.close();
+        closeCheckout();
+        openClosedDayModal();
         return;
+    }
+
+    const total = getCartTotal() + getDeliveryFee();
+    let pixPaymentUrl = '';
+    if (checkoutData.paymentMethod === 'Pix') {
+        if (!checkoutData.pixShortCode) checkoutData.pixShortCode = createPixShortCode();
+        try {
+            const amount = Number(total.toFixed(2));
+            if (!checkoutData.pixPaymentReference || Number(checkoutData.pixPaymentAmount) !== amount || !checkoutData.pixPaymentPayload) {
+                checkoutData.pixPaymentReference = createPixOrderCode();
+                checkoutData.pixShortCode = createPixShortCode();
+                checkoutData.pixPaymentAmount = amount;
+                checkoutData.pixPaymentPayload = window.SanjaPixQR.buildPixPayload({
+                    key: SANJA_PIX_CONFIG.key, amount, merchantName: SANJA_PIX_CONFIG.merchantName,
+                    merchantCity: SANJA_PIX_CONFIG.merchantCity, txid: checkoutData.pixPaymentReference
+                });
+                checkoutData.pixPaymentScreen = false;
+                checkoutData.pixOrderSupabaseId = null;
+                checkoutData.pixOrderRegistrationPromise = null;
+                saveCheckoutDraft();
+            }
+        } catch (error) {
+            if (whatsappWindow && !whatsappWindow.closed) whatsappWindow.close();
+            console.error('Não foi possível preparar o Pix:', error);
+            alert(error?.message || 'Não foi possível preparar o Pix. Tente novamente.');
+            return;
+        }
+        saveCheckoutDraft();
+        // O registro no Supabase continua em segundo plano para impressão, mas o link Pix
+        // é reconstruído localmente e não depende de lookup ou resposta do banco.
+        registerPixOrderForPrinting();
+        const compactToken = encodeCompactPixLink(checkoutData.pixPaymentAmount, checkoutData.pixPaymentReference);
+        if (compactToken) {
+            pixPaymentUrl = 'https://sanjapizzaria.com.br/p/' + compactToken;
+        } else {
+            // Compatibilidade com rascunhos antigos guardados no navegador.
+            const fallbackParams = new URLSearchParams({ v: Number(checkoutData.pixPaymentAmount).toFixed(2), r: checkoutData.pixPaymentReference });
+            pixPaymentUrl = 'https://sanjapizzaria.com.br/pix.html?' + fallbackParams.toString();
+        }
     }
     checkoutData.pixContinueToWhatsApp = false;
     const mapsUrl = checkoutData.location
@@ -3331,8 +3408,13 @@ async function sendToWhatsApp() {
         minute: '2-digit'
     });
 
-    let msg = `*--- 🍕 NOVO PEDIDO 🍕 ---*\n`;
+    let msg = checkoutData.paymentMethod === 'Pix'
+        ? `*--- ⏳ PEDIDO AGUARDANDO PAGAMENTO ---*\n`
+        : `*--- 🍕 NOVO PEDIDO 🍕 ---*\n`;
     msg += `*📅 Data:* ${dateTime}\n\n`;
+    if (checkoutData.paymentMethod === 'Pix' && checkoutData.pixPaymentPayload) {
+        msg += 'Fa\u00e7a o pagamento Pix aqui: ' + pixPaymentUrl + '\n\n';
+    }
 
     msg += `*🛒 ITENS DO PEDIDO:*\n`;
     cart.forEach(item => {
@@ -3377,14 +3459,13 @@ async function sendToWhatsApp() {
     }
 
     msg += `*• Pagamento:* ${checkoutData.paymentMethod}\n`;
-    if (checkoutData.paymentMethod === 'Pix') {
-        msg += '*Código do pedido/Pix:* ' + checkoutData.pixPaymentReference + '\n';
-        msg += '*Status do pagamento:* Aguardando conferência manual do recebimento antes do preparo.\n';
-    }
+
+
     msg += '\n';
 
     msg += `*--------------------------*\n`;
     msg += `_Sanja Pizzaria agradece a preferência!_ 🔥`;
+
 
     // Gera um ID de transação único (timestamp) para registrar como compra finalizada no GA4
     const transactionId = 'WA_' + new Date().getTime();
@@ -3446,6 +3527,8 @@ async function sendToWhatsApp() {
         clearTimeout(persistenceTimeout);
     }
 
+    // For Pix, the full order message is opened in WhatsApp before payment.
+    // The customer must tap Send in WhatsApp, then return to the original Pix screen.
     // If the new tab was blocked or closed, redirect the current tab instead.
     if (whatsappWindow && !whatsappWindow.closed) {
         whatsappWindow.location.href = url;
@@ -3458,12 +3541,40 @@ async function sendToWhatsApp() {
 // ==========================================
 // 7.5 DIA FECHADO (SEGUNDA-FEIRA)
 // ==========================================
+function getSanjaBusinessClock(now = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Sao_Paulo', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(now);
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const weekday = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }[values.weekday];
+    return { day: weekday, minutes: Number(values.hour) * 60 + Number(values.minute) };
+}
+
 function isClosedToday() {
-    return new Date().getDay() === 1; // 0 = domingo, 1 = segunda... (FECHADO ÀS SEGUNDAS)
+    return getSanjaBusinessClock().day === 1; // A pizzaria não abre às segundas-feiras.
+}
+
+function isOrderingClosedNow(now = new Date()) {
+    const clock = getSanjaBusinessClock(now);
+    if (clock.day === 1) return true;
+    // Não aceita pedidos antes das 18h nem nos cinco minutos finais do expediente.
+    const cutoffMinutes = [0, 5, 6].includes(clock.day) ? (23 * 60 + 55) : (22 * 60 + 55);
+    return clock.minutes < (18 * 60) || clock.minutes >= cutoffMinutes;
 }
 
 function openClosedDayModal() {
     const modal = document.getElementById('closed-day-modal');
+    const title = document.getElementById('closed-day-title');
+    const message = document.getElementById('closed-day-message');
+    const businessClock = getSanjaBusinessClock();
+    const weeklyClosed = businessClock.day === 1;
+    const beforeOpening = !weeklyClosed && businessClock.minutes < (18 * 60);
+    if (title) title.textContent = weeklyClosed ? 'Hoje estamos fechados' : (beforeOpening ? 'Ainda não estamos recebendo pedidos' : 'Pedidos encerrados por hoje');
+    if (message) message.textContent = weeklyClosed
+        ? 'Não trabalhamos às segundas-feiras. Voltamos no próximo dia de funcionamento, a partir das 18h!'
+        : (beforeOpening
+            ? 'Nosso atendimento começa às 18h. Volte a partir desse horário para finalizar seu pedido.'
+            : 'Nosso horário de pedidos de hoje foi encerrado para que a equipe consiga concluir a produção no horário. Voltamos no próximo dia de funcionamento, a partir das 18h!');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.classList.add('modal-open');
