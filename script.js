@@ -418,40 +418,40 @@ const COMBOS = [
         id: "kids",
         name: "Combo Kids",
         badge: "Kids",
-        desc: "Um combo especial para a criançada: burguinho acompanhado de batata frita e refrigerante de 200 ml.",
-        itens: ["1 Burguinho", "Batata frita", "Refrigerante 200 ml"],
+        desc: "Um combo especial para a criançada: burguinho acompanhado de batata frita e Coca-Cola de 200 ml.",
+        itens: ["1 Burguinho", "Batata frita", "Coca-Cola 200 ml"],
         price: 20.00,
         obs: "",
         img: "assets/combos/combokids.webp",
         type: "combo",
         directAdd: true,
-        details: "1 Burguinho (pão, hambúrguer, maionese, mussarela e batata palha) + batata frita + refrigerante 200 ml."
+        details: "1 Burguinho (pão, hambúrguer, maionese, mussarela e batata palha) + batata frita + Coca-Cola 200 ml."
     },
     {
         id: "casal-lanches",
         name: "Combo Casal",
         badge: "Casal",
-        desc: "Perfeito para dividir! Dois hambúrgueres caprichados, batata frita, calabresa acebolada e refrigerante de 600 ml.",
-        itens: ["1 X-Salada", "1 X-Bacon", "Batata frita", "Calabresa acebolada", "Refrigerante 600 ml"],
+        desc: "Perfeito para dividir! Dois hambúrgueres caprichados, batata frita, calabresa acebolada e Coca-Cola de 600 ml.",
+        itens: ["1 X-Salada", "1 X-Bacon", "Batata frita", "Calabresa acebolada", "Coca-Cola 600 ml"],
         price: 62.50,
         obs: "",
         img: "assets/combos/combocasal.webp",
         type: "combo",
         directAdd: true,
-        details: "1 X-Salada + 1 X-Bacon + batata frita + calabresa acebolada + refrigerante 600 ml."
+        details: "1 X-Salada + 1 X-Bacon + batata frita + calabresa acebolada + Coca-Cola 600 ml."
     },
     {
         id: "familia-lanches",
         name: "Combo Família",
         badge: "Família",
-        desc: "Uma opção completa para reunir todo mundo: quatro hambúrgueres, batata frita, calabresa, mandioca frita e refrigerante de 2 litros.",
-        itens: ["2 X-Saladas", "2 X-Búrgueres", "Batata frita", "Calabresa", "Mandioca frita", "Refrigerante 2 L"],
+        desc: "Uma opção completa para reunir todo mundo: quatro hambúrgueres, batata frita, calabresa, mandioca frita e Guaraná Antarctica de 2 litros.",
+        itens: ["2 X-Saladas", "2 X-Búrgueres", "Batata frita", "Calabresa", "Mandioca frita", "Guaraná Antarctica 2 L"],
         price: 105.00,
         obs: "",
         img: "assets/combos/combofamilia.webp",
         type: "combo",
         directAdd: true,
-        details: "2 X-Saladas + 2 X-Búrgueres + batata frita + calabresa + mandioca frita + refrigerante 2 L."
+        details: "2 X-Saladas + 2 X-Búrgueres + batata frita + calabresa + mandioca frita + Guaraná Antarctica 2 L."
     }
 ];
 
