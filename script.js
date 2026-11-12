@@ -415,50 +415,54 @@ const schedulePromoReminder = () => {
 
 const COMBOS = [
     {
-        id: "individual",
-        name: "Combo Individual",
-        badge: "Individual",
-        desc: "A simplicidade que conquista no primeiro pedaço. 🍕\nPizza na lenha, massa artesanal + refri gelado,\ncombinação perfeita!",
-        itens: ["Pizza 25cm · 6 fatias", "Guaraná Antarctica Lata"],
-        price: 49.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/comboindividual.webp",
-        type: "combo"
+        id: "kids",
+        name: "Combo Kids",
+        badge: "Kids",
+        desc: "Um combo especial para a criançada: burguinho acompanhado de batata frita e refrigerante de 200 ml.",
+        itens: ["1 Burguinho", "Batata frita", "Refrigerante 200 ml"],
+        price: 20.00,
+        obs: "",
+        img: "assets/combos/combokids.webp",
+        type: "combo",
+        directAdd: true,
+        details: "1 Burguinho (pão, hambúrguer, maionese, mussarela e batata palha) + batata frita + refrigerante 200 ml."
     },
     {
-        id: "casal",
+        id: "casal-lanches",
         name: "Combo Casal",
         badge: "Casal",
-        desc: "Pizza de 25 cm com 6 fatias e 1 sabor à escolha, acompanhada de Guaraná Antarctica de 2 litros.",
-        itens: ["Pizza 25cm - 6 fatias, 1 sabor à escolha", "Guaraná Antarctica 2L"],
-        price: 45.00,
-        obs: "Borda recheada não inclusa; se desejar, pode ser adicionada à parte. Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/combocasal.webp",
-        type: "combo"
+        desc: "Perfeito para dividir! Dois hambúrgueres caprichados, batata frita, calabresa acebolada e refrigerante de 600 ml.",
+        itens: ["1 X-Salada", "1 X-Bacon", "Batata frita", "Calabresa acebolada", "Refrigerante 600 ml"],
+        price: 62.50,
+        obs: "",
+        img: "assets/combos/combocasal.webp",
+        type: "combo",
+        directAdd: true,
+        details: "1 X-Salada + 1 X-Bacon + batata frita + calabresa acebolada + refrigerante 600 ml."
     },
     {
-        id: "familia",
+        id: "familia-lanches",
         name: "Combo Família",
         badge: "Família",
-        desc: "Combo Família que resolve! 👨‍👩‍👧‍👦\nPizza na lenha, massa artesanal e sabor incomparável!",
-        itens: ["Pizza 35cm · 8 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
-        price: 89.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/combofamilia2.webp",
-        type: "combo"
-    },
-    {
-        id: "perfeito",
-        name: "Combo Perfeito",
-        badge: "Perfeito",
-        desc: "Experiência completa 🍕✨\nNa lenha, massa artesanal. Não fique na vontade! 😋",
-        itens: ["Pizza 35cm · 8 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
-        price: 115.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/comboperfeito2.webp",
-        type: "combo"
+        desc: "Uma opção completa para reunir todo mundo: quatro hambúrgueres, batata frita, calabresa, mandioca frita e refrigerante de 2 litros.",
+        itens: ["2 X-Saladas", "2 X-Búrgueres", "Batata frita", "Calabresa", "Mandioca frita", "Refrigerante 2 L"],
+        price: 105.00,
+        obs: "",
+        img: "assets/combos/combofamilia.webp",
+        type: "combo",
+        directAdd: true,
+        details: "2 X-Saladas + 2 X-Búrgueres + batata frita + calabresa + mandioca frita + refrigerante 2 L."
     }
 ];
+
+// O combo de 10 esfihas tamb?m ganha destaque na grade principal de combos.
+COMBOS.push({
+    ...ESFIHAS_SALGADAS.find(item => item.id === 141),
+    badge: "10 ESFIHAS",
+    desc: "Escolha 10 esfihas doces e/ou salgadas e monte sua combina\u00e7\u00e3o favorita.",
+    itens: ["10 esfihas doces e/ou salgadas"],
+    obs: "Escolha e combine os sabores no pr\u00f3ximo passo."
+});
 
 const TRADITIONAL_SABORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47];
 const SWEET_SABORES = [50, 51, 52, 53, 54, 55, 56, 57, 58];
@@ -1145,7 +1149,13 @@ const renderDrinkCard = (drink) => {
 const renderComboCard = (combo) => {
     const card = document.createElement('div');
     card.className = "flex items-center gap-4 p-4 bg-red-50/20 border-2 border-red-200 rounded-3xl shadow-sm hover:shadow-md hover:border-red-500 transition-[transform,box-shadow,border-color] duration-300 cursor-pointer group relative z-10";
-    card.onclick = () => openComboModal(combo);
+    card.onclick = () => {
+        if (combo.id === 141) {
+            openEsfihaComboModal(combo);
+            return;
+        }
+        openComboModal(combo);
+    };
 
     const itemsHtml = combo.itens.map(item => `
         <li class="flex items-start gap-1.5 text-xs text-gray-600 font-medium">
@@ -1756,7 +1766,39 @@ function renderComboStep() {
 
     updateComboPrice();
 
-    if (comboStep === 1) {
+    if (currentCombo.directAdd) {
+        backBtn.classList.add('hidden');
+        summaryContainer.classList.add('hidden');
+        nextText.textContent = "Adicionar ao carrinho";
+        nextIcon.setAttribute('data-lucide', 'shopping-cart');
+        nextBtn.disabled = false;
+
+        const itemsHtml = currentCombo.itens.map(item => `
+            <div class="flex items-center gap-3 bg-white p-3.5 sm:p-4 rounded-xl border border-gray-900">
+                <i data-lucide="check-circle" class="w-5 h-5 text-red-600 shrink-0 stroke-[2]"></i>
+                <span class="text-sm font-bold text-gray-900">${item}</span>
+            </div>
+        `).join('');
+
+        content.innerHTML = `
+            <div class="animate-in fade-in duration-200">
+                <div class="relative h-56 sm:h-60 w-full bg-gray-100 overflow-hidden shrink-0">
+                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
+                </div>
+                <div class="px-6 py-5 sm:px-7 sm:py-6 space-y-4">
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 tracking-wide font-serif mb-2 uppercase">${currentCombo.name}</h3>
+                        <p class="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal whitespace-pre-line">${currentCombo.desc}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-normal text-gray-700 uppercase tracking-wider block mb-3">O QUE ESTÁ INCLUSO?</span>
+                        <div class="space-y-2.5">${itemsHtml}</div>
+                    </div>
+                    <p class="text-xs text-gray-500 leading-relaxed">${currentCombo.details}</p>
+                </div>
+            </div>
+        `;
+    } else if (comboStep === 1) {
         backBtn.classList.add('hidden');
         nextText.textContent = "Escolher sabor";
         nextIcon.setAttribute('data-lucide', 'arrow-right');
@@ -1983,6 +2025,11 @@ function renderComboStep() {
 
 
 function nextComboStep() {
+    if (currentCombo && currentCombo.directAdd) {
+        addToCart({ name: currentCombo.name, price: currentCombo.price, details: currentCombo.details, type: 'combo', isCombo: true });
+        closeComboModal();
+        return;
+    }
     if (comboStep === 1) {
         comboStep = 2;
         renderComboStep();
