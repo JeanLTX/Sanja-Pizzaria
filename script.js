@@ -156,6 +156,8 @@ const PORCOES_MEIA = [
     { id: 111, name: "½ Mandioca c/ contra filé acebolado", category: "Porções - Meia", desc: "Mandioca frita com contra filé.", img: "assets/mandioca_com_contrafile.jpg", type: "drink", prices: { P: 35.00, G: 40.00 }, options: { P: { label: "P", sub: "" }, G: { label: "G", sub: "" } } }
 ];
 
+const ESFIHA_COMBO_PRICE = 45.00;
+
 const ESFIHAS_SALGADAS = [
     { id: 120, name: "FRANGO", category: "Esfihas Salgadas", desc: "Frango e mussarela.", img: "assets/esfihas/esfihafrango.webp", type: "drink", price: 5.00 },
     { id: 121, name: "FRANGO C/ CATUPIRY", category: "Esfihas Salgadas", desc: "Frango e catupiry.", img: "assets/esfihas/esfihafrango_com_catupiry.webp", type: "drink", price: 6.00 },
@@ -178,7 +180,7 @@ const ESFIHAS_SALGADAS = [
     { id: 138, name: "4 QUEIJOS C/ BACON", category: "Esfihas Salgadas", desc: "Mussarela, provolone, parmesão e bacon.", img: "assets/esfihas/4queijos_com_bacon.webp", type: "drink", price: 6.50 },
     { id: 139, name: "OPÇÃO LIGHT", category: "Esfihas Salgadas", desc: "Palmito e mussarela.", img: "assets/esfihas/opçãolight.webp", type: "drink", price: 5.00 },
     { id: 140, name: "PALMITO ESPECIAL", category: "Esfihas Salgadas", desc: "Palmito, queijo e milho.", img: "assets/esfihas/palmitoespecial.webp", type: "drink", price: 6.00 },
-    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas doces e/ou salgadas de sua preferência. Você pode combinar e repetir sabores. Combo por R$ 45,00.", img: "assets/esfihas/10esfiha.webp", type: "drink", price: 45.00 }
+    { id: 141, name: "COMBO DE 10 ESFIHAS", category: "Esfihas Salgadas", desc: "Escolha 10 esfihas doces e/ou salgadas de sua preferência. Você pode combinar e repetir sabores. Combo por R$ 45,00.", img: "assets/esfihas/10esfiha.webp", type: "drink", price: ESFIHA_COMBO_PRICE }
 ];
 
 const ESFIHAS_DOCES = [
@@ -413,50 +415,54 @@ const schedulePromoReminder = () => {
 
 const COMBOS = [
     {
-        id: "individual",
-        name: "Combo Individual",
-        badge: "Individual",
-        desc: "A simplicidade que conquista no primeiro pedaço. 🍕\nPizza na lenha, massa artesanal + refri gelado,\ncombinação perfeita!",
-        itens: ["Pizza 25cm · 6 fatias", "Guaraná Antarctica Lata"],
-        price: 49.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/comboindividual.webp",
-        type: "combo"
+        id: "kids",
+        name: "Combo Kids",
+        badge: "Kids",
+        desc: "Um combo especial para a criançada: burguinho acompanhado de batata frita e Coca-Cola de 200 ml.",
+        itens: ["1 Burguinho", "Batata frita", "Coca-Cola 200 ml"],
+        price: 20.00,
+        obs: "",
+        img: "assets/combos/combokids.webp",
+        type: "combo",
+        directAdd: true,
+        details: "1 Burguinho (pão, hambúrguer, maionese, mussarela e batata palha) + batata frita + Coca-Cola 200 ml."
     },
     {
-        id: "casal",
+        id: "casal-lanches",
         name: "Combo Casal",
         badge: "Casal",
-        desc: "Pizza de 25 cm com 6 fatias e 1 sabor à escolha, acompanhada de Guaraná Antarctica de 2 litros.",
-        itens: ["Pizza 25cm - 6 fatias, 1 sabor à escolha", "Guaraná Antarctica 2L"],
-        price: 45.00,
-        obs: "Borda recheada não inclusa; se desejar, pode ser adicionada à parte. Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/combocasal.webp",
-        type: "combo"
+        desc: "Perfeito para dividir! Dois hambúrgueres caprichados, batata frita, calabresa acebolada e Coca-Cola de 600 ml.",
+        itens: ["1 X-Salada", "1 X-Bacon", "Batata frita", "Calabresa acebolada", "Coca-Cola 600 ml"],
+        price: 62.50,
+        obs: "",
+        img: "assets/combos/combocasal.webp",
+        type: "combo",
+        directAdd: true,
+        details: "1 X-Salada + 1 X-Bacon + batata frita + calabresa acebolada + Coca-Cola 600 ml."
     },
     {
-        id: "familia",
+        id: "familia-lanches",
         name: "Combo Família",
         badge: "Família",
-        desc: "Combo Família que resolve! 👨‍👩‍👧‍👦\nPizza na lenha, massa artesanal e sabor incomparável!",
-        itens: ["Pizza 35cm · 8 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
-        price: 89.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/combofamilia2.webp",
-        type: "combo"
-    },
-    {
-        id: "perfeito",
-        name: "Combo Perfeito",
-        badge: "Perfeito",
-        desc: "Experiência completa 🍕✨\nNa lenha, massa artesanal. Não fique na vontade! 😋",
-        itens: ["Pizza 35cm · 8 fatias", "Pizza doce 25cm · 4 fatias", "Refrigerante 2L (Fanta ou Guaraná Antarctica)"],
-        price: 115.90,
-        obs: "Válido para pizzas tradicionais, exceto Carne Seca e Atum.",
-        img: "assets/comboperfeito2.webp",
-        type: "combo"
+        desc: "Uma opção completa para reunir todo mundo: quatro hambúrgueres, batata frita, calabresa, mandioca frita e Guaraná Antarctica de 2 litros.",
+        itens: ["2 X-Saladas", "2 X-Búrgueres", "Batata frita", "Calabresa", "Mandioca frita", "Guaraná Antarctica 2 L"],
+        price: 105.00,
+        obs: "",
+        img: "assets/combos/combofamilia.webp",
+        type: "combo",
+        directAdd: true,
+        details: "2 X-Saladas + 2 X-Búrgueres + batata frita + calabresa + mandioca frita + Guaraná Antarctica 2 L."
     }
 ];
+
+// O combo de 10 esfihas tamb?m ganha destaque na grade principal de combos.
+COMBOS.push({
+    ...ESFIHAS_SALGADAS.find(item => item.id === 141),
+    badge: "10 ESFIHAS",
+    desc: "Escolha 10 esfihas doces e/ou salgadas e monte sua combina\u00e7\u00e3o favorita.",
+    itens: ["10 esfihas doces e/ou salgadas"],
+    obs: "Escolha e combine os sabores no pr\u00f3ximo passo."
+});
 
 const TRADITIONAL_SABORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47];
 const SWEET_SABORES = [50, 51, 52, 53, 54, 55, 56, 57, 58];
@@ -1143,7 +1149,13 @@ const renderDrinkCard = (drink) => {
 const renderComboCard = (combo) => {
     const card = document.createElement('div');
     card.className = "flex items-center gap-4 p-4 bg-red-50/20 border-2 border-red-200 rounded-3xl shadow-sm hover:shadow-md hover:border-red-500 transition-[transform,box-shadow,border-color] duration-300 cursor-pointer group relative z-10";
-    card.onclick = () => openComboModal(combo);
+    card.onclick = () => {
+        if (combo.id === 141) {
+            openEsfihaComboModal(combo);
+            return;
+        }
+        openComboModal(combo);
+    };
 
     const itemsHtml = combo.itens.map(item => `
         <li class="flex items-start gap-1.5 text-xs text-gray-600 font-medium">
@@ -1250,6 +1262,8 @@ function openEsfihaComboModal(combo) {
 
     badge.textContent = '10 esfihas doces e/ou salgadas';
     name.textContent = combo.name;
+    const priceDisplay = document.getElementById('esfiha-combo-modal-price');
+    if (priceDisplay) priceDisplay.textContent = formatCurrency(ESFIHA_COMBO_PRICE);
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -1377,7 +1391,7 @@ function renderEsfihaCombo() {
 }
 
 function addEsfihaComboToCart() {
-    if (!currentEsfihaCombo) return;
+    if (!currentEsfihaCombo || currentEsfihaCombo.id !== 141) return;
 
     const variants = getEsfihaComboVariants(currentEsfihaCombo.id === 149);
     const total = getEsfihaComboTotalSelected();
@@ -1394,7 +1408,7 @@ function addEsfihaComboToCart() {
 
     const item = {
         name: currentEsfihaCombo.name,
-        price: currentEsfihaCombo.price,
+        price: ESFIHA_COMBO_PRICE,
         details,
         type: 'combo',
         isCombo: true
@@ -1752,7 +1766,39 @@ function renderComboStep() {
 
     updateComboPrice();
 
-    if (comboStep === 1) {
+    if (currentCombo.directAdd) {
+        backBtn.classList.add('hidden');
+        summaryContainer.classList.add('hidden');
+        nextText.textContent = "Adicionar ao carrinho";
+        nextIcon.setAttribute('data-lucide', 'shopping-cart');
+        nextBtn.disabled = false;
+
+        const itemsHtml = currentCombo.itens.map(item => `
+            <div class="flex items-center gap-3 bg-white p-3.5 sm:p-4 rounded-xl border border-gray-900">
+                <i data-lucide="check-circle" class="w-5 h-5 text-red-600 shrink-0 stroke-[2]"></i>
+                <span class="text-sm font-bold text-gray-900">${item}</span>
+            </div>
+        `).join('');
+
+        content.innerHTML = `
+            <div class="animate-in fade-in duration-200">
+                <div class="relative h-56 sm:h-60 w-full bg-gray-100 overflow-hidden shrink-0">
+                    <img src="${currentCombo.img}" alt="${currentCombo.name}" class="w-full h-full object-cover" onerror="this.src='assets/thumbs/logosemfundo.webp'">
+                </div>
+                <div class="px-6 py-5 sm:px-7 sm:py-6 space-y-4">
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 tracking-wide font-serif mb-2 uppercase">${currentCombo.name}</h3>
+                        <p class="text-xs sm:text-sm text-gray-700 leading-relaxed font-normal whitespace-pre-line">${currentCombo.desc}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-normal text-gray-700 uppercase tracking-wider block mb-3">O QUE ESTÁ INCLUSO?</span>
+                        <div class="space-y-2.5">${itemsHtml}</div>
+                    </div>
+                    <p class="text-xs text-gray-500 leading-relaxed">${currentCombo.details}</p>
+                </div>
+            </div>
+        `;
+    } else if (comboStep === 1) {
         backBtn.classList.add('hidden');
         nextText.textContent = "Escolher sabor";
         nextIcon.setAttribute('data-lucide', 'arrow-right');
@@ -1979,6 +2025,11 @@ function renderComboStep() {
 
 
 function nextComboStep() {
+    if (currentCombo && currentCombo.directAdd) {
+        addToCart({ name: currentCombo.name, price: currentCombo.price, details: currentCombo.details, type: 'combo', isCombo: true });
+        closeComboModal();
+        return;
+    }
     if (comboStep === 1) {
         comboStep = 2;
         renderComboStep();
@@ -3027,15 +3078,21 @@ function renderCheckoutForm() {
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Forma de Pagamento</label>
             <div class="payment-method-grid">
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Pix' ? 'active' : ''}" onclick="setPaymentMethod('Pix')">
-                    <span class="payment-icon payment-icon-pix" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-pix" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m7.2 3.8 4.8 4.8 4.8-4.8a3.4 3.4 0 0 0-4.8 0l-4.8 4.8-2.4-2.4a3.4 3.4 0 0 0-4.8 4.8l4.8 4.8 4.8-4.8"/><path d="m16.8 20.2-4.8-4.8-4.8 4.8a3.4 3.4 0 0 0 4.8 0l4.8-4.8 2.4 2.4a3.4 3.4 0 0 0 4.8-4.8l-4.8-4.8-4.8 4.8"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Pix</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Dinheiro' ? 'active' : ''}" onclick="setPaymentMethod('Dinheiro')">
-                    <span class="payment-icon payment-icon-cash" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-cash" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Dinheiro</span>
                 </div>
                 <div class="payment-method-btn ${checkoutData.paymentMethod === 'Cartão' ? 'active' : ''}" onclick="setPaymentMethod('Cartão')">
-                    <span class="payment-icon payment-icon-card" aria-hidden="true"></span>
+                    <span class="payment-icon payment-icon-card" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="M2 9h20M6 15h4"/></svg>
+                    </span>
                     <span class="text-xs uppercase tracking-tighter">Cartão</span>
                 </div>
             </div>

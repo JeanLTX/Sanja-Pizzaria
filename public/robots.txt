@@ -1,16 +1,14 @@
-# Robots.txt for Sanja Pizzaria
+# Sanja Pizzaria — regras de rastreamento
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://sanjapizzaria.com.br/sitemap.xml
+User-agent: OAI-SearchBot
+Allow: /
 
-# Disallow admin/private areas (if any)
-Disallow: /assets/
-Disallow: /src/
-Disallow: /node_modules/
-Disallow: /package.json
-Disallow: /package-lock.json
-Disallow: /script.js
-Disallow: /style.css
-Disallow: /*.map$
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+Sitemap: https://sanjapizzaria.com.br/sitemap.xml

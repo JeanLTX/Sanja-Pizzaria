@@ -1,6 +1,6 @@
 {
   "name": "jean-print-bridge",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Aplicativo local para impressão de pedidos no Windows.",
   "author": "Impressão",
   "main": "main.js",
@@ -16,13 +16,17 @@
     "appId": "com.jeanlucca.printbridge",
     "productName": "Impressão",
     "asar": true,
+    "icon": "app-icon.ico",
     "files": [
       "main.js",
       "preload.js",
       "renderer.html",
-      "config.example.json"
+      "config.example.json",
+      "app-icon.ico",
+      "app-icon.png"
     ],
     "win": {
+      "icon": "app-icon.ico",
       "target": [
         "nsis"
       ]
